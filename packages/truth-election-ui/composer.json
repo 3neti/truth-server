@@ -1,0 +1,70 @@
+{
+    "name": "lbhurtado/truth-election-ui",
+    "description": "Vue + Inertia UI components and routes for the TRUTH Hybrid Election System.",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-qr-ui"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-qr-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-renderer-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-codec-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-election-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-election-db"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthElectionUi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthElectionUi\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "spatie/laravel-data": "^4.0",
+        "lbhurtado/truth-qr-php": "dev-main",
+        "lbhurtado/truth-election-php": "dev-main"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthElectionUi\\TruthElectionUiServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

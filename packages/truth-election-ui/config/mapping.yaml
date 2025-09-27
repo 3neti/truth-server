@@ -1,0 +1,152 @@
+code: 0102800000
+location_name: 'Currimao, Ilocos Norte'
+district: 2
+marks:
+  # NATIONAL POSITIONS
+  # PRESIDENT (Row A)
+  - key: A1
+    value: 'LD_001'
+  - key: A2
+    value: 'SJ_002'
+  - key: A3
+    value: 'DW_003'
+  - key: A4
+    value: 'MS_004'
+  - key: A5
+    value: 'BP_005'
+  - key: A6
+    value: 'AJ_006'
+
+  # VICE-PRESIDENT (Row B)
+  - key: B1
+    value: 'TH_001'
+  - key: B2
+    value: 'VD_002'
+  - key: B3
+    value: 'CH_003'
+  - key: B4
+    value: 'NP_004'
+  - key: B5
+    value: 'RDJ_005'
+  - key: B6
+    value: 'AH_006'
+
+  # SENATOR (Row C) — First 12 only
+  - key: C1
+    value: 'JD_001'
+  - key: C2
+    value: 'ES_002'
+  - key: C3
+    value: 'MF_003'
+  - key: C4
+    value: 'JL_004'
+  - key: C5
+    value: 'CB_005'
+  - key: C6
+    value: 'SB_006'
+  - key: C7
+    value: 'WS_007'
+  - key: C8
+    value: 'JR_008'
+  - key: C9
+    value: 'MD_009'
+  - key: C10
+    value: 'CT_010'
+  - key: C11
+    value: 'KR_011'
+  - key: C12
+    value: 'NK_012'
+
+  # LOCAL POSITIONS (A–H already used)
+  # GOVERNOR (Row D)
+  - key: D1
+    value: 'EN_001'
+  - key: D2
+    value: 'JB_002'
+  - key: D3
+    value: 'RP_003'
+
+  # VICE-GOVERNOR (Row E)
+  - key: E1
+    value: 'NW_001'
+  - key: E2
+    value: 'MF_002'
+  - key: E3
+    value: 'DK_003'
+  - key: E4
+    value: 'JH_004'
+
+  # BOARD-MEMBER (Row F)
+  - key: F1
+    value: 'RW_001'
+  - key: F2
+    value: 'HB_002'
+  - key: F3
+    value: 'RW_003'
+  - key: F4
+    value: 'DP_004'
+  - key: F5
+    value: 'BDT_005'
+  - key: F6
+    value: 'DJ_006'
+  - key: F7
+    value: 'AD_007'
+  - key: F8
+    value: 'GR_008'
+
+  # REPRESENTATIVE (Row G)
+  - key: G1
+    value: 'JF_001'
+  - key: G2
+    value: 'RW_002'
+  - key: G3
+    value: 'CF_003'
+  - key: G4
+    value: 'DC_004'
+
+  # MAYOR (Row H)
+
+  - key: H1
+    value: 'BC_001'
+  - key: H2
+    value: 'LJ_002'
+  - key: H3
+    value: 'EW_003'
+
+  # VICE-MAYOR (Row I)
+  - key: I1
+    value: 'JKS_001'
+  - key: I2
+    value: 'JL_002'
+  - key: I3
+    value: 'JF_003'
+
+  # COUNCILORS (Row J)
+  - key: J1
+    value: 'ER_001'
+  - key: J2
+    value: 'SG_002'
+  - key: J3
+    value: 'SR_003'
+  - key: J4
+    value: 'MC_004'
+  - key: J5
+    value: 'MS_005'
+  - key: J6
+    value: 'CE_006'
+  - key: J7
+    value: 'GMR_007'
+  - key: J8
+    value: 'DO_008'
+
+  # PARTY-LIST REPRESENTATIVE (Row K)
+  - key: K1
+    value: 'THE_GODFATHER_001'
+  - key: K2
+    value: 'TITANIC_002'
+  - key: K3
+    value: 'THE_DARK_KNIGHT_003'
+  - key: K4
+    value: 'FORREST_GUMP_004'
+  - key: K5
+    value: 'PULP_FICTION_005'
