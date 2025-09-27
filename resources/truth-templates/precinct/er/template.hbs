@@ -1,0 +1,21 @@
+<h2>Vote Tallies</h2>
+
+{{#groupBy tallies key="position_code"}}
+  <h3>{{key}}</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 1em;">
+    <thead>
+      <tr>
+        <th style="text-align: left; border-bottom: 1px solid #ccc;">Candidate</th>
+        <th style="text-align: right; border-bottom: 1px solid #ccc;">Votes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+        <tr>
+          <td>{{candidate_name}}</td>
+          <td style="text-align: right;">{{count}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/groupBy}}

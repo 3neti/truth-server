@@ -8,13 +8,19 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        { "type": "path", "url": "../hybrid-election/packages/*" }
+    ],
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
+        "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "lbhurtado/truth-election-db": "dev-main",
+        "lbhurtado/truth-election-ui": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -82,6 +88,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

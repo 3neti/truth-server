@@ -1,0 +1,857 @@
+{
+    "templateName": "core:precinct/er_qr/template",
+    "format": "pdf",
+    "data": {
+        "tallyMeta": {
+            "id": "01990963-9ce0-7382-9256-c7a85dcfc639",
+            "code": "5KPJBQNCRWNG",
+            "precinct": {
+                "id": "01990963-9972-70e8-a123-53a28d91f193",
+                "code": "CURRIMAO-001",
+                "location_name": "Currimao National High School",
+                "latitude": 17.993217,
+                "longitude": 120.488902,
+                "electoral_inspectors": [
+                    {
+                        "id": "uuid-juan",
+                        "name": "Juan dela Cruz",
+                        "role": "chairperson"
+                    },
+                    {
+                        "id": "uuid-maria",
+                        "name": "Maria Santos",
+                        "role": "member"
+                    },
+                    {
+                        "id": "uuid-pedro",
+                        "name": "Pedro Reyes",
+                        "role": "member"
+                    }
+                ],
+                "watchers_count": null,
+                "precincts_count": null,
+                "registered_voters_count": null,
+                "actual_voters_count": null,
+                "ballots_in_box_count": null,
+                "unused_ballots_count": null,
+                "spoiled_ballots_count": null,
+                "void_ballots_count": null
+            },
+            "tallies": [
+                {
+                    "position_code": "PRESIDENT",
+                    "candidate_code": "AJ_006",
+                    "candidate_name": "Angelina Jolie",
+                    "count": 3
+                },
+                {
+                    "position_code": "PRESIDENT",
+                    "candidate_code": "DW_003",
+                    "candidate_name": "Denzel Washington",
+                    "count": 1
+                },
+                {
+                    "position_code": "PRESIDENT",
+                    "candidate_code": "SJ_002",
+                    "candidate_name": "Scarlett Johansson",
+                    "count": 1
+                },
+                {
+                    "position_code": "VICE-PRESIDENT",
+                    "candidate_code": "TH_001",
+                    "candidate_name": "Tom Hanks",
+                    "count": 2
+                },
+                {
+                    "position_code": "VICE-PRESIDENT",
+                    "candidate_code": "RDJ_005",
+                    "candidate_name": "Robert Downey Jr.",
+                    "count": 2
+                },
+                {
+                    "position_code": "VICE-PRESIDENT",
+                    "candidate_code": "AH_006",
+                    "candidate_name": "Anne Hathaway",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "AA_018",
+                    "candidate_name": "Amy Adams",
+                    "count": 4
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "BC_015",
+                    "candidate_name": "Benedict Cumberbatch",
+                    "count": 3
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "MA_035",
+                    "candidate_name": "Mahershala Ali",
+                    "count": 3
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "MF_003",
+                    "candidate_name": "Morgan Freeman",
+                    "count": 3
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "FP_038",
+                    "candidate_name": "Florence Pugh",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "LN_048",
+                    "candidate_name": "Lupita Nyong'o",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "OS_028",
+                    "candidate_name": "Octavia Spencer",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "SB_006",
+                    "candidate_name": "Sandra Bullock",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "A_044",
+                    "candidate_name": "Awkwafina",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "KR_011",
+                    "candidate_name": "Keanu Reeves",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "CB_025",
+                    "candidate_name": "Chadwick Boseman",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "RM_024",
+                    "candidate_name": "Rachel McAdams",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "SH_030",
+                    "candidate_name": "Salma Hayek",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "CB_005",
+                    "candidate_name": "Christian Bale",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "ZS_014",
+                    "candidate_name": "Zoe Saldana",
+                    "count": 2
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "ES_002",
+                    "candidate_name": "Emma Stone",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "GG_016",
+                    "candidate_name": "Gal Gadot",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "MD_009",
+                    "candidate_name": "Matt Damon",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "WS_007",
+                    "candidate_name": "Will Smith",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "EB_022",
+                    "candidate_name": "Emily Blunt",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JC_045",
+                    "candidate_name": "Jessica Chastain",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JD_001",
+                    "candidate_name": "Johnny Depp",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JM_027",
+                    "candidate_name": "Jason Momoa",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "RG_029",
+                    "candidate_name": "Ryan Gosling",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "DC_019",
+                    "candidate_name": "Daniel Craig",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "EG_036",
+                    "candidate_name": "Eva Green",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JG_017",
+                    "candidate_name": "Jake Gyllenhaal",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JR_008",
+                    "candidate_name": "Julia Roberts",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "RM_040",
+                    "candidate_name": "Rami Malek",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "TH_047",
+                    "candidate_name": "Tom Holland",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "AG_046",
+                    "candidate_name": "Andrew Garfield",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "ATJ_041",
+                    "candidate_name": "Anya Taylor-Joy",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "BC_049",
+                    "candidate_name": "Bryan Cranston",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "CE_023",
+                    "candidate_name": "Chris Evans",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "PP_039",
+                    "candidate_name": "Pedro Pascal",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "HM_050",
+                    "candidate_name": "Helen Mirren",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "JL_004",
+                    "candidate_name": "Jennifer Lawrence",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "MR_021",
+                    "candidate_name": "Mark Ruffalo",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "TC_037",
+                    "candidate_name": "Timothee Chalamet",
+                    "count": 1
+                },
+                {
+                    "position_code": "SENATOR",
+                    "candidate_code": "TS_026",
+                    "candidate_name": "Tilda Swinton",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-PARTY-LIST",
+                    "candidate_code": "THE_MATRIX_008",
+                    "candidate_name": "The Matrix",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-PARTY-LIST",
+                    "candidate_code": "TENET_040",
+                    "candidate_name": "Tenet",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-PARTY-LIST",
+                    "candidate_code": "LUCA_148",
+                    "candidate_name": "Luca",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-PARTY-LIST",
+                    "candidate_code": "THE_MARTIAN_044",
+                    "candidate_name": "The Martian",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-PARTY-LIST",
+                    "candidate_code": "THE_GREEN_MILE_081",
+                    "candidate_name": "The Green Mile",
+                    "count": 1
+                },
+                {
+                    "position_code": "GOVERNOR-ILN",
+                    "candidate_code": "EN_001",
+                    "candidate_name": "Edward Norton",
+                    "count": 4
+                },
+                {
+                    "position_code": "GOVERNOR-ILN",
+                    "candidate_code": "RP_003",
+                    "candidate_name": "Rosamund Pike",
+                    "count": 1
+                },
+                {
+                    "position_code": "VICE-GOVERNOR-ILN",
+                    "candidate_code": "MF_002",
+                    "candidate_name": "Michael Fassbender",
+                    "count": 2
+                },
+                {
+                    "position_code": "VICE-GOVERNOR-ILN",
+                    "candidate_code": "DK_003",
+                    "candidate_name": "Daniel Kaluuya",
+                    "count": 1
+                },
+                {
+                    "position_code": "VICE-GOVERNOR-ILN",
+                    "candidate_code": "NW_001",
+                    "candidate_name": "Naomi Watts",
+                    "count": 1
+                },
+                {
+                    "position_code": "VICE-GOVERNOR-ILN",
+                    "candidate_code": "JH_004",
+                    "candidate_name": "Jennifer Hudson",
+                    "count": 1
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "DP_004",
+                    "candidate_name": "Dev Patel",
+                    "count": 2
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "RW_001",
+                    "candidate_name": "Reese Witherspoon",
+                    "count": 2
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "DJ_006",
+                    "candidate_name": "Dakota Johnson",
+                    "count": 2
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "BDT_005",
+                    "candidate_name": "Benicio Del Toro",
+                    "count": 1
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "HB_002",
+                    "candidate_name": "Halle Berry",
+                    "count": 1
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "RW_003",
+                    "candidate_name": "Robin Wright",
+                    "count": 1
+                },
+                {
+                    "position_code": "BOARD-MEMBER-ILN",
+                    "candidate_code": "AD_007",
+                    "candidate_name": "Adam Driver",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-ILN-1",
+                    "candidate_code": "DC_004",
+                    "candidate_name": "Don Cheadle",
+                    "count": 3
+                },
+                {
+                    "position_code": "REPRESENTATIVE-ILN-1",
+                    "candidate_code": "JF_001",
+                    "candidate_name": "Jodie Foster",
+                    "count": 1
+                },
+                {
+                    "position_code": "REPRESENTATIVE-ILN-1",
+                    "candidate_code": "RW_002",
+                    "candidate_name": "Rachel Weisz",
+                    "count": 1
+                },
+                {
+                    "position_code": "MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "BC_001",
+                    "candidate_name": "Billy Crudup",
+                    "count": 2
+                },
+                {
+                    "position_code": "MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "LJ_002",
+                    "candidate_name": "Lily James",
+                    "count": 2
+                },
+                {
+                    "position_code": "MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "EW_003",
+                    "candidate_name": "Emily Watson",
+                    "count": 1
+                },
+                {
+                    "position_code": "VICE-MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "JKS_001",
+                    "candidate_name": "J.K. Simmons",
+                    "count": 2
+                },
+                {
+                    "position_code": "VICE-MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "JL_002",
+                    "candidate_name": "Jared Leto",
+                    "count": 2
+                },
+                {
+                    "position_code": "VICE-MAYOR-ILN-CURRIMAO",
+                    "candidate_code": "JF_003",
+                    "candidate_name": "Jamie Foxx",
+                    "count": 1
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "CE_006",
+                    "candidate_name": "Chiwetel Ejiofor",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "DO_008",
+                    "candidate_name": "David Oyelowo",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "ER_001",
+                    "candidate_name": "Eddie Redmayne",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "GMR_007",
+                    "candidate_name": "Gugu Mbatha-Raw",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "MC_004",
+                    "candidate_name": "Marion Cotillard",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "MS_005",
+                    "candidate_name": "Michael Shannon",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "SG_002",
+                    "candidate_name": "Stephen Graham",
+                    "count": 5
+                },
+                {
+                    "position_code": "COUNCILOR-ILN-CURRIMAO",
+                    "candidate_code": "SR_003",
+                    "candidate_name": "Saoirse Ronan",
+                    "count": 5
+                }
+            ],
+            "signatures": [
+                {
+                    "id": "uuid-juan",
+                    "name": "Juan dela Cruz",
+                    "role": "chairperson"
+                },
+                {
+                    "id": "uuid-maria",
+                    "name": "Maria Santos",
+                    "role": "member"
+                },
+                {
+                    "id": "uuid-pedro",
+                    "name": "Pedro Reyes",
+                    "role": "member"
+                }
+            ],
+            "created_at": "2025-09-02T15:45:47+08:00",
+            "updated_at": "2025-09-02T15:45:52+08:00",
+            "last_ballot": {
+                "id": "3316fd7e-44ab-4db5-97bc-c79711e6015d",
+                "code": "BAL-005",
+                "votes": [
+                    {
+                        "position": {
+                            "code": "PRESIDENT",
+                            "name": "President of the Philippines",
+                            "level": "national",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "AJ_006",
+                                "name": "Angelina Jolie",
+                                "alias": "AJ"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "VICE-PRESIDENT",
+                            "name": "Vice President of the Philippines",
+                            "level": "national",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "RDJ_005",
+                                "name": "Robert Downey Jr.",
+                                "alias": "RDJ"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "SENATOR",
+                            "name": "Senator of the Philippines",
+                            "level": "national",
+                            "count": 12
+                        },
+                        "candidates": [
+                            {
+                                "code": "AA_018",
+                                "name": "Amy Adams",
+                                "alias": "AA"
+                            },
+                            {
+                                "code": "A_044",
+                                "name": "Awkwafina",
+                                "alias": "A"
+                            },
+                            {
+                                "code": "BC_015",
+                                "name": "Benedict Cumberbatch",
+                                "alias": "BC"
+                            },
+                            {
+                                "code": "CB_005",
+                                "name": "Christian Bale",
+                                "alias": "CB"
+                            },
+                            {
+                                "code": "HM_050",
+                                "name": "Helen Mirren",
+                                "alias": "HM"
+                            },
+                            {
+                                "code": "JL_004",
+                                "name": "Jennifer Lawrence",
+                                "alias": "JL"
+                            },
+                            {
+                                "code": "LN_048",
+                                "name": "Lupita Nyong'o",
+                                "alias": "LN"
+                            },
+                            {
+                                "code": "MF_003",
+                                "name": "Morgan Freeman",
+                                "alias": "MF"
+                            },
+                            {
+                                "code": "MR_021",
+                                "name": "Mark Ruffalo",
+                                "alias": "MR"
+                            },
+                            {
+                                "code": "TC_037",
+                                "name": "Timothee Chalamet",
+                                "alias": "TC"
+                            },
+                            {
+                                "code": "TS_026",
+                                "name": "Tilda Swinton",
+                                "alias": "TS"
+                            },
+                            {
+                                "code": "ZS_014",
+                                "name": "Zoe Saldana",
+                                "alias": "ZS"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "REPRESENTATIVE-PARTY-LIST",
+                            "name": "Party-list Representative",
+                            "level": "national",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "THE_GREEN_MILE_081",
+                                "name": "The Green Mile",
+                                "alias": "the_green_mile"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "GOVERNOR-ILN",
+                            "name": "Governor — Ilocos Norte",
+                            "level": "local",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "EN_001",
+                                "name": "Edward Norton",
+                                "alias": "EN"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "VICE-GOVERNOR-ILN",
+                            "name": "Vice Governor — Ilocos Norte",
+                            "level": "local",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "JH_004",
+                                "name": "Jennifer Hudson",
+                                "alias": "JH"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "BOARD-MEMBER-ILN",
+                            "name": "Provincial Board Member — Ilocos Norte",
+                            "level": "local",
+                            "count": 2
+                        },
+                        "candidates": [
+                            {
+                                "code": "AD_007",
+                                "name": "Adam Driver",
+                                "alias": "AD"
+                            },
+                            {
+                                "code": "DJ_006",
+                                "name": "Dakota Johnson",
+                                "alias": "DJ"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "REPRESENTATIVE-ILN-1",
+                            "name": "District Representative — Ilocos Norte (1st District)",
+                            "level": "district",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "DC_004",
+                                "name": "Don Cheadle",
+                                "alias": "DC"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "MAYOR-ILN-CURRIMAO",
+                            "name": "Municipal Mayor — Currimao, Ilocos Norte",
+                            "level": "local",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "BC_001",
+                                "name": "Billy Crudup",
+                                "alias": "BC"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "VICE-MAYOR-ILN-CURRIMAO",
+                            "name": "Municipal Vice Mayor — Currimao, Ilocos Norte",
+                            "level": "local",
+                            "count": 1
+                        },
+                        "candidates": [
+                            {
+                                "code": "JL_002",
+                                "name": "Jared Leto",
+                                "alias": "JL"
+                            }
+                        ]
+                    },
+                    {
+                        "position": {
+                            "code": "COUNCILOR-ILN-CURRIMAO",
+                            "name": "Sangguniang Bayan Member — Currimao, Ilocos Norte",
+                            "level": "local",
+                            "count": 8
+                        },
+                        "candidates": [
+                            {
+                                "code": "CE_006",
+                                "name": "Chiwetel Ejiofor",
+                                "alias": "CE"
+                            },
+                            {
+                                "code": "DO_008",
+                                "name": "David Oyelowo",
+                                "alias": "DO"
+                            },
+                            {
+                                "code": "ER_001",
+                                "name": "Eddie Redmayne",
+                                "alias": "ER"
+                            },
+                            {
+                                "code": "GMR_007",
+                                "name": "Gugu Mbatha-Raw",
+                                "alias": "GMR"
+                            },
+                            {
+                                "code": "MC_004",
+                                "name": "Marion Cotillard",
+                                "alias": "MC"
+                            },
+                            {
+                                "code": "MS_005",
+                                "name": "Michael Shannon",
+                                "alias": "MS"
+                            },
+                            {
+                                "code": "SG_002",
+                                "name": "Stephen Graham",
+                                "alias": "SG"
+                            },
+                            {
+                                "code": "SR_003",
+                                "name": "Saoirse Ronan",
+                                "alias": "SR"
+                            }
+                        ]
+                    }
+                ],
+                "precinct": {
+                    "id": "01990963-9972-70e8-a123-53a28d91f193",
+                    "code": "CURRIMAO-001",
+                    "location_name": "Currimao National High School",
+                    "latitude": 17.993217,
+                    "longitude": 120.488902,
+                    "electoral_inspectors": [
+                        {
+                            "id": "uuid-juan",
+                            "name": "Juan dela Cruz",
+                            "role": "chairperson"
+                        },
+                        {
+                            "id": "uuid-maria",
+                            "name": "Maria Santos",
+                            "role": "member"
+                        },
+                        {
+                            "id": "uuid-pedro",
+                            "name": "Pedro Reyes",
+                            "role": "member"
+                        }
+                    ],
+                    "watchers_count": null,
+                    "precincts_count": null,
+                    "registered_voters_count": null,
+                    "actual_voters_count": null,
+                    "ballots_in_box_count": null,
+                    "unused_ballots_count": null,
+                    "spoiled_ballots_count": null,
+                    "void_ballots_count": null
+                }
+            }
+        },
+        "qrMeta": {
+            "code": "DEMO-001",
+            "by": "size",
+            "urls": [
+                "truth://v1/TRUTH/DEMO-001/1/1?c=q1ZKzk9JVbJScnH19dc1MDBU0lFKSSxJVLKqVspIzcnJB0qV5xflpCjV6iiVVBaAlKak5uYr1QIA"
+            ],
+            "qr": [
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"256\" height=\"256\" viewBox=\"0 0 256 256\"><rect x=\"0\" y=\"0\" width=\"256\" height=\"256\" fill=\"#fefefe\"/><g transform=\"scale(3.507)\"><g transform=\"translate(16.000,16.000)\"><path fill-rule=\"evenodd\" d=\"M8 0L8 1L9 1L9 0ZM15 0L15 1L14 1L14 2L12 2L12 3L10 3L10 2L8 2L8 5L9 5L9 6L8 6L8 7L9 7L9 8L8 8L8 9L7 9L7 8L6 8L6 9L7 9L7 10L6 10L6 11L7 11L7 12L6 12L6 13L8 13L8 11L9 11L9 12L10 12L10 13L9 13L9 14L10 14L10 16L11 16L11 17L10 17L10 18L11 18L11 17L12 17L12 19L11 19L11 20L10 20L10 19L8 19L8 18L9 18L9 17L8 17L8 18L6 18L6 17L7 17L7 16L6 16L6 17L5 17L5 19L7 19L7 20L5 20L5 21L4 21L4 22L5 22L5 21L7 21L7 22L6 22L6 23L5 23L5 25L4 25L4 23L3 23L3 26L5 26L5 27L7 27L7 26L6 26L6 25L7 25L7 24L8 24L8 26L9 26L9 27L8 27L8 28L10 28L10 30L8 30L8 29L7 29L7 28L5 28L5 29L2 29L2 28L4 28L4 27L2 27L2 23L0 23L0 26L1 26L1 27L0 27L0 28L1 28L1 29L2 29L2 31L3 31L3 32L4 32L4 33L8 33L8 34L10 34L10 35L9 35L9 36L10 36L10 35L11 35L11 38L9 38L9 37L8 37L8 41L11 41L11 40L12 40L12 38L13 38L13 39L14 39L14 37L13 37L13 36L15 36L15 37L16 37L16 38L15 38L15 39L16 39L16 40L15 40L15 41L16 41L16 40L17 40L17 41L20 41L20 40L22 40L22 41L29 41L29 40L28 40L28 39L26 39L26 38L25 38L25 37L26 37L26 36L27 36L27 37L28 37L28 38L30 38L30 36L31 36L31 35L30 35L30 32L31 32L31 31L28 31L28 30L26 30L26 31L27 31L27 32L26 32L26 33L25 33L25 31L23 31L23 32L24 32L24 33L25 33L25 34L23 34L23 35L25 35L25 37L24 37L24 39L26 39L26 40L22 40L22 39L23 39L23 37L22 37L22 36L21 36L21 39L19 39L19 35L18 35L18 34L22 34L22 33L20 33L20 32L21 32L21 30L20 30L20 29L19 29L19 28L20 28L20 27L22 27L22 25L23 25L23 26L25 26L25 27L23 27L23 28L22 28L22 30L23 30L23 28L24 28L24 30L25 30L25 29L26 29L26 28L28 28L28 29L29 29L29 30L30 30L30 29L31 29L31 27L32 27L32 30L33 30L33 31L32 31L32 33L31 33L31 34L32 34L32 37L31 37L31 38L33 38L33 39L30 39L30 40L31 40L31 41L34 41L34 40L33 40L33 39L35 39L35 40L36 40L36 41L37 41L37 40L38 40L38 39L39 39L39 41L40 41L40 39L41 39L41 36L40 36L40 34L41 34L41 33L40 33L40 32L39 32L39 30L40 30L40 29L38 29L38 28L37 28L37 30L38 30L38 31L36 31L36 32L35 32L35 31L34 31L34 29L33 29L33 28L35 28L35 30L36 30L36 27L38 27L38 26L34 26L34 25L33 25L33 27L32 27L32 26L30 26L30 25L31 25L31 22L32 22L32 24L33 24L33 23L34 23L34 24L35 24L35 25L36 25L36 24L37 24L37 25L39 25L39 27L41 27L41 26L40 26L40 25L39 25L39 24L37 24L37 23L40 23L40 24L41 24L41 23L40 23L40 22L41 22L41 19L40 19L40 20L39 20L39 19L37 19L37 21L35 21L35 20L34 20L34 18L35 18L35 17L34 17L34 16L35 16L35 15L34 15L34 14L36 14L36 17L37 17L37 16L38 16L38 17L39 17L39 18L40 18L40 17L39 17L39 16L41 16L41 13L40 13L40 10L41 10L41 8L40 8L40 10L38 10L38 9L39 9L39 8L36 8L36 10L37 10L37 11L39 11L39 12L37 12L37 13L38 13L38 14L36 14L36 12L35 12L35 11L34 11L34 12L35 12L35 13L33 13L33 11L32 11L32 12L31 12L31 13L30 13L30 15L32 15L32 16L28 16L28 17L27 17L27 20L26 20L26 21L27 21L27 22L24 22L24 21L25 21L25 20L23 20L23 19L22 19L22 18L21 18L21 16L22 16L22 17L23 17L23 18L25 18L25 19L26 19L26 18L25 18L25 17L26 17L26 16L27 16L27 14L28 14L28 15L29 15L29 13L28 13L28 12L29 12L29 10L31 10L31 9L32 9L32 10L35 10L35 9L34 9L34 8L33 8L33 6L32 6L32 5L30 5L30 3L33 3L33 0L32 0L32 2L30 2L30 3L29 3L29 4L28 4L28 5L30 5L30 7L29 7L29 6L28 6L28 7L29 7L29 8L28 8L28 9L29 9L29 10L28 10L28 12L26 12L26 11L25 11L25 12L26 12L26 13L25 13L25 14L26 14L26 16L25 16L25 15L23 15L23 14L22 14L22 13L24 13L24 9L23 9L23 12L20 12L20 11L21 11L21 10L20 10L20 9L21 9L21 8L20 8L20 7L21 7L21 6L20 6L20 7L19 7L19 6L18 6L18 7L17 7L17 4L16 4L16 5L14 5L14 8L13 8L13 6L12 6L12 5L13 5L13 3L15 3L15 1L17 1L17 2L18 2L18 5L19 5L19 3L20 3L20 2L18 2L18 1L17 1L17 0ZM19 0L19 1L20 1L20 0ZM21 0L21 1L23 1L23 3L21 3L21 5L22 5L22 8L24 8L24 7L25 7L25 6L26 6L26 7L27 7L27 6L26 6L26 5L27 5L27 3L28 3L28 2L29 2L29 1L28 1L28 2L27 2L27 0L26 0L26 2L25 2L25 0ZM30 0L30 1L31 1L31 0ZM24 2L24 4L25 4L25 5L26 5L26 4L25 4L25 2ZM9 3L9 5L12 5L12 4L10 4L10 3ZM22 4L22 5L23 5L23 7L24 7L24 5L23 5L23 4ZM9 6L9 7L10 7L10 6ZM11 6L11 7L12 7L12 6ZM15 6L15 7L16 7L16 6ZM31 6L31 8L32 8L32 9L33 9L33 8L32 8L32 6ZM0 8L0 11L1 11L1 9L2 9L2 12L0 12L0 13L1 13L1 14L0 14L0 17L1 17L1 16L2 16L2 18L0 18L0 20L2 20L2 21L3 21L3 20L2 20L2 18L3 18L3 19L4 19L4 16L3 16L3 15L8 15L8 16L9 16L9 15L8 15L8 14L4 14L4 11L5 11L5 10L4 10L4 8ZM10 8L10 9L8 9L8 10L10 10L10 9L11 9L11 8ZM19 8L19 9L20 9L20 8ZM29 8L29 9L30 9L30 8ZM12 9L12 10L13 10L13 9ZM14 9L14 11L13 11L13 12L11 12L11 13L10 13L10 14L11 14L11 16L12 16L12 17L16 17L16 16L17 16L17 19L18 19L18 18L19 18L19 19L20 19L20 20L17 20L17 22L16 22L16 24L15 24L15 25L14 25L14 24L13 24L13 25L14 25L14 26L10 26L10 25L11 25L11 24L10 24L10 22L8 22L8 24L9 24L9 26L10 26L10 27L12 27L12 28L13 28L13 29L11 29L11 31L12 31L12 32L10 32L10 31L9 31L9 33L10 33L10 34L12 34L12 36L13 36L13 35L14 35L14 32L15 32L15 33L16 33L16 32L17 32L17 34L15 34L15 36L16 36L16 37L17 37L17 40L19 40L19 39L18 39L18 35L17 35L17 34L18 34L18 32L17 32L17 31L18 31L18 30L19 30L19 32L20 32L20 30L19 30L19 29L17 29L17 31L15 31L15 30L16 30L16 28L17 28L17 27L16 27L16 24L18 24L18 23L19 23L19 24L20 24L20 26L21 26L21 25L22 25L22 23L21 23L21 24L20 24L20 23L19 23L19 22L20 22L20 21L22 21L22 22L23 22L23 21L22 21L22 19L21 19L21 18L19 18L19 17L20 17L20 16L21 16L21 15L19 15L19 17L18 17L18 14L20 14L20 13L19 13L19 11L20 11L20 10L19 10L19 11L18 11L18 10L16 10L16 9ZM25 9L25 10L27 10L27 9ZM16 11L16 12L14 12L14 13L13 13L13 14L12 14L12 13L11 13L11 14L12 14L12 16L13 16L13 14L15 14L15 13L17 13L17 14L18 14L18 13L17 13L17 12L18 12L18 11ZM2 12L2 15L3 15L3 12ZM32 13L32 15L33 15L33 16L34 16L34 15L33 15L33 13ZM38 14L38 16L39 16L39 14ZM14 15L14 16L16 16L16 15ZM22 15L22 16L23 16L23 15ZM29 17L29 18L30 18L30 22L27 22L27 23L28 23L28 26L27 26L27 24L26 24L26 25L25 25L25 26L26 26L26 27L25 27L25 28L26 28L26 27L28 27L28 28L29 28L29 29L30 29L30 27L29 27L29 24L30 24L30 22L31 22L31 21L33 21L33 22L34 22L34 23L35 23L35 24L36 24L36 23L35 23L35 21L33 21L33 20L32 20L32 19L33 19L33 17ZM13 18L13 20L12 20L12 21L11 21L11 23L13 23L13 22L14 22L14 21L16 21L16 19L15 19L15 18ZM8 20L8 21L9 21L9 20ZM13 20L13 21L14 21L14 20ZM37 21L37 22L38 22L38 21ZM39 21L39 22L40 22L40 21ZM6 23L6 24L7 24L7 23ZM23 23L23 24L25 24L25 23ZM17 25L17 26L18 26L18 25ZM14 26L14 27L13 27L13 28L14 28L14 27L15 27L15 26ZM6 29L6 30L3 30L3 31L4 31L4 32L7 32L7 31L6 31L6 30L7 30L7 29ZM13 29L13 31L14 31L14 29ZM0 30L0 31L1 31L1 30ZM33 31L33 32L34 32L34 31ZM1 32L1 33L2 33L2 32ZM12 32L12 33L13 33L13 32ZM27 32L27 36L28 36L28 35L29 35L29 36L30 36L30 35L29 35L29 32ZM33 33L33 36L36 36L36 33ZM37 33L37 35L38 35L38 36L37 36L37 38L35 38L35 37L34 37L34 38L35 38L35 39L36 39L36 40L37 40L37 39L38 39L38 36L39 36L39 34L40 34L40 33L39 33L39 34L38 34L38 33ZM34 34L34 35L35 35L35 34ZM39 37L39 38L40 38L40 37ZM0 0L0 7L7 7L7 0ZM1 1L1 6L6 6L6 1ZM2 2L2 5L5 5L5 2ZM41 0L34 0L34 7L41 7ZM40 1L35 1L35 6L40 6ZM39 2L36 2L36 5L39 5ZM0 41L7 41L7 34L0 34ZM1 40L6 40L6 35L1 35ZM2 39L5 39L5 36L2 36Z\" fill=\"#000000\"/></g></g></svg>\n"
+            ]
+        }
+    }
+}

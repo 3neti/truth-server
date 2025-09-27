@@ -1,0 +1,20 @@
+<h1>Ballot Summary</h1>
+
+<p><strong>Ballot Code:</strong> {{code}}</p>
+
+<p><strong>Precinct:</strong> {{precinct.code}} - {{precinct.location_name}}</p>
+
+<h2>Votes</h2>
+
+<ul>
+  {{#each votes}}
+    <li>
+      <strong>{{position.code}}</strong>
+      <ul>
+        {{#each candidates}}
+          <li>{{code}}</li>
+        {{/each}}
+      </ul>
+    </li>
+  {{/each}}
+</ul>

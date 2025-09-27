@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Invoice {{code}}</title>
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 6px 8px; border-bottom: 1px solid #ddd; text-align: left; }
+        tfoot td { font-weight: bold; }
+    </style>
+</head>
+<body>
+<h1>Invoice {{code}}</h1>
+<p>Date: {{date date "Y-m-d"}}</p>
+
+<table>
+    <thead>
+    <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+    </thead>
+    <tbody>
+    {{#each items}}
+        {{> itemRow}}
+    {{/each}}
+    </tbody>
+    <tfoot>
+    {{> summary}}
+    </tfoot>
+</table>
+</body>
+</html>
