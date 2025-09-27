@@ -1,0 +1,50 @@
+{
+    "name": "lbhurtado/truth-election-db",
+    "description": "TRUTH Election: Database-backed ElectionStore implementation.",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-election-php"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthElectionDb\\": "src/",
+            "TruthElectionDb\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthElectionDb\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "spatie/laravel-data": "^4.0",
+        "lbhurtado/truth-election-php": "*",
+        "spatie/laravel-schemaless-attributes": "^2.5"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthElectionDb\\TruthElectionDbServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

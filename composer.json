@@ -9,7 +9,13 @@
     ],
     "license": "MIT",
     "repositories": [
-        { "type": "path", "url": "../hybrid-election/packages/*" }
+        { "type": "path", "url": "packages/truth-qr-php" },
+        { "type": "path", "url": "packages/truth-codec-php" },
+        { "type": "path", "url": "packages/truth-qr-ui" },
+        { "type": "path", "url": "packages/truth-renderer-php" },
+        { "type": "path", "url": "packages/truth-election-php" },
+        { "type": "path", "url": "packages/truth-election-db" },
+        { "type": "path", "url": "packages/truth-election-ui" }
     ],
     "require": {
         "php": "^8.2",

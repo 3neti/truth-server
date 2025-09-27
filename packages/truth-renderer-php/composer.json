@@ -1,0 +1,55 @@
+{
+    "name": "lbhurtado/truth-renderer-php",
+    "description": "TRUTH Renderer: JSON/YAML → Handlebars → HTML/PDF/Markdown",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-qr-ui"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthRenderer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthRenderer\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "symfony/yaml": "^7.3",
+        "dompdf/dompdf": "^3.1",
+        "justinrainbow/json-schema": "^6.5",
+        "zordius/lightncandy": "^1.2",
+        "spatie/browsershot": "^5.0",
+        "lorisleiva/laravel-actions": "^2.9",
+        "colinodell/json5": "^3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthRenderer\\TruthRendererServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "example": "php examples/render_example.php"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

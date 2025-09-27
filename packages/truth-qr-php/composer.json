@@ -1,0 +1,51 @@
+{
+    "name": "lbhurtado/truth-qr-php",
+    "description": "QR writer utilities for TRUTH envelopes (line & URL) using truth-codec-php.",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-codec-php"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthQr\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthQr\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "lbhurtado/truth-codec-php": "dev-main",
+        "ext-json": "*",
+        "bacon/bacon-qr-code": "^3.0",
+        "endroid/qr-code": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthQr\\TruthQrServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

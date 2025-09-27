@@ -1,0 +1,42 @@
+{
+    "name": "lbhurtado/truth-codec-php",
+    "description": "TruthCodec v1 encoder/decoder (PHP) for TRUTH payloads",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "TruthCodec\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthCodec\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "symfony/yaml": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthCodec\\TruthCodecServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

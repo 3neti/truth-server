@@ -1,0 +1,59 @@
+{
+    "name": "lbhurtado/truth-qr-ui",
+    "description": "Visual UI for truth-codec-php and truth-qr-php: encode payloads to QR chunks and decode them back",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-qr-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-codec-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-renderer-php"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthQrUi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthQrUi\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "lbhurtado/truth-qr-php": "dev-main",
+        "lorisleiva/laravel-actions": "^2.9",
+        "ext-zip": "*",
+        "lbhurtado/truth-renderer-php": "dev-main"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthQrUi\\TruthQrUiServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

@@ -1,0 +1,66 @@
+{
+    "name": "lbhurtado/truth-election-php",
+    "description": "TRUTH Election: Ballot data structures and election logic (no database required).",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./../truth-qr-ui"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-qr-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-renderer-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-qr-php"
+        },
+        {
+            "type": "path",
+            "url": "./../truth-codec-php"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TruthElection\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TruthElection\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "spatie/laravel-data": "^4.0",
+        "lorisleiva/laravel-actions": "^2.9",
+        "lbhurtado/truth-qr-ui": "dev-main"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TruthElection\\TruthElectionServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

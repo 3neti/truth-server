@@ -1,0 +1,39 @@
+# Composer dependencies
+/vendor/
+
+# Node dependencies (if you add a UI build)
+node_modules/
+
+# Laravel specific (only if package has its own storage/logs/cache)
+storage/
+bootstrap/cache/
+
+# PHPUnit & Pest
+.phpunit.result.cache
+coverage/
+.clover.xml
+.junit.xml
+test-output/
+
+# IDEs & OS junk
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Environment files (in case package has local testing)
+.env
+.env.*.local
+
+# Build artifacts (if you add Mix/Vite)
+public/hot
+/public/storage
+/public/build
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

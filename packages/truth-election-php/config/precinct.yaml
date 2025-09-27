@@ -1,0 +1,17 @@
+code: CURRIMAO-001
+location_name: 'Currimao National High School'
+latitude: 17.993217
+longitude: 120.488902
+electoral_inspectors:
+  -
+    id: uuid-juan
+    name: 'Juan dela Cruz'
+    role: 'chairperson'
+  -
+    id: uuid-maria
+    name: 'Maria Santos'
+    role: 'member'
+  -
+    id: uuid-pedro
+    name: 'Pedro Reyes'
+    role: 'member'

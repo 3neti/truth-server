@@ -1,0 +1,47 @@
+{
+    "ballot_code": "BAL001",
+    "votes": [
+        {
+            "position": {
+                "code": "PRESIDENT",
+                "name": "President",
+                "level": "national",
+                "count": 1
+            },
+            "candidates": [
+                {
+                    "code": "LD_001",
+                    "name": "Leonardo DiCaprio",
+                    "alias": "LD",
+                    "position": {
+                        "code": "PRESIDENT",
+                        "name": "President",
+                        "level": "national",
+                        "count": 1
+                    }
+                }
+            ]
+        },
+        {
+            "position": {
+                "code": "VICE-PRESIDENT",
+                "name": "Vice President",
+                "level": "national",
+                "count": 1
+            },
+            "candidates": [
+                {
+                    "code": "TH_001",
+                    "name": "Tom Hanks",
+                    "alias": "TH",
+                    "position": {
+                        "code": "VICE-PRESIDENT",
+                        "name": "Vice President",
+                        "level": "national",
+                        "count": 1
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+<h2>QR Code Sheet</h2>
+
+<p><strong>Code:</strong> {{qrMeta.code}}</p>
+<p><strong>Split By:</strong> {{qrMeta.by}}</p>
+
+<div style="display: flex; flex-wrap: wrap; gap: 2em; margin-top: 1.5em;">
+    {{#each qrMeta.qr}}
+        <div style="text-align: center; width: 256px;">
+            {{#if (startsWith this "data:image/png")}}
+                <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" />
+            {{else if (includes this "<svg")}}
+                <div style="width: 256px; height: 256px;">{{{this}}}</div>
+            {{else}}
+                <p style="color: red;">Unsupported QR format</p>
+            {{/if}}
+            <p style="margin-top: 0.5em;">QR {{inc @index}}</p>
+        </div>
+    {{/each}}
+</div>
