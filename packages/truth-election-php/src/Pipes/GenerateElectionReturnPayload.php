@@ -3,13 +3,14 @@
 namespace TruthElection\Pipes;
 
 use TruthCodec\Transport\Base64UrlDeflateTransport;
+use Illuminate\Support\Facades\{Log, Storage};
 use TruthCodec\Serializer\JsonSerializer;
 use TruthElection\Data\FinalizeErContext;
-use Illuminate\Support\Facades\Storage;
 use TruthCodec\Envelope\EnvelopeV1Line;
 use TruthQrUi\Actions\EncodePayload;
 use TruthQr\Writers\BaconQrWriter;
 use Closure;
+
 
 class GenerateElectionReturnPayload
 {
@@ -92,5 +93,9 @@ class GenerateElectionReturnPayload
             $this->getPath($ctx),
             json_encode($this->getPayload(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
+
+        Log::info("[GenerateElectionReturnPayload] PDF saved successfully.", [
+            'path' => $this->getPath($ctx),
+        ]);
     }
 }

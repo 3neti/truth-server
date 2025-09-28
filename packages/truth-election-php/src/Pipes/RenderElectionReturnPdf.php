@@ -22,7 +22,7 @@ final class RenderElectionReturnPdf
             'paperSize'    => 'A4',
             'orientation'  => 'portrait',
             'filename'     => 'election_return', //TODO: put this in the config
-        ], persist: true);
+        ], persist: false);
 
         // Save the rendered PDF to the appropriate folder
         $path = "{$ctx->folder}/election_return.pdf"; //TODO: put this in the config

@@ -1,6 +1,7 @@
 # Cheat Sheet
 
 ```bash
+truncate -s0 storage/logs/laravel.log
 php artisan election:setup-precinct --fresh
 echo "317537" | php artisan election:tally-votes
 php artisan election:read-vote BAL-000 A1
@@ -119,3 +120,19 @@ curl -X PATCH http://truth.test/api/election/record-statistics \
 # 8. Wrap Up Voting
 curl -X POST http://truth.test/api/election/wrapup-voting
 ```
+cdbf0f83ab4f7d46be767e73c59b5cbca9743dd5fb887142c96f4b2df38fa5ad *ubuntu-24.04.3-desktop-arm64.iso
+dba22b48348731494e4ce3925c1b1f458c62375c3f12419fc5e144542f765756 *ubuntu-24.04.3-live-server-arm64+largemem.iso
+2ee2163c9b901ff5926400e80759088ff3b879982a3956c02100495b489fd555 *ubuntu-24.04.3-live-server-arm64.iso
+823d5db6c452d8cda75b9ad8253deeaba418a2a2f544d353136fe53d3c0be9d2 *ubuntu-24.04.3-live-server-ppc64el.iso
+f469d225af0886d4221b9f147891976101b1faed379bad0070cc7c844a942a0f *ubuntu-24.04.3-live-server-riscv64.iso
+968c208fad190780e8ec321c51bcf7d4b59bfaf34e393c6d8251243be45f549d *ubuntu-24.04.3-live-server-s390x.iso
+04a87330d2dfbe29c29f69d2113d92bbde44daa516054074ff4b96c7ee3c528b *ubuntu-24.04.3-preinstalled-desktop-arm64+raspi.img.xz
+9bb1799cee8965e6df0234c1c879dd35be1d87afe39b84951f278b6bd0433e56 *ubuntu-24.04.3-preinstalled-server-arm64+raspi.img.xz
+4474947b7816128a934f7245c17ba0eff90ccb3e03b66cac221d7a3a1912c27b *ubuntu-24.04.3-preinstalled-server-riscv64+icicle.img.xz
+36f57bcecb5201e30e78a1404758c6d8061f4561f8e598abec2a2c056e35ed72 *ubuntu-24.04.3-preinstalled-server-riscv64+jh7110.img.xz
+b2d81bd6122b6868c102afd07ce62fc22293a05ff09366b170fae370a612b9fe *ubuntu-24.04.3-preinstalled-server-riscv64+licheerv.img.xz
+890564e8659903a36a1f68f26c30ff76bd97cfc4e7db2484bec24f32c6432aab *ubuntu-24.04.3-preinstalled-server-riscv64+nezha.img.xz
+202c17f9d39529aad5957f0fbcdb9083dc5ba49aa94706ec045e27616369694a *ubuntu-24.04.3-preinstalled-server-riscv64+pic64gx.img.xz
+f385868c2870c4d16213bcfee50e9bd168400f34df1b4b6b3f6ceae19acd59de *ubuntu-24.04.3-preinstalled-server-riscv64+unmatched.img.xz
+8e7553f229f5889e8698281404f05d565ae694066215d45df9178d9e865e23fe *ubuntu-24.04.3-preinstalled-server-riscv64.img.xz
+edaf375ea0d1319da08e7154e9bc64cd4eead5af21ea032f2edaa335fadf0970 *ubuntu-24.04.3-wsl-arm64.wsl

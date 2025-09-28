@@ -53,7 +53,7 @@ class RenderElectionReturnPayloadPdf extends GenerateElectionReturnPayload
             'paperSize'    => 'A4',
             'orientation'  => 'portrait',
             'filename'     => 'election_return_payload',
-        ], persist: true);
+        ], persist: false);
 
         // 💾 Save the rendered PDF to the configured disk
         $path = "{$ctx->folder}/election_return_payload.pdf";
