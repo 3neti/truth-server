@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue TallyMarks Test</title>
+    <style>
+        body { 
+            font-family: system-ui, sans-serif; 
+            padding: 2rem; 
+            background: #f8f9fa; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .test-section h3 { 
+            margin-top: 0; 
+            color: #2c3e50; 
+        }
+        
+        /* Original styles for comparison */
+        .original-tally {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .original-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .original-diagonal {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 52px;
+            height: 2px;
+            background-color: black;
+            transform: rotate(21deg);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        /* Vue component styles */
+        .tally-marks-container {
+            display: inline-block;
+        }
+        
+        .tally-marks-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tally-marks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tally-marks-multiline {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .tally-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tally-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .mark {
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: monospace;
+            line-height: 1;
+            user-select: none;
+        }
+        
+        .diagonal {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 52px;
+            height: 2px;
+            background-color: black;
+            transform: rotate(21deg);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        .tally-count {
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .tally-count--above,
+        .tally-count--below {
+            text-align: center;
+            margin: 4px 0;
+        }
+        
+        .tally-count--before {
+            margin-right: 8px;
+        }
+        
+        .tally-count--after {
+            margin-left: 8px;
+        }
+        
+        .tally-count--after-fixed {
+            top: 0;
+            white-space: pre; /* Preserve spaces in padStart */
+            font-family: monospace;
+            font-weight: bold;
+            border: 1px dashed #ccc; /* Visual border to show alignment area */
+            padding: 2px 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .tally-buttons {
+            display: inline-flex;
+            gap: 2px;
+            margin-left: 8px;
+            align-items: center;
+        }
+        
+        .tally-button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 0.8em;
+            font-family: monospace;
+            cursor: pointer;
+            user-select: none;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .tally-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .tally-button:active {
+            background: #d0d0d0;
+        }
+        
+        .tally-button:disabled {
+            background: #f8f8f8;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .tally-timestamp {
+            font-family: monospace;
+            font-size: 0.8em;
+            color: #888;
+            text-align: center;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vue 3 TallyMarks Component Test</h1>
+    
+    <div class="test-section">
+        <h3>Original Manual Tally (Reference)</h3>
+        <p>This shows how the tally marks should look with proper diagonal positioning:</p>
+        <div class="original-tally">
+            <div class="original-group">
+                <span>|</span><span>|</span><span>|</span><span>|</span>
+                <span class="original-diagonal"></span>
+            </div>
+            <div class="original-group">
+                <span>|</span><span>|</span><span>|</span><span>|</span>
+                <span class="original-diagonal"></span>
+            </div>
+            <div class="original-group">
+                <span>|</span><span>|</span>
+            </div>
+        </div>
+        <p><strong>Count: 12</strong></p>
+    </div>
+    
+    <div class="test-section">
+        <h3>Expected Behavior Explanation</h3>
+        <ul>
+            <li><strong>Count 7:</strong> Should show 1 complete group (4 marks + diagonal = ||||) + 2 remaining marks (||)</li>
+            <li><strong>Count 12:</strong> Should show 2 complete groups (||||, ||||) + 2 remaining marks (||)</li>
+            <li><strong>Count 5:</strong> Should show 1 complete group (||||)</li>
+            <li><strong>Count 10:</strong> Should show 2 complete groups (||||, ||||)</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h3>Vue Component Test</h3>
+        <div id="vue-test">
+            <p>Test count 5 (should show 1 complete group with diagonal):</p>
+            <tally-marks :count="5"></tally-marks>
+            
+            <br><br>
+            
+            <p>Basic tally marks (count: 7) - should show 1 complete group + 2 remaining:</p>
+            <tally-marks :count="7"></tally-marks>
+            
+            <br><br>
+            
+            <p>Test count 10 (should show 2 complete groups with diagonals):</p>
+            <tally-marks :count="10" :show-count="true" count-position="after"></tally-marks>
+            
+            <br><br>
+            
+            <p>With count display (count: 12) - should show 2 complete groups + 2 remaining:</p>
+            <tally-marks :count="12" :show-count="true" count-position="after"></tally-marks>
+            
+            <br><br>
+            
+            <p>Different sizes:</p>
+            <div style="margin: 1rem 0;">
+                <div>Small: <tally-marks :count="8" size="small"></tally-marks></div>
+                <div style="margin: 0.5rem 0;">Medium: <tally-marks :count="8" size="medium"></tally-marks></div>
+                <div>Large: <tally-marks :count="8" size="large"></tally-marks></div>
+            </div>
+            
+            <br>
+            
+            <p>With custom colors:</p>
+            <tally-marks :count="15" color="#2c3e50" highlight-color="#e74c3c" :show-count="true"></tally-marks>
+            
+            <br><br>
+            
+            <p>Line wrapping test (count: 65, max 50 per line):</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <tally-marks :count="65" :show-count="true" count-position="below" :max-per-line="50"></tally-marks>
+            </div>
+            
+            <br>
+            
+            <p>Custom line length (count: 35, max 20 per line):</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <tally-marks :count="35" :show-count="true" count-position="below" :max-per-line="20"></tally-marks>
+            </div>
+            
+            <br>
+            
+            <p>Fixed-position count test (count stays at fixed position):</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <p>Count: 5 <tally-marks :count="5" :show-count="true" count-position="after" :max-per-line="30" :max-digits="4" :count-distance="16"></tally-marks></p>
+                <p>Count: 25 <tally-marks :count="25" :show-count="true" count-position="after" :max-per-line="30" :max-digits="4" :count-distance="16"></tally-marks></p>
+                <p>Count: 123 <tally-marks :count="123" :show-count="true" count-position="after" :max-per-line="30" :max-digits="4" :count-distance="16"></tally-marks></p>
+                <p>3-digit max: <tally-marks :count="999" :show-count="true" count-position="after" :max-per-line="30" :max-digits="3" :count-distance="16"></tally-marks></p>
+            </div>
+            
+            <br>
+            
+            <p>Distance variations (same count, different distances) - Notice right alignment in boxes:</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <p>Distance 0 (much closer now): <tally-marks :count="42" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="0"></tally-marks></p>
+                <p>Distance 8: <tally-marks :count="42" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="8"></tally-marks></p>
+                <p>Distance 16 (default): <tally-marks :count="42" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="16"></tally-marks></p>
+                <p>Distance 32: <tally-marks :count="42" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="32"></tally-marks></p>
+                
+                <br>
+                <p><em style="font-size: 0.9em; color: #666;">Different counts showing right alignment:</em></p>
+                <p>Count 7: <tally-marks :count="7" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="16"></tally-marks></p>
+                <p>Count 99: <tally-marks :count="99" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="16"></tally-marks></p>
+                <p>Count 123: <tally-marks :count="123" :show-count="true" count-position="after" :max-per-line="25" :max-digits="3" :count-distance="16"></tally-marks></p>
+            </div>
+            
+            <br>
+            
+            <p>Label positioning examples:</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <div style="margin: 1rem 0;">
+                    <p>Left label: <tally-marks :count="15" label="Votes:" label-position="left" :show-count="true" count-position="after" :max-digits="3"></tally-marks></p>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <p>Right label: <tally-marks :count="23" label="items" label-position="right" :show-count="true" count-position="after" :max-digits="3"></tally-marks></p>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <p>Top label:</p>
+                    <tally-marks :count="8" label="Survey Responses" label-position="top" :show-count="true" count-position="below" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <p>Bottom label:</p>
+                    <tally-marks :count="31" label="Total Count" label-position="bottom" :show-count="true" count-position="after" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <p>Multiple features: <tally-marks :count="67" label="Score:" label-position="left" :show-count="true" count-position="after" :max-per-line="30" :max-digits="3" :count-distance="8"></tally-marks></p>
+                </div>
+            </div>
+            
+            <br>
+            
+            <p>Label padding for alignment (all tally marks start at same position):</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="15" label="A:" label-position="left" :label-padding="12" :show-count="true" count-position="after" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="23" label="Score:" label-position="left" :label-padding="12" :show-count="true" count-position="after" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="8" label="Total Items:" label-position="left" :label-padding="12" :show-count="true" count-position="after" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="42" label="B:" label-position="left" :label-padding="12" :show-count="true" count-position="after" :max-digits="3"></tally-marks>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9em; color: #666;">
+                    <em>Notice how all tally marks start at the same horizontal position despite different label lengths</em>
+                </p>
+            </div>
+            
+            <br>
+            
+            <p>Built-in interactive buttons positioned around numeric count:</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks v-model:count="buttonTestA" label="Both buttons:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-increment-button="true" :show-decrement-button="true" :max-digits="3" :min-count="0" :max-count="50"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks v-model:count="buttonTestB" label="Increment only:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-increment-button="true" :increment-step="5" :max-digits="3" :min-count="0" :max-count="100"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks v-model:count="buttonTestC" label="Decrement only:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-decrement-button="true" :decrement-step="2" :max-digits="3" :min-count="0" :max-count="50"></tally-marks>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9em; color: #666;">
+                    <em>Notice buttons are positioned around the numeric count: [−] 25 [+]. Different step sizes and button combinations.</em>
+                </p>
+            </div>
+            
+            <br>
+            
+            <p>Timestamp formats (shows current datetime in different formats):</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="42" label="MySQL format:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="mysql" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="25" label="ISO format:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="iso" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="13" label="Local format:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="local" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="8" label="Date only:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="date" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="19" label="Time only:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="time" :max-digits="3"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks :count="31" label="Short format:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" timestamp-format="short" :max-digits="3"></tally-marks>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9em; color: #666;">
+                    <em>Timestamps appear below the numeric count in smaller, monospace font.</em>
+                </p>
+            </div>
+            
+            <br>
+            
+            <p>Timestamp with buttons and different positions:</p>
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <div style="margin: 0.5rem 0;">
+                    <tally-marks v-model:count="timestampTestA" label="After position:" label-position="left" :label-padding="15" :show-count="true" count-position="after" :show-timestamp="true" :show-increment-button="true" :show-decrement-button="true" :max-digits="3" :min-count="0"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0; text-align: center;">
+                    <tally-marks v-model:count="timestampTestB" label="Above position" label-position="top" :show-count="true" count-position="above" :show-timestamp="true" :show-increment-button="true" :show-decrement-button="true" :max-digits="3" :min-count="0"></tally-marks>
+                </div>
+                <div style="margin: 0.5rem 0; text-align: center;">
+                    <tally-marks v-model:count="timestampTestC" :show-count="true" count-position="below" :show-timestamp="true" timestamp-format="short" :show-increment-button="true" :show-decrement-button="true" :max-digits="3" :min-count="0"></tally-marks>
+                    <div style="font-size: 0.9em; margin-top: 0.5rem;">Below position with short timestamp</div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9em; color: #666;">
+                    <em>🕐 Try clicking the buttons - notice how the timestamp updates each time the count changes!</em>
+                </p>
+            </div>
+            
+            <br>
+            
+            <p>Interactive counters to demonstrate right alignment:</p>
+            
+            <div style="display: flex; gap: 2rem; margin: 1rem 0;">
+                <!-- Counter 1 -->
+                <div style="flex: 1; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                    <h4 style="margin-top: 0;">Counter A</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <button @click="countA++" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">+1</button>
+                        <button @click="countA > 0 && countA--" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">-1</button>
+                        <button @click="countA += 10" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">+10</button>
+                        <button @click="countA = 0" style="padding: 0.5rem 1rem;">Reset</button>
+                    </div>
+                    <tally-marks :count="countA" :show-count="true" count-position="after" :max-per-line="25" :max-digits="4" :count-distance="16"></tally-marks>
+                </div>
+                
+                <!-- Counter 2 -->
+                <div style="flex: 1; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                    <h4 style="margin-top: 0;">Counter B</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <button @click="countB++" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">+1</button>
+                        <button @click="countB > 0 && countB--" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">-1</button>
+                        <button @click="countB += 10" style="margin-right: 0.5rem; padding: 0.5rem 1rem;">+10</button>
+                        <button @click="countB = 0" style="padding: 0.5rem 1rem;">Reset</button>
+                    </div>
+                    <tally-marks :count="countB" :show-count="true" count-position="after" :max-per-line="25" :max-digits="4" :count-distance="16"></tally-marks>
+                </div>
+            </div>
+            
+            <p>Configuration controls:</p>
+            <div style="padding: 1rem; background: #f0f0f0; border-radius: 4px; margin: 1rem 0;">
+                <div style="margin-bottom: 1rem;">
+                    <label>Max per line: </label>
+                    <input v-model.number="maxPerLine" type="number" min="5" max="100" style="width: 80px; margin-left: 0.5rem;">
+                    <label style="margin-left: 1rem;">Count position: </label>
+                    <select v-model="countPosition" style="margin-left: 0.5rem;">
+                        <option value="after">After (fixed)</option>
+                        <option value="below">Below</option>
+                        <option value="before">Before</option>
+                        <option value="above">Above</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Distance from sticks: </label>
+                    <input v-model.number="countDistance" type="number" min="0" max="50" style="width: 80px; margin-left: 0.5rem;">
+                    <span style="margin-left: 0.5rem; font-size: 0.9em; color: #666;">(0 = nearest)</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label>Label: </label>
+                    <input v-model="labelText" type="text" placeholder="Enter label text" style="width: 150px; margin-left: 0.5rem;">
+                    <label style="margin-left: 1rem;">Label position: </label>
+                    <select v-model="labelPosition" style="margin-left: 0.5rem;">
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                    </select>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label>Label padding: </label>
+                    <input v-model.number="labelPadding" type="number" min="0" max="20" placeholder="auto" style="width: 80px; margin-left: 0.5rem;">
+                    <span style="margin-left: 0.5rem; font-size: 0.9em; color: #666;">(characters for left alignment)</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label>
+                        <input type="checkbox" v-model="showIncrementButton" style="margin-right: 0.5rem;">Increment button
+                    </label>
+                    <label style="margin-left: 1rem;">
+                        <input type="checkbox" v-model="showDecrementButton" style="margin-right: 0.5rem;">Decrement button
+                    </label>
+                    <label style="margin-left: 1rem;">Inc step: </label>
+                    <input v-model.number="incrementStep" type="number" min="1" max="10" style="width: 60px; margin-left: 0.5rem;">
+                    <label style="margin-left: 1rem;">Dec step: </label>
+                    <input v-model.number="decrementStep" type="number" min="1" max="10" style="width: 60px; margin-left: 0.5rem;">
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label>
+                        <input type="checkbox" v-model="showTimestamp" style="margin-right: 0.5rem;">Show timestamp
+                    </label>
+                    <label style="margin-left: 1rem;">Format: </label>
+                    <select v-model="timestampFormat" style="margin-left: 0.5rem;">
+                        <option value="mysql">MySQL (YYYY-MM-DD HH:mm:ss)</option>
+                        <option value="iso">ISO (YYYY-MM-DDTHH:mm:ss.sssZ)</option>
+                        <option value="local">Local (MM/DD/YYYY, HH:mm:ss AM/PM)</option>
+                        <option value="date">Date only</option>
+                        <option value="time">Time only</option>
+                        <option value="short">Short (Oct 11, 08:52 AM)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <p><strong>Configurable Demo:</strong></p>
+                <tally-marks 
+                    v-model:count="count"
+                    :show-count="true" 
+                    :count-position="countPosition" 
+                    :animated="true" 
+                    :max-per-line="maxPerLine" 
+                    :max-digits="4" 
+                    :count-distance="countDistance"
+                    :label="labelText"
+                    :label-position="labelPosition"
+                    :label-padding="labelPadding"
+                    :show-increment-button="showIncrementButton"
+                    :show-decrement-button="showDecrementButton"
+                    :increment-step="incrementStep"
+                    :decrement-step="decrementStep"
+                    :show-timestamp="showTimestamp"
+                    :timestamp-format="timestampFormat"
+                    :min-count="0"
+                    :max-count="200"></tally-marks>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue 3 and TallyMarks -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        // Since we're testing locally, we'll inline the component
+        const TallyMarks = {
+            emits: ['update:count'],
+            props: {
+                count: { type: Number, required: true },
+                highlightColor: { type: String, default: '#e74c3c' },
+                size: { type: String, default: 'medium' },
+                color: { type: String, default: 'currentColor' },
+                animated: { type: Boolean, default: false },
+                animationDelay: { type: Number, default: 100 },
+                showCount: { type: Boolean, default: false },
+                countPosition: { type: String, default: 'after' },
+                customClass: { type: String, default: '' },
+                ariaLabel: { type: String, default: '' },
+                maxPerLine: { type: Number, default: 50 },
+                maxDigits: { type: Number, default: 4 },
+                countDistance: { type: Number, default: 16 },
+                label: { type: String, default: '' },
+                labelPosition: { type: String, default: 'left' },
+                labelPadding: { type: Number, default: null },
+                showIncrementButton: { type: Boolean, default: false },
+                showDecrementButton: { type: Boolean, default: false },
+                incrementStep: { type: Number, default: 1 },
+                decrementStep: { type: Number, default: 1 },
+                minCount: { type: Number, default: 0 },
+                maxCount: { type: Number, default: null },
+                showTimestamp: { type: Boolean, default: false },
+                timestampFormat: { type: String, default: 'mysql' },
+                customTimestamp: { type: [String, Date], default: null }
+            },
+            setup(props, { emit }) {
+                const { computed, ref, watch } = Vue
+                
+                // Reactive timestamp that updates when count changes
+                const lastUpdated = ref(props.customTimestamp ? new Date(props.customTimestamp) : new Date())
+                
+                // Watch for count changes and update timestamp
+                watch(() => props.count, () => {
+                    if (!props.customTimestamp) {
+                        lastUpdated.value = new Date()
+                    }
+                }, { flush: 'sync' })
+                
+                const fullGroups = computed(() => Math.floor(props.count / 5))
+                const remainingMarks = computed(() => props.count % 5)
+                const hasRemainder = computed(() => remainingMarks.value > 0)
+                
+                // Organize marks into lines based on maxPerLine
+                const tallyLines = computed(() => {
+                    const lines = []
+                    let currentLine = []
+                    let currentLineCount = 0
+                    
+                    // Add complete groups
+                    for (let i = 0; i < fullGroups.value; i++) {
+                        if (currentLineCount + 5 > props.maxPerLine && currentLine.length > 0) {
+                            lines.push({ groups: currentLine, isComplete: true })
+                            currentLine = []
+                            currentLineCount = 0
+                        }
+                        
+                        currentLine.push({ 
+                            type: 'complete', 
+                            index: i, 
+                            isLast: i === fullGroups.value - 1 && !hasRemainder.value 
+                        })
+                        currentLineCount += 5
+                    }
+                    
+                    // Add remaining marks if any
+                    if (remainingMarks.value > 0) {
+                        if (currentLineCount + remainingMarks.value > props.maxPerLine && currentLine.length > 0) {
+                            lines.push({ groups: currentLine, isComplete: true })
+                            currentLine = []
+                        }
+                        
+                        currentLine.push({ 
+                            type: 'partial', 
+                            count: remainingMarks.value 
+                        })
+                    }
+                    
+                    // Add the last line if it has content
+                    if (currentLine.length > 0) {
+                        lines.push({ groups: currentLine, isComplete: false })
+                    }
+                    
+                    return lines
+                })
+                
+                // Calculate fixed position for count display
+                const countDisplayStyle = computed(() => {
+                    if (props.countPosition !== 'after') return {}
+                    
+                    // Calculate the width needed for maxPerLine marks
+                    // Each group takes approximately: 4 marks * fontSize + diagonal width + gaps
+                    const groupsInMaxLine = Math.floor(props.maxPerLine / 5)
+                    const remainingInMaxLine = props.maxPerLine % 5
+                    
+                    // More accurate width calculation
+                    const fontSize = parseFloat(sizeStyles.value.fontSize.replace('rem', '')) * 16
+                    const groupGap = parseFloat(sizeStyles.value.groupGap)
+                    const lineGap = parseFloat(sizeStyles.value.gap)
+                    const diagonalWidth = parseFloat(sizeStyles.value.diagonalWidth)
+                    
+                    // Each complete group: 4 marks + diagonal width + internal gaps
+                    const groupWidth = (4 * fontSize * 0.6) + diagonalWidth + (3 * groupGap) // 3 gaps between 4 marks
+                    
+                    // Remaining marks width
+                    const remainingWidth = remainingInMaxLine * (fontSize * 0.6) + 
+                        (remainingInMaxLine > 1 ? (remainingInMaxLine - 1) * groupGap : 0)
+                    
+                    // Total width of maxPerLine marks + gaps between groups
+                    const totalMarksWidth = (groupsInMaxLine * groupWidth) + remainingWidth + 
+                        (groupsInMaxLine > 0 && remainingInMaxLine > 0 ? lineGap : 0) + // gap before remaining group
+                        ((groupsInMaxLine - 1) * lineGap) // gaps between complete groups
+                    
+                    // Position count at: marks width + configurable distance
+                    // For zero distance, use a very minimal gap (just a few pixels for readability)
+                    const minDistance = props.countDistance === 0 ? 4 : props.countDistance
+                    const countStartPosition = totalMarksWidth + minDistance
+                    
+                    // Width for the count display (based on maxDigits)
+                    const digitWidth = fontSize * 0.6 // monospace character width
+                    const countWidth = props.maxDigits * digitWidth
+                    
+                    return {
+                        position: 'absolute',
+                        left: `${countStartPosition}px`,
+                        width: `${countWidth}px`,
+                        textAlign: 'right',
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                        display: 'inline-block'
+                    }
+                })
+                
+                // Label positioning styles
+                const labelDisplayStyle = computed(() => {
+                    if (!props.label) return {}
+                    
+                    const baseStyle = {
+                        fontFamily: 'monospace', // Make all fonts monospaced
+                        fontWeight: 'normal',
+                        fontSize: '0.9em',
+                        color: '#666'
+                    }
+                    
+                    switch (props.labelPosition) {
+                        case 'left':
+                            const leftStyle = {
+                                ...baseStyle,
+                                marginRight: '8px'
+                            }
+                            
+                            // Handle label padding for alignment
+                            if (props.labelPadding !== null && props.labelPadding > props.label.length) {
+                                leftStyle.width = `${props.labelPadding}ch` // Use ch unit for monospace
+                                leftStyle.display = 'inline-block'
+                                leftStyle.textAlign = 'left'
+                            }
+                            
+                            return leftStyle
+                        case 'right':
+                            return {
+                                ...baseStyle,
+                                marginLeft: '8px'
+                            }
+                        case 'top':
+                            return {
+                                ...baseStyle,
+                                textAlign: 'left',
+                                marginBottom: '4px',
+                                display: 'block'
+                            }
+                        case 'bottom':
+                            return {
+                                ...baseStyle,
+                                textAlign: 'left',
+                                marginTop: '4px',
+                                display: 'block'
+                            }
+                        default:
+                            return baseStyle
+                    }
+                })
+                
+                // Timestamp formatting
+                const formattedTimestamp = computed(() => {
+                    if (!props.showTimestamp) return ''
+                    
+                    const now = props.customTimestamp ? new Date(props.customTimestamp) : lastUpdated.value
+                    
+                    switch (props.timestampFormat) {
+                        case 'mysql':
+                            return now.toISOString().slice(0, 19).replace('T', ' ')
+                        case 'iso':
+                            return now.toISOString()
+                        case 'local':
+                            return now.toLocaleString()
+                        case 'date':
+                            return now.toLocaleDateString()
+                        case 'time':
+                            return now.toLocaleTimeString()
+                        case 'short':
+                            return now.toLocaleString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                            })
+                        default:
+                            // Treat as custom format or return mysql as fallback
+                            return now.toISOString().slice(0, 19).replace('T', ' ')
+                    }
+                })
+                
+                const isLastGroup = (index) => index === fullGroups.value - 1
+                
+                const sizeStyles = computed(() => {
+                    const sizeMap = {
+                        small: { fontSize: '0.9rem', gap: '4px', groupGap: '1px', diagonalWidth: '42px' },
+                        medium: { fontSize: '1.2rem', gap: '6px', groupGap: '2px', diagonalWidth: '52px' },
+                        large: { fontSize: '1.5rem', gap: '8px', groupGap: '3px', diagonalWidth: '62px' }
+                    }
+                    
+                    if (props.size in sizeMap) {
+                        return sizeMap[props.size]
+                    }
+                    
+                    const numericSize = parseInt(props.size) || 16
+                    const diagonalWidth = Math.round(numericSize * 2.7)
+                    return {
+                        fontSize: props.size,
+                        gap: `${Math.max(4, numericSize * 0.3)}px`,
+                        groupGap: `${Math.max(1, numericSize * 0.1)}px`,
+                        diagonalWidth: `${diagonalWidth}px`
+                    }
+                })
+                
+                // Button methods
+                const increment = () => {
+                    const newCount = props.count + props.incrementStep
+                    if (props.maxCount === null || newCount <= props.maxCount) {
+                        emit('update:count', newCount)
+                    }
+                }
+                
+                const decrement = () => {
+                    const newCount = props.count - props.decrementStep
+                    if (newCount >= props.minCount) {
+                        emit('update:count', newCount)
+                    }
+                }
+                
+                return {
+                    fullGroups,
+                    remainingMarks,
+                    hasRemainder,
+                    isLastGroup,
+                    sizeStyles,
+                    tallyLines,
+                    countDisplayStyle,
+                    labelDisplayStyle,
+                    formattedTimestamp,
+                    increment,
+                    decrement
+                }
+            },
+            template: `
+                <div class="tally-marks-container" :class="customClass">
+                    <!-- Label above -->
+                    <div v-if="label && labelPosition === 'top'" class="tally-label tally-label--top" :style="labelDisplayStyle">
+                        {{ label }}
+                    </div>
+                    
+                    <!-- Count above -->
+                    <div v-if="showCount && countPosition === 'above'" 
+                         style="display: flex; align-items: flex-start; justify-content: center; gap: 2px; margin: 4px 0;">
+                        <button v-if="showDecrementButton"
+                                class="tally-button" 
+                                @click="decrement"
+                                :disabled="count <= minCount"
+                                title="Decrease">
+                            −
+                        </button>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span class="tally-count tally-count--above" style="margin: 0;">
+                                {{ count }}
+                            </span>
+                            <div v-if="showTimestamp" class="tally-timestamp">
+                                {{ formattedTimestamp }}
+                            </div>
+                        </div>
+                        <button v-if="showIncrementButton"
+                                class="tally-button" 
+                                @click="increment"
+                                :disabled="maxCount !== null && count >= maxCount"
+                                title="Increase">
+                            +
+                        </button>
+                    </div>
+                    
+                    <div class="tally-marks-wrapper" :style="{ position: showCount && countPosition === 'after' ? 'relative' : 'static' }">
+                        <!-- Label left -->
+                        <span v-if="label && labelPosition === 'left'" class="tally-label tally-label--left" :style="labelDisplayStyle">
+                            {{ label }}
+                        </span>
+                        <div v-if="showCount && countPosition === 'before'"
+                             style="display: flex; align-items: flex-start; gap: 2px; margin-right: 8px;">
+                            <button v-if="showDecrementButton"
+                                    class="tally-button" 
+                                    @click="decrement"
+                                    :disabled="count <= minCount"
+                                    title="Decrease">
+                                −
+                            </button>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <span class="tally-count tally-count--before" style="margin: 0;">
+                                    {{ count }}
+                                </span>
+                                <div v-if="showTimestamp" class="tally-timestamp">
+                                    {{ formattedTimestamp }}
+                                </div>
+                            </div>
+                            <button v-if="showIncrementButton"
+                                    class="tally-button" 
+                                    @click="increment"
+                                    :disabled="maxCount !== null && count >= maxCount"
+                                    title="Increase">
+                                +
+                            </button>
+                        </div>
+                        
+                        <div class="tally-marks-multiline" :style="{ color: color }">
+                            <!-- Render each line -->
+                            <div v-for="(line, lineIndex) in tallyLines" :key="'line-' + lineIndex" 
+                                 class="tally-line" :style="{ gap: sizeStyles.gap }">
+                                
+                                <!-- Render groups in this line -->
+                                <template v-for="(group, groupIndex) in line.groups" :key="'group-' + lineIndex + '-' + groupIndex">
+                                    
+                                    <!-- Complete group (4 marks + diagonal) -->
+                                    <div v-if="group.type === 'complete'" 
+                                         class="tally-group" :style="{ gap: sizeStyles.groupGap }">
+                                        <span v-for="markIndex in 4" :key="'mark-' + markIndex" 
+                                              class="mark" :style="{ fontSize: sizeStyles.fontSize }">|</span>
+                                        <span class="diagonal" :style="{ 
+                                            backgroundColor: group.isLast ? highlightColor : 'black',
+                                            width: sizeStyles.diagonalWidth
+                                        }"></span>
+                                    </div>
+                                    
+                                    <!-- Partial group (remaining marks) -->
+                                    <div v-else-if="group.type === 'partial'" 
+                                         class="tally-group" :style="{ gap: sizeStyles.groupGap }">
+                                        <span v-for="mark in group.count" :key="'mark-' + mark" 
+                                              class="mark" :style="{ 
+                                                  fontSize: sizeStyles.fontSize,
+                                                  color: mark === group.count ? highlightColor : color 
+                                              }">|</span>
+                                    </div>
+                                    
+                                </template>
+                                
+                                <!-- Fixed position count with buttons for 'after' on first line only -->
+                                <div v-if="showCount && countPosition === 'after' && lineIndex === 0" 
+                                     style="position: absolute; display: flex; align-items: center; gap: 2px;"
+                                     :style="{ left: countDisplayStyle.left }">
+                                    <!-- Decrement button -->
+                                    <button v-if="showDecrementButton"
+                                            class="tally-button" 
+                                            @click="decrement"
+                                            :disabled="count <= minCount"
+                                            title="Decrease">
+                                        −
+                                    </button>
+                                    
+                                    <!-- Count display -->
+                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                        <span class="tally-count tally-count--after-fixed" 
+                                              :style="{ 
+                                                  width: countDisplayStyle.width,
+                                                  textAlign: countDisplayStyle.textAlign,
+                                                  fontFamily: countDisplayStyle.fontFamily,
+                                                  fontWeight: countDisplayStyle.fontWeight,
+                                                  border: countDisplayStyle.border || '1px dashed #ccc',
+                                                  padding: countDisplayStyle.padding || '2px 4px',
+                                                  backgroundColor: countDisplayStyle.backgroundColor || 'rgba(255, 255, 255, 0.7)'
+                                              }">
+                                            {{ count.toString().padStart(maxDigits, ' ').replace(/ /g, '\u00A0') }}
+                                        </span>
+                                        <div v-if="showTimestamp" class="tally-timestamp">
+                                            {{ formattedTimestamp }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Increment button -->
+                                    <button v-if="showIncrementButton"
+                                            class="tally-button" 
+                                            @click="increment"
+                                            :disabled="maxCount !== null && count >= maxCount"
+                                            title="Increase">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Keep regular after count for non-fixed positioning as fallback -->
+                        <div v-if="showCount && countPosition === 'after' && Object.keys(countDisplayStyle).length === 0"
+                             style="display: flex; align-items: flex-start; gap: 2px; margin-left: 8px;">
+                            <button v-if="showDecrementButton"
+                                    class="tally-button" 
+                                    @click="decrement"
+                                    :disabled="count <= minCount"
+                                    title="Decrease">
+                                −
+                            </button>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <span class="tally-count tally-count--after" style="margin: 0;">
+                                    {{ count }}
+                                </span>
+                                <div v-if="showTimestamp" class="tally-timestamp">
+                                    {{ formattedTimestamp }}
+                                </div>
+                            </div>
+                            <button v-if="showIncrementButton"
+                                    class="tally-button" 
+                                    @click="increment"
+                                    :disabled="maxCount !== null && count >= maxCount"
+                                    title="Increase">
+                                +
+                            </button>
+                        </div>
+                        
+                        <!-- Label right -->
+                        <span v-if="label && labelPosition === 'right'" class="tally-label tally-label--right" :style="labelDisplayStyle">
+                            {{ label }}
+                        </span>
+                    </div>
+                    
+                    <!-- Count below -->
+                    <div v-if="showCount && countPosition === 'below'" 
+                         style="display: flex; align-items: flex-start; justify-content: center; gap: 2px; margin: 4px 0;">
+                        <button v-if="showDecrementButton"
+                                class="tally-button" 
+                                @click="decrement"
+                                :disabled="count <= minCount"
+                                title="Decrease">
+                            −
+                        </button>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span class="tally-count tally-count--below" style="margin: 0;">
+                                {{ count }}
+                            </span>
+                            <div v-if="showTimestamp" class="tally-timestamp">
+                                {{ formattedTimestamp }}
+                            </div>
+                        </div>
+                        <button v-if="showIncrementButton"
+                                class="tally-button" 
+                                @click="increment"
+                                :disabled="maxCount !== null && count >= maxCount"
+                                title="Increase">
+                            +
+                        </button>
+                    </div>
+                    
+                    <!-- Label below -->
+                    <div v-if="label && labelPosition === 'bottom'" class="tally-label tally-label--bottom" :style="labelDisplayStyle">
+                        {{ label }}
+                    </div>
+                </div>
+`
+        }
+
+        const { createApp, ref } = Vue
+        
+        createApp({
+            components: {
+                TallyMarks
+            },
+            setup() {
+                const count = ref(7)
+                const countA = ref(5)
+                const countB = ref(23)
+                const buttonTestA = ref(5)
+                const buttonTestB = ref(15)
+                const buttonTestC = ref(30)
+                const timestampTestA = ref(12)
+                const timestampTestB = ref(8)
+                const timestampTestC = ref(23)
+                const maxPerLine = ref(25)
+                const countPosition = ref('after')
+                const countDistance = ref(16)
+                const labelText = ref('Items:')
+                const labelPosition = ref('left')
+                const labelPadding = ref(null)
+                const showIncrementButton = ref(false)
+                const showDecrementButton = ref(false)
+                const incrementStep = ref(1)
+                const decrementStep = ref(1)
+                const showTimestamp = ref(false)
+                const timestampFormat = ref('mysql')
+                return { 
+                    count, countA, countB, buttonTestA, buttonTestB, buttonTestC,
+                    timestampTestA, timestampTestB, timestampTestC,
+                    maxPerLine, countPosition, countDistance, 
+                    labelText, labelPosition, labelPadding,
+                    showIncrementButton, showDecrementButton, incrementStep, decrementStep,
+                    showTimestamp, timestampFormat
+                }
+            }
+        }).mount('#vue-test')
+    </script>
+</body>
+</html>

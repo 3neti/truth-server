@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import TallyMarks from '@/components/TallyMarks.vue'
+import { TallyMarks } from '@lbhurtado/vue-tally-marks'
 import type { TallyData } from '@/types/election'
 
 /** Props */
