@@ -1,6 +1,8 @@
 ```bash
+npm run dev
 php artisan install:broadcasting --reverb
 php artisan vendor:publish --tag=truth-election-ui-stubs --force
+php artisan vendor:publish --tag=truth-qr-ui-stubs --force
 php artisan reverb:start -v
 ```
 
