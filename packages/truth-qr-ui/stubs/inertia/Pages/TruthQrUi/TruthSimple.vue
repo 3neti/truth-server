@@ -9,6 +9,8 @@ const error = ref('')
 const result = ref<any>(null)
 const decodedPayload = ref<any>(null)
 const copyStatus = ref('')
+const pdfLoading = ref(false)
+const pdfError = ref('')
 
 // Simple decode function
 async function decode() {
@@ -60,6 +62,7 @@ function clear() {
   decodedPayload.value = null
   error.value = ''
   copyStatus.value = ''
+  pdfError.value = ''
 }
 
 // Copy to clipboard function
@@ -81,6 +84,53 @@ async function copyToClipboard() {
     setTimeout(() => {
       copyStatus.value = ''
     }, 2000)
+  }
+}
+
+// PDF rendering function
+async function renderPdf() {
+  if (!decodedPayload.value) return
+  
+  pdfLoading.value = true
+  pdfError.value = ''
+  
+  try {
+    console.log('Rendering PDF with payload:', decodedPayload.value)
+    
+    // Call the truth-render API endpoint
+    const response = await axios.post('/api/truth/render', {
+      templateName: 'core:precinct/er/template',
+      data: decodedPayload.value,
+      format: 'pdf',
+      paperSize: 'A4',
+      orientation: 'portrait',
+      filename: 'election_return'
+    }, {
+      responseType: 'blob' // Important for PDF downloads
+    })
+    
+    // Create blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    const url = window.URL.createObjectURL(blob)
+    
+    // Create temporary link and trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `election_return_${decodedPayload.value.code || 'decoded'}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    // Clean up blob URL
+    window.URL.revokeObjectURL(url)
+    
+    console.log('PDF rendered and downloaded successfully')
+    
+  } catch (err: any) {
+    console.error('PDF render error:', err)
+    pdfError.value = err.response?.data?.error || err.message || 'PDF rendering failed'
+  } finally {
+    pdfLoading.value = false
   }
 }
 
@@ -210,9 +260,22 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
               >
                 📋 Copy
               </button>
+              <button
+                @click="renderPdf"
+                :disabled="pdfLoading"
+                class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                title="Render and download PDF"
+              >
+                {{ pdfLoading ? '🔄 Rendering...' : '📄 PDF' }}
+              </button>
             </div>
           </div>
           <pre class="p-4 bg-gray-50 border rounded-md text-xs overflow-auto max-h-96">{{ JSON.stringify(decodedPayload, null, 2) }}</pre>
+        </div>
+        
+        <!-- PDF Error -->
+        <div v-if="pdfError" class="p-3 bg-red-50 border border-red-200 rounded-md">
+          <p class="text-red-800 text-sm">🚫 PDF Error: {{ pdfError }}</p>
         </div>
       </div>
     </div>
