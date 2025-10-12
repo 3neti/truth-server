@@ -17,6 +17,8 @@ final class TruthQrUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../stubs/inertia/Pages/TruthQrUi/Playground.vue'
             => resource_path('js/Pages/TruthQrUi/Playground.vue'),
+            __DIR__ . '/../stubs/inertia/Pages/TruthQrUi/TruthSimple.vue'
+            => resource_path('js/Pages/TruthQrUi/TruthSimple.vue'),
             __DIR__ . '/../stubs/inertia/components/TruthQrForm.vue'
             => resource_path('js/Pages/TruthQrUi/components/TruthQrForm.vue'),
             __DIR__ . '/../stubs/inertia/components/ScannerPanel.vue'
