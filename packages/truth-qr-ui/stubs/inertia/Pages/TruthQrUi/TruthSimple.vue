@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 // State
@@ -13,6 +13,14 @@ const pdfLoading = ref(false)
 const pdfError = ref('')
 const pdfUrl = ref('')
 const pdfBlob = ref<Blob | null>(null)
+
+// Scanner state
+const scannerMode = ref<'manual' | 'keyboard'>('manual')
+const scannerActive = ref(false)
+const scannedChunks = ref<Set<string>>(new Set())
+const scanningBuffer = ref('')
+const lastScanTime = ref(0)
+const scanProgress = ref({ received: 0, total: 0, complete: false })
 
 // Simple decode function
 async function decode() {
@@ -73,6 +81,11 @@ function clear() {
     pdfUrl.value = ''
   }
   pdfBlob.value = null
+  
+  // Reset scanner state
+  scannedChunks.value.clear()
+  scanningBuffer.value = ''
+  scanProgress.value = { received: 0, total: 0, complete: false }
 }
 
 // Copy to clipboard function
@@ -159,6 +172,154 @@ function sharePdf() {
   console.log('PDF shared/downloaded successfully')
 }
 
+// Keyboard Scanner Functions
+function toggleScannerMode(mode: 'manual' | 'keyboard') {
+  scannerMode.value = mode
+  if (mode === 'keyboard') {
+    startKeyboardScanner()
+  } else {
+    stopKeyboardScanner()
+  }
+}
+
+function startKeyboardScanner() {
+  scannerActive.value = true
+  scannedChunks.value.clear()
+  scanProgress.value = { received: 0, total: 0, complete: false }
+  console.log('🔍 Keyboard scanner started - Ready to scan QR codes!')
+}
+
+function stopKeyboardScanner() {
+  scannerActive.value = false
+  scanningBuffer.value = ''
+  console.log('⏹️ Keyboard scanner stopped')
+}
+
+// Handle keyboard input from QR scanner
+function handleKeyboardInput(event: KeyboardEvent) {
+  if (!scannerActive.value) return
+  
+  const currentTime = Date.now()
+  
+  // Detect Enter/Return key (end of QR scan)
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    event.preventDefault()
+    
+    if (scanningBuffer.value.trim()) {
+      processScannedChunk(scanningBuffer.value.trim())
+      scanningBuffer.value = ''
+    }
+    return
+  }
+  
+  // Filter out modifier keys and control characters
+  const ignoredKeys = [
+    'Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape',
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Backspace', 'Delete',
+    'Home', 'End', 'PageUp', 'PageDown', 'Insert', 'F1', 'F2', 'F3', 'F4', 
+    'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'
+  ]
+  
+  // Skip if it's a modifier key or control character
+  if (ignoredKeys.includes(event.key) || event.key.length > 1) {
+    return
+  }
+  
+  // Skip if modifier keys are pressed (except for normal character input)
+  if (event.ctrlKey || event.altKey || event.metaKey) {
+    return
+  }
+  
+  // Only add printable characters
+  if (event.key.length === 1) {
+    scanningBuffer.value += event.key
+    lastScanTime.value = currentTime
+    
+    console.log(`📝 Added character: '${event.key}' (buffer: ${scanningBuffer.value.length} chars)`)
+  }
+}
+
+// Process a scanned chunk
+function processScannedChunk(chunkData: string) {
+  console.log('📱 Scanned chunk:', chunkData)
+  
+  // Very relaxed validation - just check if it looks like it has some structure
+  if (!chunkData || chunkData.length < 10) {
+    console.warn('⚠️ Chunk too short:', chunkData)
+    return
+  }
+  
+  let currentPart = 1, totalParts = 1
+  
+  // Try to extract part numbers from various formats
+  // URL format: truth://v1/TRUTH/code/part/total?c=data
+  if (chunkData.includes('://')) {
+    try {
+      const url = new URL(chunkData)
+      const pathParts = url.pathname.split('/').filter(p => p.length > 0)
+      if (pathParts.length >= 4) {
+        currentPart = parseInt(pathParts[3]) || 1
+        totalParts = parseInt(pathParts[4]) || 1
+        console.log(`📊 URL format detected - Part: ${currentPart}/${totalParts}`)
+      }
+    } catch (e) {
+      console.log('📊 URL parsing failed, treating as single chunk')
+    }
+  }
+  // Pipe format: ER|v1|code|part/total|data
+  else if (chunkData.includes('|') && chunkData.includes('/')) {
+    const parts = chunkData.split('|')
+    for (const part of parts) {
+      if (part.includes('/')) {
+        const [p, t] = part.split('/').map(Number)
+        if (!isNaN(p) && !isNaN(t)) {
+          currentPart = p
+          totalParts = t
+          console.log(`📊 Pipe format detected - Part: ${currentPart}/${totalParts}`)
+          break
+        }
+      }
+    }
+  }
+  
+  // Check for duplicates
+  if (scannedChunks.value.has(chunkData)) {
+    console.log('🔄 Duplicate chunk detected, ignoring')
+    return
+  }
+  
+  // Add chunk to collection
+  scannedChunks.value.add(chunkData)
+  console.log(`✅ Added chunk ${scannedChunks.value.size} to collection`)
+  
+  // Update progress (use the detected total, or just show current count)
+  scanProgress.value = {
+    received: scannedChunks.value.size,
+    total: totalParts > 1 ? totalParts : scannedChunks.value.size,
+    complete: totalParts > 1 ? (scannedChunks.value.size === totalParts) : false
+  }
+  
+  console.log(`📊 Progress: ${scanProgress.value.received}/${scanProgress.value.total} chunks`)
+  
+  // Update chunks textarea
+  chunks.value = Array.from(scannedChunks.value).join('\n')
+  
+  // Auto-decode if we think we have all chunks (only if totalParts > 1)
+  if (scanProgress.value.complete && totalParts > 1) {
+    console.log('✅ All chunks received! Auto-decoding...')
+    setTimeout(() => decode(), 500) // Small delay to ensure UI updates
+  }
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  document.addEventListener('keydown', handleKeyboardInput)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyboardInput)
+})
+
 // Sample data for testing - only first 2 chunks
 function loadSample() {
   chunks.value = `ER|v1|317537|1/6|7Z1bc-LIkoD_SoVfdjdOewIwbl_eAMlgjDAhNOM5s9tBlFHZ1LFQOSRhNz0x_31T2IjUzRc1I2tMvsw0BpRJqpSVlV9l1p9719xxVODvnf7vn3tTZYu90712a7Bfq9X2vuzde2Iq3WkweX6n86tpnhutS3i7Dm8_qEA8f5O7trT5-iV3JId_7Q00-NTzdwfa5OlbLp-vXgvlcs9WTJMdfu9JFcpTvgykcvdOI2VGpj4-1_ShtbrSwg32Tutf9hzxIBx41-Xhx7mzuezIE760hRswdcOCmWCjmXTk_b10Qbe__vpWhpAvuQaxehuDWL24QSw1Zz3u3vnZhvjtvKPvv1fR3-QUlCtikr9NXL5x-mi09BOjpa9mrrtkmri_zzbPWB-2rEsTKdp4SdOxgL8pL1fFtU4da6NTx5rU6rXNNToz7jnyh2DWTHigTJl6XZgbvS5M0AvZ6kJwd8FMAUL8UpUaXmyUGl6AUo3NNYZyqhzBLqQ95-WaSh9vtNLHMKyQVvp8ztk4UK4oVSXjbKOScQYqHWyuYSjvlrvszBOibEv1B-gBHIBaTfQACteVN8JjA_7oCXdarsE6bfQYtkGzQ_wYetIPJNiszZ1y1RojtcahWl_RNcDJeZy1FzC_Tu9KVesKjfircMQfba5xJR2HjecymJU7tJC_6oO_qh2jobWADzFTXQsvKNdhGWjGMcIZ5wQ9hzwImMbnZTj2b2X86JxZVx8i9ziMz7q6_QghGhsqL8gzQ_fyN90cXpr754NhZpQAox9r2VUPwnNBzf9bNGr1JjuH95W_EiFyLbFlIfnGGF6hGewqbowhV3PJrmBYvBShvVfVVchUyCh_m7h885jIPGbCPBBv-IJdgWMRnn-v8sZL-7JlavuGbrT1hNKNXKVHnnqAZYjkDmurcEAaYg7OIl_9tb495J977fjU34OFj2Bt4XnLj9L028dZKC8ER4FJ_ywZgttSsDPlB8LLtpiphwsGWC60rPPf9FD3_XrmoLRhwvbkNNhcXHv-C4StsOj0YfUA_u1BZP0A9t91Hzzz8xf-J9eOH6VNvnXbnY112524ddswLy9Zx1vYi5wVjtH699Nzvr9ehr_lgTcWrpzKexgYBl9uHvnOwvPknKsvbxuT5ch-YZJC4YNuJiepcFyaAhYWy7w4vnP567BzPsj9Dce5vwHCuNtb-B3wP4gvlxBl
@@ -174,38 +335,146 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
       <p class="text-gray-600 mt-1">Paste encoded chunks to reconstruct election return JSON</p>
     </header>
 
+    <!-- MODE SELECTOR -->
+    <div class="border-b pb-4">
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">Input Mode:</span>
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button
+            @click="toggleScannerMode('manual')"
+            :class="[
+              'px-3 py-1 text-sm rounded-md transition-all',
+              scannerMode === 'manual' 
+                ? 'bg-white shadow text-blue-600 font-medium' 
+                : 'text-gray-600 hover:text-gray-800'
+            ]"
+          >
+            ✏️ Manual Entry
+          </button>
+          <button
+            @click="toggleScannerMode('keyboard')"
+            :class="[
+              'px-3 py-1 text-sm rounded-md transition-all',
+              scannerMode === 'keyboard' 
+                ? 'bg-white shadow text-green-600 font-medium' 
+                : 'text-gray-600 hover:text-gray-800'
+            ]"
+          >
+            ⌨️ QR Scanner
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCANNER STATUS -->
+    <div v-if="scannerMode === 'keyboard'" class="p-4 bg-green-50 border border-green-200 rounded-md">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold text-green-800">🔍 QR Scanner Mode</h3>
+        <div class="flex items-center gap-2">
+          <div :class="[
+            'w-3 h-3 rounded-full',
+            scannerActive ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+          ]"></div>
+          <span class="text-sm" :class="scannerActive ? 'text-green-700' : 'text-gray-600'">
+            {{ scannerActive ? 'Ready to Scan' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="text-sm text-green-700 mb-3">
+        📱 Point your QR scanner at the election return QR codes. Each scan will be automatically processed.
+      </div>
+      
+      <!-- Scanning Progress -->
+      <div v-if="scanProgress.total > 0" class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-green-700">Progress:</span>
+          <span class="font-mono text-green-800">{{ scanProgress.received }}/{{ scanProgress.total }} chunks</span>
+        </div>
+        <div class="w-full bg-green-200 rounded-full h-2">
+          <div 
+            class="bg-green-600 h-2 rounded-full transition-all duration-300"
+            :style="{ width: scanProgress.total > 0 ? (scanProgress.received / scanProgress.total * 100) + '%' : '0%' }"
+          ></div>
+        </div>
+        <div v-if="scanProgress.complete" class="text-sm text-green-800 font-medium">
+          ✅ All chunks received! Auto-decoding...
+        </div>
+      </div>
+    </div>
+
     <!-- INPUT SECTION -->
     <div class="space-y-4">
       <div>
         <label for="chunks" class="block text-sm font-medium text-gray-700 mb-2">
-          Encoded Chunks (one per line):
+          {{ scannerMode === 'manual' ? 'Encoded Chunks (one per line):' : 'Scanned Chunks:' }}
         </label>
         <textarea
           id="chunks"
           v-model="chunks"
+          :readonly="scannerMode === 'keyboard'"
           rows="8"
-          class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-mono text-xs"
-          placeholder="Paste your encoded chunks here, one per line...&#10;Example:&#10;ER|v1|317537|1/6|7Z1bc-LIkoD_SoVf...&#10;ER|v1|317537|2/6|xh-tl35MFCZ2UZjY..."
+          :class="[
+            'w-full p-3 border rounded-md shadow-sm font-mono text-xs',
+            scannerMode === 'keyboard' 
+              ? 'bg-gray-50 border-gray-200 text-gray-700' 
+              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+          ]"
+          :placeholder="scannerMode === 'manual' 
+            ? 'Paste your encoded chunks here, one per line...\nExample:\nER|v1|317537|1/6|7Z1bc-LIkoD_SoVf...\nER|v1|317537|2/6|xh-tl35MFCZ2UZjY...'
+            : 'Scanned QR codes will appear here automatically...'
+          "
         ></textarea>
       </div>
 
       <!-- CONTROLS -->
-      <div class="flex gap-3">
-        <button
-          @click="decode"
-          :disabled="loading || !chunks.trim()"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ loading ? '🔄 Decoding...' : '🔓 Decode' }}
-        </button>
+      <div class="flex gap-3 flex-wrap">
+        <!-- Manual Mode Controls -->
+        <template v-if="scannerMode === 'manual'">
+          <button
+            @click="decode"
+            :disabled="loading || !chunks.trim()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ loading ? '🔄 Decoding...' : '🔓 Decode' }}
+          </button>
+          
+          <button
+            @click="loadSample"
+            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+          >
+            📝 Load Sample (2/6)
+          </button>
+        </template>
         
-        <button
-          @click="loadSample"
-          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-        >
-          📝 Load Sample (2/6)
-        </button>
-
+        <!-- Scanner Mode Controls -->
+        <template v-if="scannerMode === 'keyboard'">
+          <button
+            v-if="!scannerActive"
+            @click="startKeyboardScanner"
+            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            🔍 Start Scanner
+          </button>
+          
+          <button
+            v-if="scannerActive"
+            @click="stopKeyboardScanner"
+            class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+          >
+            ⏹️ Stop Scanner
+          </button>
+          
+          <button
+            @click="decode"
+            :disabled="loading || !chunks.trim()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ loading ? '🔄 Decoding...' : '🔓 Manual Decode' }}
+          </button>
+        </template>
+        
+        <!-- Common Controls -->
         <button
           @click="clear"
           class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
