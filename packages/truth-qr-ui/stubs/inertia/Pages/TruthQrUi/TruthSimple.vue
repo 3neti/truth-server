@@ -8,6 +8,7 @@ const loading = ref(false)
 const error = ref('')
 const result = ref<any>(null)
 const decodedPayload = ref<any>(null)
+const copyStatus = ref('')
 
 // Simple decode function
 async function decode() {
@@ -58,6 +59,29 @@ function clear() {
   result.value = null
   decodedPayload.value = null
   error.value = ''
+  copyStatus.value = ''
+}
+
+// Copy to clipboard function
+async function copyToClipboard() {
+  if (!decodedPayload.value) return
+  
+  try {
+    const jsonString = JSON.stringify(decodedPayload.value, null, 2)
+    await navigator.clipboard.writeText(jsonString)
+    copyStatus.value = 'Copied!'
+    
+    // Clear status after 2 seconds
+    setTimeout(() => {
+      copyStatus.value = ''
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+    copyStatus.value = 'Copy failed'
+    setTimeout(() => {
+      copyStatus.value = ''
+    }, 2000)
+  }
 }
 
 // Sample data for testing - only first 2 chunks
@@ -173,7 +197,21 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
 
         <!-- Raw JSON -->
         <div>
-          <h4 class="font-semibold mb-2">📋 Full JSON Data</h4>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold">📋 Full JSON Data</h4>
+            <div class="flex items-center gap-2">
+              <span v-if="copyStatus" class="text-sm" :class="copyStatus === 'Copied!' ? 'text-green-600' : 'text-red-600'">
+                {{ copyStatus }}
+              </span>
+              <button
+                @click="copyToClipboard"
+                class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                title="Copy JSON to clipboard"
+              >
+                📋 Copy
+              </button>
+            </div>
+          </div>
           <pre class="p-4 bg-gray-50 border rounded-md text-xs overflow-auto max-h-96">{{ JSON.stringify(decodedPayload, null, 2) }}</pre>
         </div>
       </div>
