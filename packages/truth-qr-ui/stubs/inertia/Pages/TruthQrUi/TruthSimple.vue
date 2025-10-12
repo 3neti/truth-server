@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
+import useZxingVideo from '../composables/useZxingVideo'
+import { parseIndexTotal } from '../composables/MultiPartTools'
 
 // State
 const chunks = ref('')
@@ -15,12 +17,36 @@ const pdfUrl = ref('')
 const pdfBlob = ref<Blob | null>(null)
 
 // Scanner state
-const scannerMode = ref<'manual' | 'keyboard'>('manual')
+const scannerMode = ref<'manual' | 'keyboard' | 'camera'>('manual')
 const scannerActive = ref(false)
 const scannedChunks = ref<Set<string>>(new Set())
 const scanningBuffer = ref('')
 const lastScanTime = ref(0)
 const scanProgress = ref({ received: 0, total: 0, complete: false })
+
+// Camera scanner state
+const { videoEl, active: cameraActive, start: startCamera, stop: stopCamera } = useZxingVideo({
+  onDetected: (text) => {
+    console.log('📷 Camera detected:', text)
+    
+    // Check if it looks like a TRUTH chunk
+    const looksTruthy = /^truth:\/\//i.test(text) || /[?&]c=/.test(text) || !!parseIndexTotal(text) || /^ER\|/.test(text)
+    if (!looksTruthy) {
+      console.log('📷 Ignoring non-TRUTH chunk:', text)
+      return
+    }
+    
+    processScannedChunk(text)
+  },
+  onStarted: (deviceId) => {
+    console.log('📷 Camera started:', deviceId)
+    scannerActive.value = true
+  },
+  onStopped: () => {
+    console.log('📷 Camera stopped')
+    scannerActive.value = false
+  }
+})
 
 // Simple decode function
 async function decode() {
@@ -86,6 +112,11 @@ function clear() {
   scannedChunks.value.clear()
   scanningBuffer.value = ''
   scanProgress.value = { received: 0, total: 0, complete: false }
+  
+  // Stop camera if active
+  if (cameraActive.value) {
+    stopCamera()
+  }
 }
 
 // Copy to clipboard function
@@ -172,13 +203,23 @@ function sharePdf() {
   console.log('PDF shared/downloaded successfully')
 }
 
-// Keyboard Scanner Functions
-function toggleScannerMode(mode: 'manual' | 'keyboard') {
+// Scanner Mode Functions
+function toggleScannerMode(mode: 'manual' | 'keyboard' | 'camera') {
+  // Stop all active scanners first
+  if (scannerActive.value) {
+    stopKeyboardScanner()
+  }
+  if (cameraActive.value) {
+    stopCamera()
+  }
+  
   scannerMode.value = mode
+  
+  // Start the selected scanner
   if (mode === 'keyboard') {
     startKeyboardScanner()
-  } else {
-    stopKeyboardScanner()
+  } else if (mode === 'camera') {
+    startCameraScanner()
   }
 }
 
@@ -193,6 +234,18 @@ function stopKeyboardScanner() {
   scannerActive.value = false
   scanningBuffer.value = ''
   console.log('⏹️ Keyboard scanner stopped')
+}
+
+function startCameraScanner() {
+  scannedChunks.value.clear()
+  scanProgress.value = { received: 0, total: 0, complete: false }
+  startCamera()
+  console.log('📷 Camera scanner starting...')
+}
+
+function stopCameraScanner() {
+  stopCamera()
+  console.log('📷 Camera scanner stopped')
 }
 
 // Handle keyboard input from QR scanner
@@ -362,11 +415,22 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
           >
             ⌨️ QR Scanner
           </button>
+          <button
+            @click="toggleScannerMode('camera')"
+            :class="[
+              'px-3 py-1 text-sm rounded-md transition-all',
+              scannerMode === 'camera' 
+                ? 'bg-white shadow text-purple-600 font-medium' 
+                : 'text-gray-600 hover:text-gray-800'
+            ]"
+          >
+            📷 Camera
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- SCANNER STATUS -->
+    <!-- KEYBOARD SCANNER STATUS -->
     <div v-if="scannerMode === 'keyboard'" class="p-4 bg-green-50 border border-green-200 rounded-md">
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-semibold text-green-800">🔍 QR Scanner Mode</h3>
@@ -403,26 +467,84 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
       </div>
     </div>
 
+    <!-- CAMERA SCANNER STATUS -->
+    <div v-if="scannerMode === 'camera'" class="p-4 bg-purple-50 border border-purple-200 rounded-md">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold text-purple-800">📷 Camera Scanner Mode</h3>
+        <div class="flex items-center gap-2">
+          <div :class="[
+            'w-3 h-3 rounded-full',
+            cameraActive ? 'bg-purple-500 animate-pulse' : 'bg-gray-400'
+          ]"></div>
+          <span class="text-sm" :class="cameraActive ? 'text-purple-700' : 'text-gray-600'">
+            {{ cameraActive ? 'Camera Active' : 'Camera Off' }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="text-sm text-purple-700 mb-3">
+        📱 Position QR codes in front of your camera. Detected chunks will be processed automatically.
+      </div>
+      
+      <!-- Camera Video Preview -->
+      <div class="mb-3 rounded-lg overflow-hidden border border-purple-200">
+        <video 
+          ref="videoEl" 
+          class="w-full h-64 bg-black object-cover" 
+          autoplay 
+          playsinline 
+          muted
+          :class="{ 'opacity-50': !cameraActive }"
+        />
+      </div>
+      
+      <!-- Scanning Progress -->
+      <div v-if="scanProgress.total > 0" class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-purple-700">Progress:</span>
+          <span class="font-mono text-purple-800">{{ scanProgress.received }}/{{ scanProgress.total }} chunks</span>
+        </div>
+        <div class="w-full bg-purple-200 rounded-full h-2">
+          <div 
+            class="bg-purple-600 h-2 rounded-full transition-all duration-300"
+            :style="{ width: scanProgress.total > 0 ? (scanProgress.received / scanProgress.total * 100) + '%' : '0%' }"
+          ></div>
+        </div>
+        <div v-if="scanProgress.complete" class="text-sm text-purple-800 font-medium">
+          ✅ All chunks received! Auto-decoding...
+        </div>
+      </div>
+    </div>
+
     <!-- INPUT SECTION -->
     <div class="space-y-4">
       <div>
         <label for="chunks" class="block text-sm font-medium text-gray-700 mb-2">
-          {{ scannerMode === 'manual' ? 'Encoded Chunks (one per line):' : 'Scanned Chunks:' }}
+          {{ 
+            scannerMode === 'manual' 
+              ? 'Encoded Chunks (one per line):' 
+              : scannerMode === 'keyboard'
+              ? 'Scanned Chunks (Keyboard):'
+              : 'Scanned Chunks (Camera):'
+          }}
         </label>
         <textarea
           id="chunks"
           v-model="chunks"
-          :readonly="scannerMode === 'keyboard'"
+          :readonly="scannerMode === 'keyboard' || scannerMode === 'camera'"
           rows="8"
           :class="[
             'w-full p-3 border rounded-md shadow-sm font-mono text-xs',
-            scannerMode === 'keyboard' 
+            scannerMode === 'keyboard' || scannerMode === 'camera'
               ? 'bg-gray-50 border-gray-200 text-gray-700' 
               : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
           ]"
-          :placeholder="scannerMode === 'manual' 
-            ? 'Paste your encoded chunks here, one per line...\nExample:\nER|v1|317537|1/6|7Z1bc-LIkoD_SoVf...\nER|v1|317537|2/6|xh-tl35MFCZ2UZjY...'
-            : 'Scanned QR codes will appear here automatically...'
+          :placeholder="
+            scannerMode === 'manual' 
+              ? 'Paste your encoded chunks here, one per line...\nExample:\nER|v1|317537|1/6|7Z1bc-LIkoD_SoVf...\nER|v1|317537|2/6|xh-tl35MFCZ2UZjY...'
+              : scannerMode === 'keyboard'
+              ? 'QR scanner chunks will appear here automatically...'
+              : 'Camera-detected chunks will appear here automatically...'
           "
         ></textarea>
       </div>
@@ -463,6 +585,33 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
             class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
           >
             ⏹️ Stop Scanner
+          </button>
+          
+          <button
+            @click="decode"
+            :disabled="loading || !chunks.trim()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ loading ? '🔄 Decoding...' : '🔓 Manual Decode' }}
+          </button>
+        </template>
+        
+        <!-- Camera Mode Controls -->
+        <template v-if="scannerMode === 'camera'">
+          <button
+            v-if="!cameraActive"
+            @click="startCameraScanner"
+            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            📷 Start Camera
+          </button>
+          
+          <button
+            v-if="cameraActive"
+            @click="stopCameraScanner"
+            class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+          >
+            ⏹️ Stop Camera
           </button>
           
           <button
