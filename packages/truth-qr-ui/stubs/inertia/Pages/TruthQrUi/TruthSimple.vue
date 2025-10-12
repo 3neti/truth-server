@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
-import useZxingVideo from '../composables/useZxingVideo'
-import { parseIndexTotal } from '../composables/MultiPartTools'
+import useZxingVideo from './composables/useZxingVideo'
+import { parseIndexTotal } from './composables/MultiPartTools'
 
 // State
 const chunks = ref('')
