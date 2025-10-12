@@ -11,6 +11,8 @@ const decodedPayload = ref<any>(null)
 const copyStatus = ref('')
 const pdfLoading = ref(false)
 const pdfError = ref('')
+const pdfUrl = ref('')
+const pdfBlob = ref<Blob | null>(null)
 
 // Simple decode function
 async function decode() {
@@ -46,6 +48,8 @@ async function decode() {
 
     if (response.data.complete && response.data.payload) {
       decodedPayload.value = response.data.payload
+      // Auto-generate PDF when decoding is complete
+      await generatePdf()
     }
 
   } catch (e: any) {
@@ -63,6 +67,12 @@ function clear() {
   error.value = ''
   copyStatus.value = ''
   pdfError.value = ''
+  // Clean up PDF resources
+  if (pdfUrl.value) {
+    window.URL.revokeObjectURL(pdfUrl.value)
+    pdfUrl.value = ''
+  }
+  pdfBlob.value = null
 }
 
 // Copy to clipboard function
@@ -87,15 +97,15 @@ async function copyToClipboard() {
   }
 }
 
-// PDF rendering function
-async function renderPdf() {
+// PDF generation function (for auto-generation)
+async function generatePdf() {
   if (!decodedPayload.value) return
   
   pdfLoading.value = true
   pdfError.value = ''
   
   try {
-    console.log('Rendering PDF with payload:', decodedPayload.value)
+    console.log('Generating PDF with payload:', decodedPayload.value)
     
     // Call the truth-render API endpoint
     const response = await axios.post('/truth/render', {
@@ -106,32 +116,47 @@ async function renderPdf() {
       orientation: 'portrait',
       filename: 'election_return'
     }, {
-      responseType: 'blob' // Important for PDF downloads
+      responseType: 'blob' // Important for PDF handling
     })
     
-    // Create blob URL and trigger download
+    // Store blob and create URL for inline display
     const blob = new Blob([response.data], { type: 'application/pdf' })
-    const url = window.URL.createObjectURL(blob)
+    pdfBlob.value = blob
     
-    // Create temporary link and trigger download
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `election_return_${decodedPayload.value.code || 'decoded'}.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    // Clean up previous URL if exists
+    if (pdfUrl.value) {
+      window.URL.revokeObjectURL(pdfUrl.value)
+    }
     
-    // Clean up blob URL
-    window.URL.revokeObjectURL(url)
+    pdfUrl.value = window.URL.createObjectURL(blob)
     
-    console.log('PDF rendered and downloaded successfully')
+    console.log('PDF generated successfully')
     
   } catch (err: any) {
-    console.error('PDF render error:', err)
-    pdfError.value = err.response?.data?.error || err.message || 'PDF rendering failed'
+    console.error('PDF generation error:', err)
+    pdfError.value = err.response?.data?.error || err.message || 'PDF generation failed'
   } finally {
     pdfLoading.value = false
   }
+}
+
+// Share/download PDF function
+function sharePdf() {
+  if (!pdfBlob.value || !decodedPayload.value) return
+  
+  // Create temporary link and trigger download
+  const url = window.URL.createObjectURL(pdfBlob.value)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `election_return_${decodedPayload.value.code || 'decoded'}.pdf`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  
+  // Clean up temporary URL
+  window.URL.revokeObjectURL(url)
+  
+  console.log('PDF shared/downloaded successfully')
 }
 
 // Sample data for testing - only first 2 chunks
@@ -260,17 +285,42 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
               >
                 📋 Copy
               </button>
+              <!-- Share Button (shown when PDF is ready) -->
               <button
-                @click="renderPdf"
-                :disabled="pdfLoading"
-                class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
-                title="Render and download PDF"
+                v-if="pdfUrl && !pdfLoading"
+                @click="sharePdf"
+                class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                title="Download PDF"
               >
-                {{ pdfLoading ? '🔄 Rendering...' : '📄 PDF' }}
+                🔗 Share
               </button>
+              
+              <!-- PDF Loading indicator -->
+              <div
+                v-if="pdfLoading"
+                class="px-3 py-1 text-xs text-gray-600 flex items-center gap-1"
+              >
+                <span class="animate-spin">🔄</span>
+                PDF...
+              </div>
             </div>
           </div>
           <pre class="p-4 bg-gray-50 border rounded-md text-xs overflow-auto max-h-96">{{ JSON.stringify(decodedPayload, null, 2) }}</pre>
+        </div>
+        
+        <!-- PDF Viewer -->
+        <div v-if="pdfUrl" class="space-y-2">
+          <h4 class="font-semibold">📄 Election Return PDF</h4>
+          <div class="border border-gray-300 rounded-md overflow-hidden">
+            <iframe
+              :src="pdfUrl"
+              class="w-full h-96"
+              title="Election Return PDF"
+            >
+              Your browser doesn't support PDF viewing. 
+              <a :href="pdfUrl" target="_blank" class="text-blue-600 hover:underline">Download PDF</a>
+            </iframe>
+          </div>
         </div>
         
         <!-- PDF Error -->
