@@ -98,7 +98,7 @@ async function renderPdf() {
     console.log('Rendering PDF with payload:', decodedPayload.value)
     
     // Call the truth-render API endpoint
-    const response = await axios.post('/api/truth/render', {
+    const response = await axios.post('/truth/render', {
       templateName: 'core:precinct/er/template',
       data: decodedPayload.value,
       format: 'pdf',
