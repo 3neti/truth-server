@@ -3,19 +3,23 @@
 <p><strong>Code:</strong> {{qrMeta.code}}</p>
 <p><strong>Split By:</strong> {{qrMeta.by}}</p>
 
-<!-- QR Code Matrix Grid - 5 columns x 6 rows for optimal scanning -->
-<div style="display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 1.5em; margin-top: 1.5em; max-width: 100%; page-break-inside: avoid;">
+<!-- QR Code Matrix Grid - 2 columns x 2 rows for testing -->
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 2em; margin-top: 2em; max-width: 100%; page-break-inside: avoid;">
     {{#each qrMeta.qr}}
-        <div style="text-align: center; page-break-inside: avoid;">
+        {{#if (lt @index 4)}}
+        <div style="text-align: center; page-break-inside: avoid; border: 2px solid #333; padding: 1em; background: #f9f9f9;">
             {{#if (startsWith this "data:image/png")}}
-                <img src="{{this}}" width="128" height="128" alt="QR Code {{inc @index}}" style="border: 1px solid #ddd;" />
+                <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" style="border: 1px solid #000; display: block; margin: 0 auto;" />
             {{else if (includes this "<svg")}}
-                <div style="width: 128px; height: 128px; margin: 0 auto; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">{{{this}}}</div>
+                <div style="width: 256px; height: 256px; margin: 0 auto; border: 1px solid #000; display: flex; align-items: center; justify-content: center; background: white;">{{{this}}}</div>
             {{else}}
-                <p style="color: red; font-size: 10px;">Unsupported QR format</p>
+                <div style="width: 256px; height: 256px; margin: 0 auto; border: 1px solid #000; background: #ffe6e6; display: flex; align-items: center; justify-content: center;">
+                    <p style="color: red; font-size: 14px; text-align: center;">QR Format Error<br/>{{this}}</p>
+                </div>
             {{/if}}
-            <p style="margin: 0.3em 0 0 0; font-size: 10px; font-weight: bold;">{{inc @index}}/30</p>
+            <p style="margin: 1em 0 0 0; font-size: 14px; font-weight: bold; color: #333;">QR Code {{inc @index}} of 4</p>
         </div>
+        {{/if}}
     {{/each}}
 </div>
 
