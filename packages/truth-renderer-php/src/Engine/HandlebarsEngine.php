@@ -44,8 +44,7 @@ class HandlebarsEngine
             'flags'    => LightnCandy::FLAG_HANDLEBARSJS | LightnCandy::FLAG_NAMEDARG,
             'partials' => $partials,
         ], $engineFlagsSansHelpers);
-
-        // Built-in helpers as FQN strings to satisfy LightnCandy’s exporter
+        // Built-in helpers as FQN strings to satisfy LightnCandy's exporter
         $compileOptions['helpers'] = array_merge([
             'upper'     => HbsHelpers::class . '::upper',
             'lower'     => HbsHelpers::class . '::lower',
@@ -62,6 +61,9 @@ class HandlebarsEngine
             'inc'       => HbsHelpers::class . '::inc',
             'startsWith' => HbsHelpers::class . '::startsWith',
             'includes'  => HbsHelpers::class . '::includes',
+            'add'       => HbsHelpers::class . '::add',
+            'lt'        => HbsHelpers::class . '::lt',
+        ], $normalizedHelpers);
         ], $normalizedHelpers);
 
         // --- Compile ---
