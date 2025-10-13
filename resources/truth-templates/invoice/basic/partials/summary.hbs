@@ -1,9 +1,0 @@
-<p><strong>Total:</strong> ${{round2 (calcTotal items)}}</p>
-
-{{#if total}}
-    {{#unless (eq (round2 total) (round2 (calcTotal items)))}}
-        <p class="text-amber-700 text-xs">
-            Note: supplied total ${{round2 total}} differs from computed ${{round2 (calcTotal items)}}
-        </p>
-    {{/unless}}
-{{/if}}

@@ -81,7 +81,8 @@
         ],
         "pub-stubs": [
             "@php artisan vendor:publish --tag=truth-election-ui-stubs --force --ansi",
-            "@php artisan vendor:publish --tag=truth-qr-ui-stubs --force --ansi"
+            "@php artisan vendor:publish --tag=truth-qr-ui-stubs --force --ansi",
+            "@php artisan vendor:publish --tag=truth-renderer-templates --force --ansi"
         ]
     },
     "extra": {
