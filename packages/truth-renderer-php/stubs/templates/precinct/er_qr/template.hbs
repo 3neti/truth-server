@@ -276,20 +276,18 @@
             <p>Scan all {{qrMeta.qr.length}} codes to reconstruct election return data</p>
         </header>
         
-        <div class="qr-grid {{#if (lt qrMeta.qr.length 9)}}small-set{{/if}}">
+        <div style="display: flex; flex-wrap: wrap; gap: 2em; margin-top: 1.5em; justify-content: center;">
             {{#each qrMeta.qr}}
-            <div class="qr-item">
-                <div class="qr-code">
-                    {{#if (startsWith this "<svg")}}
-                        {{{this}}}
-                    {{else if (includes this "data:image/")}}
-                        <img src="{{this}}" alt="QR Code {{add @index 1}}" />
+                <div style="text-align: center; width: 256px;">
+                    {{#if (startsWith this "data:image/png")}}
+                        <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" />
+                    {{else if (includes this "data:image/svg+xml;base64")}}
+                        <div style="width: 256px; height: 256px;">{{{this}}}</div>
                     {{else}}
-                        <div style="background: #fee; padding: 10px; font-size: 8pt; color: #991b1b;">Invalid QR</div>
+                        <p style="color: red;">Unsupported QR format</p>
                     {{/if}}
+                    <p style="margin-top: 0.5em; font-weight: bold;">QR {{inc @index}}</p>
                 </div>
-                <p class="qr-label">QR {{add @index 1}}</p>
-            </div>
             {{/each}}
         </div>
         

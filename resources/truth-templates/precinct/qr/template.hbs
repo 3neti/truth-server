@@ -3,25 +3,17 @@
 <p><strong>Code:</strong> {{qrMeta.code}}</p>
 <p><strong>Split By:</strong> {{qrMeta.by}}</p>
 
-<!-- QR Code Matrix Grid - 2 columns x 2 rows for testing -->
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 2em; margin-top: 2em; max-width: 100%; page-break-inside: avoid;">
+<div style="display: flex; flex-wrap: wrap; gap: 2em; margin-top: 1.5em;">
     {{#each qrMeta.qr}}
-        {{#if (lt @index 4)}}
-        <div style="text-align: center; page-break-inside: avoid; border: 2px solid #333; padding: 1em; background: #f9f9f9;">
+        <div style="text-align: center; width: 256px;">
             {{#if (startsWith this "data:image/png")}}
-                <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" style="border: 1px solid #000; display: block; margin: 0 auto;" />
-            {{else if (includes this "<svg")}}
-                <div style="width: 256px; height: 256px; margin: 0 auto; border: 1px solid #000; display: flex; align-items: center; justify-content: center; background: white;">{{{this}}}</div>
+                <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" />
+            {{else if (includes this "data:image/svg+xml;base64")}}
+                <div style="width: 256px; height: 256px;">{{{this}}}</div>
             {{else}}
-                <div style="width: 256px; height: 256px; margin: 0 auto; border: 1px solid #000; background: #ffe6e6; display: flex; align-items: center; justify-content: center;">
-                    <p style="color: red; font-size: 14px; text-align: center;">QR Format Error<br/>{{this}}</p>
-                </div>
+                <p style="color: red;">Unsupported QR format</p>
             {{/if}}
-            <p style="margin: 1em 0 0 0; font-size: 14px; font-weight: bold; color: #333;">QR Code {{inc @index}} of 4</p>
+            <p style="margin-top: 0.5em;">QR {{inc @index}}</p>
         </div>
-        {{/if}}
     {{/each}}
 </div>
-
-<!-- Page breaks after every 30 QR codes for clean printing -->
-<div style="page-break-after: always;"></div>
