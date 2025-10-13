@@ -155,4 +155,20 @@ final class HbsHelpers
     {
         return str_contains((string)$string, (string)$needle);
     }
+
+    /**
+     * Add two numbers together
+     */
+    public static function add($a, $b): int
+    {
+        return (int)$a + (int)$b;
+    }
+
+    /**
+     * Less than comparison
+     */
+    public static function lt($a, $b): bool
+    {
+        return (int)$a < (int)$b;
+    }
 }
