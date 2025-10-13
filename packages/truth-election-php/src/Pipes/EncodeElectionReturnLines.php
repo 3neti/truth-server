@@ -23,7 +23,7 @@ final class EncodeElectionReturnLines
             transport: new Base64UrlDeflateTransport(),
             envelope: new EnvelopeV1Line(),
             writer: null,
-            opts: ['by' => 'size', 'size' => $ctx->maxChars]
+            opts: $ctx->getEncodeOptions()
         );
 
         $lines = $result['lines'] ?? [];

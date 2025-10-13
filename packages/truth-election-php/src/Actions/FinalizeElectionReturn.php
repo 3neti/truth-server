@@ -27,6 +27,13 @@ class FinalizeElectionReturn
         int $maxChars = 1200,
         string $dir = 'final',
         bool $force = false,
+        // QR encoding parameters
+        ?string $encodingStrategy = null,
+        ?int $chunkCount = null,
+        ?int $chunkSize = null,
+        ?string $qrWriterFormat = null,
+        ?int $qrWriterSize = null,
+        ?int $qrWriterMargin = null,
     ): ElectionReturnData {
         $precinct = $this->precinctContext->getPrecinct();
 
@@ -43,6 +50,9 @@ class FinalizeElectionReturn
             throw new RuntimeException("Election Return for [{$precinct->code}] not found.");
         }
 
+        // Get QR encoding configuration defaults
+        $qrConfig = config('truth-election.finalize_election_return.qr_encoding', []);
+        
         $ctx = new FinalizeErContext(
             precinct: $precinct,
             er: $er,
@@ -51,6 +61,15 @@ class FinalizeElectionReturn
             payload: $payload,
             maxChars: $maxChars,
             force: $force,
+            qrPersistedAbs: null,
+            
+            // QR encoding with config defaults
+            encodingStrategy: $encodingStrategy ?? $qrConfig['strategy'] ?? 'count',
+            chunkCount: $chunkCount ?? $qrConfig['chunk_count'] ?? 4,
+            chunkSize: $chunkSize ?? $qrConfig['chunk_size'] ?? 1200,
+            qrWriterFormat: $qrWriterFormat ?? $qrConfig['writer']['format'] ?? 'svg',
+            qrWriterSize: $qrWriterSize ?? $qrConfig['writer']['size'] ?? 512,
+            qrWriterMargin: $qrWriterMargin ?? $qrConfig['writer']['margin'] ?? 16,
         );
 
         $configuredPipes = config('truth-election.finalize_election_return.pipes', []);
@@ -75,6 +94,13 @@ class FinalizeElectionReturn
             'maxChars' => ['nullable', 'integer'],
             'dir' => ['nullable', 'string'],
             'force' => ['nullable', 'boolean'],
+            // QR encoding parameters
+            'encodingStrategy' => ['nullable', 'string', 'in:size,count'],
+            'chunkCount' => ['nullable', 'integer', 'min:1'],
+            'chunkSize' => ['nullable', 'integer', 'min:100'],
+            'qrWriterFormat' => ['nullable', 'string', 'in:svg,png,eps'],
+            'qrWriterSize' => ['nullable', 'integer', 'min:128'],
+            'qrWriterMargin' => ['nullable', 'integer', 'min:0'],
         ];
     }
     public function asController(ActionRequest $request): ElectionReturnData
@@ -87,6 +113,13 @@ class FinalizeElectionReturn
             maxChars: (int) Arr::get($validated, 'maxChars', 1200),
             dir: Arr::get($validated, 'dir', 'final'),
             force: (bool) Arr::get($validated, 'force', false),
+            // QR encoding parameters
+            encodingStrategy: Arr::get($validated, 'encodingStrategy'),
+            chunkCount: isset($validated['chunkCount']) ? (int) $validated['chunkCount'] : null,
+            chunkSize: isset($validated['chunkSize']) ? (int) $validated['chunkSize'] : null,
+            qrWriterFormat: Arr::get($validated, 'qrWriterFormat'),
+            qrWriterSize: isset($validated['qrWriterSize']) ? (int) $validated['qrWriterSize'] : null,
+            qrWriterMargin: isset($validated['qrWriterMargin']) ? (int) $validated['qrWriterMargin'] : null,
         );
     }
 }

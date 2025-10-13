@@ -48,16 +48,13 @@ class GenerateElectionReturnPayload
         $transport  = new Base64UrlDeflateTransport();
         $envelope   = new EnvelopeV1Line();
 
-        // QR Writer – using modern constructor signature (fmt, size, margin)
+        // QR Writer – using DTO configuration
         $writerFqcn = \TruthQr\Writers\BaconQrWriter::class;
-        $writerFmt = 'svg';
-        $writerSize = 512;
-        $writerMargin = 16;
 
         $writer = new $writerFqcn(
-            fmt: $writerFmt,
-            size: $writerSize,
-            margin: $writerMargin
+            fmt: $ctx->qrWriterFormat,
+            size: $ctx->qrWriterSize,
+            margin: $ctx->qrWriterMargin
         );
 
         $qrMeta = app(EncodePayload::class)->handle(
@@ -67,7 +64,7 @@ class GenerateElectionReturnPayload
             transport: $transport,
             envelope: $envelope,
             writer: $writer,
-            opts: ['by' => 'size', 'size' => $ctx->maxChars]
+            opts: $ctx->getEncodeOptions()
         );
 
         $payload = [

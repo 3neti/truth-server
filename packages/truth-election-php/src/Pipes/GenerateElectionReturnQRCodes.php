@@ -24,16 +24,13 @@ final class GenerateElectionReturnQRCodes
         $transport  = new Base64UrlDeflateTransport();
         $envelope   = new EnvelopeV1Line();
 
-        // QR Writer – using modern constructor signature (fmt, size, margin)
+        // QR Writer – using DTO configuration
         $writerFqcn = \TruthQr\Writers\BaconQrWriter::class;
-        $writerFmt = 'svg';
-        $writerSize = 512;
-        $writerMargin = 16;
 
         $writer = new $writerFqcn(
-            fmt: $writerFmt,
-            size: $writerSize,
-            margin: $writerMargin
+            fmt: $ctx->qrWriterFormat,
+            size: $ctx->qrWriterSize,
+            margin: $ctx->qrWriterMargin
         );
 
         // Encode payload with QR
@@ -44,14 +41,14 @@ final class GenerateElectionReturnQRCodes
             transport: $transport,
             envelope: $envelope,
             writer: $writer,
-            opts: ['by' => 'size', 'size' => $ctx->maxChars]
+            opts: $ctx->getEncodeOptions()
         );
 
         $qrImages = $result['qr'] ?? [];
 
         // Persist to storage
         foreach ($qrImages as $i => $qr) {
-            $filename = "{$ctx->folder}/qr_part_" . str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) . ".{$writerFmt}";
+            $filename = "{$ctx->folder}/qr_part_" . str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) . ".{$ctx->qrWriterFormat}";
             Storage::disk($ctx->disk)->put($filename, $qr);
         }
 
