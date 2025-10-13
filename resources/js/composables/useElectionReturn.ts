@@ -75,7 +75,6 @@ export function useElectionReturn(options: UseElectionReturnOptions = {}) {
     }
 
     function setFromJson(json: unknown): void {
-        console.log('[useElectionReturn] setFromJson input:', json)
         try {
             const obj = typeof json === 'string' ? JSON.parse(json) : json
             validateErShape(obj)

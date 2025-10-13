@@ -25,19 +25,12 @@ const noDataYet = computed(() => erError?.includes('Election Return'))
             </button>
         </header>
 
-<!--        <p v-if="erError" class="text-sm text-red-600">Error: {{ erError }}</p>-->
         <p v-if="erError && erError.includes('Election Return')" class="text-sm text-gray-600">
             No election return data yet.
         </p>
         <p v-else-if="erError" class="text-sm text-red-600">
             Error: {{ erError }}
         </p>
-<!--        <p v-if="noDataYet" class="text-sm text-gray-600">-->
-<!--            No election return data yet. Try refreshing.-->
-<!--        </p>-->
-<!--        <p v-else-if="erError" class="text-sm text-red-600">-->
-<!--            Error: {{ erError }}-->
-<!--        </p>-->
 
         <section v-if="er" class="border rounded p-4">
             <ErTallyView

@@ -3,17 +3,21 @@
 <p><strong>Code:</strong> {{qrMeta.code}}</p>
 <p><strong>Split By:</strong> {{qrMeta.by}}</p>
 
-<div style="display: flex; flex-wrap: wrap; gap: 2em; margin-top: 1.5em;">
+<!-- QR Code Matrix Grid - 5 columns x 6 rows for optimal scanning -->
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 1.5em; margin-top: 1.5em; max-width: 100%; page-break-inside: avoid;">
     {{#each qrMeta.qr}}
-        <div style="text-align: center; width: 256px;">
+        <div style="text-align: center; page-break-inside: avoid;">
             {{#if (startsWith this "data:image/png")}}
-                <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" />
+                <img src="{{this}}" width="128" height="128" alt="QR Code {{inc @index}}" style="border: 1px solid #ddd;" />
             {{else if (includes this "<svg")}}
-                <div style="width: 256px; height: 256px;">{{{this}}}</div>
+                <div style="width: 128px; height: 128px; margin: 0 auto; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">{{{this}}}</div>
             {{else}}
-                <p style="color: red;">Unsupported QR format</p>
+                <p style="color: red; font-size: 10px;">Unsupported QR format</p>
             {{/if}}
-            <p style="margin-top: 0.5em;">QR {{inc @index}}</p>
+            <p style="margin: 0.3em 0 0 0; font-size: 10px; font-weight: bold;">{{inc @index}}/30</p>
         </div>
     {{/each}}
 </div>
+
+<!-- Page breaks after every 30 QR codes for clean printing -->
+<div style="page-break-after: always;"></div>

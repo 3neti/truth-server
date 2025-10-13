@@ -64,7 +64,6 @@ class HandlebarsEngine
             'add'       => HbsHelpers::class . '::add',
             'lt'        => HbsHelpers::class . '::lt',
         ], $normalizedHelpers);
-        ], $normalizedHelpers);
 
         // --- Compile ---
         $php = LightnCandy::compile($template, $compileOptions);
