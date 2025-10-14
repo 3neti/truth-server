@@ -2,6 +2,7 @@
 
 ```bash
 truncate -s0 storage/logs/laravel.log
+composer pub-stubs
 php artisan election:setup-precinct --fresh
 echo "317537" | php artisan election:tally-votes
 php artisan election:read-vote BAL-000 A1

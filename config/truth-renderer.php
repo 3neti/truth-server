@@ -12,6 +12,6 @@ return [
         'default_namespace' => 'core',
     ],
     'render' => [
-        'qr_size' => 300, // default QR code size in pixels
+        'qr_size' => 150, // default QR code size in pixels
     ],
 ];
