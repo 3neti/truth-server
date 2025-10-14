@@ -276,17 +276,26 @@
             <p>Scan all {{qrMeta.qr.length}} codes to reconstruct election return data</p>
         </header>
         
-        <div style="display: flex; flex-wrap: wrap; gap: 2em; margin-top: 1.5em; justify-content: center;">
+        <div style="width: 100%; max-width: 580px; margin: 1em auto 0; padding: 5px; background: yellow; border: 3px solid red;">
             {{#each qrMeta.qr}}
-                <div style="text-align: center; width: 256px;">
+                <div style="display: inline-block; width: 180px; height: 180px; margin: 2px 3px; vertical-align: top; background: lightblue; border: 2px solid green; position: relative;">
                     {{#if (startsWith this "data:image/png")}}
-                        <img src="{{this}}" width="256" height="256" alt="QR Code {{inc @index}}" />
+                        <div style="width: 150px; height: 150px; border: 2px solid orange; position: absolute; top: 15px; left: 15px;">
+                            <img src="{{this}}" width="150" height="150" alt="QR {{inc @index}}" style="display: block;" />
+                        </div>
                     {{else if (includes this "data:image/svg+xml;base64")}}
-                        <div style="width: 256px; height: 256px;">{{{this}}}</div>
+                        <div style="width: 150px; height: 150px; border: 2px solid orange; position: absolute; top: 15px; left: 15px; overflow: hidden;">
+                            <div style="width: 150px; height: 150px;">{{{this}}}</div>
+                        </div>
+                    {{else if (startsWith this "<?xml")}}
+                        <div style="width: 150px; height: 150px; border: 2px solid orange; position: absolute; top: 15px; left: 15px; overflow: hidden;">
+                            <div style="width: 150px; height: 150px;">{{{this}}}</div>
+                        </div>
                     {{else}}
-                        <p style="color: red;">Unsupported QR format</p>
+                        <div style="width: 150px; height: 150px; position: absolute; top: 15px; left: 15px; background: #f0f0f0; border: 2px solid orange; text-align: center; line-height: 150px;">
+                            <p style="color: #666; margin: 0; font-size: 12px;">QR {{inc @index}}</p>
+                        </div>
                     {{/if}}
-                    <p style="margin-top: 0.5em; font-weight: bold;">QR {{inc @index}}</p>
                 </div>
             {{/each}}
         </div>
