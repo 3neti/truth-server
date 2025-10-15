@@ -203,10 +203,61 @@
     <div class="page summary-page">
         <header class="er-header">
             <div class="er-title">ELECTION RETURN</div>
-            <div class="er-meta">
-                <span>CODE: {{qrMeta.code}}</span>
-                <span>STRATEGY: {{qrMeta.by}}</span>
-                <span>QR PARTS: {{qrMeta.qr.length}}</span>
+            
+            <!-- Precinct Information -->
+            <table style="width: 100%; margin: 10px 0; font-size: 8pt; border-collapse: collapse;">
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">ELECTION RETURN ID:</td><td style="padding: 1px 0;">{{tallyMeta.id}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">CODE:</td><td style="padding: 1px 0;">{{tallyMeta.code}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">PRECINCT:</td><td style="padding: 1px 0;">{{tallyMeta.precinct.code}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">LOCATION:</td><td style="padding: 1px 0;">{{tallyMeta.precinct.location_name}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">COORDINATES:</td><td style="padding: 1px 0;">{{tallyMeta.precinct.latitude}}, {{tallyMeta.precinct.longitude}}</td></tr>
+                {{#if tallyMeta.precinct.closed_at}}<tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">CLOSED AT:</td><td style="padding: 1px 0;">{{tallyMeta.precinct.closed_at}}</td></tr>{{/if}}
+            </table>
+            
+            <!-- Voting Statistics -->
+            <div style="margin: 15px 0 0 0; padding: 8px 0; border-top: 1px solid #666; border-bottom: 1px solid #666;">
+                <div style="font-size: 8pt; font-weight: bold; margin-bottom: 5px;">VOTING STATISTICS</div>
+                <table style="width: 100%; font-size: 7pt; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Watchers:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.watchers_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Registered Voters:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.registered_voters_count}}</td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Actual Voters:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.actual_voters_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Ballots in Box:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.ballots_in_box_count}}</td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Unused Ballots:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.unused_ballots_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        {{#if tallyMeta.precinct.spoiled_ballots_count}}
+                            <td style="font-weight: bold; width: 20%; padding: 1px 0;">Spoiled Ballots:</td>
+                            <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.spoiled_ballots_count}}</td>
+                        {{else}}
+                            <td style="width: 20%; padding: 1px 0;"></td>
+                            <td style="width: 10%; padding: 1px 0;"></td>
+                        {{/if}}
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    {{#if tallyMeta.precinct.void_ballots_count}}
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Void Ballots:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{tallyMeta.precinct.void_ballots_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="width: 20%; padding: 1px 0;"></td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    {{/if}}
+                </table>
             </div>
         </header>
 
