@@ -1,21 +1,223 @@
-<h2>Vote Tallies</h2>
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Election Return {{qrMeta.code}}</title>
+    <style>
+        /* Print-optimized CSS */
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        body {
+            font-family: 'Courier New', 'DejaVu Sans Mono', monospace;
+            font-size: 9pt;
+            line-height: 1.2;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Page structure */
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Typewritten style header */
+        .er-header {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .er-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Compact typewritten tables */
+        .vote-tallies {
+            margin-bottom: 15px;
+        }
+        
+        .position-title {
+            font-size: 9pt;
+            font-weight: bold;
+            margin: 10px 0 3px 0;
+            text-transform: uppercase;
+            text-decoration: underline;
+        }
+        
+        .vote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 8pt;
+        }
+        
+        .vote-table td {
+            padding: 1px 0;
+        }
+        
+        .candidate-cell {
+            width: 95%;
+            font-family: 'Courier New', 'DejaVu Sans Mono', monospace;
+            white-space: nowrap;
+        }
+        
+        .vote-cell {
+            width: 5%;
+            text-align: right;
+            font-weight: bold;
+            padding: 0 2px;
+        }
+        
+        /* Compact signatures */
+        .signatures {
+            margin-top: 15px;
+            font-size: 8pt;
+        }
+        
+        .signature-line {
+            margin: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dotted #666;
+            padding-bottom: 2px;
+        }
+        
+        .signature-name {
+            font-weight: bold;
+        }
+        
+        .signature-value {
+            font-style: italic;
+        }
+        
+        /* Print optimizations */
+        @media print {
+            .page {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Election Return Summary -->
+    <div class="page summary-page">
+        <header class="er-header">
+            <div class="er-title">ELECTION RETURN</div>
+            
+            <!-- Precinct Information -->
+            <table style="width: 100%; margin: 10px 0; font-size: 8pt; border-collapse: collapse;">
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">ELECTION RETURN ID:</td><td style="padding: 1px 0;">{{id}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">CODE:</td><td style="padding: 1px 0;">{{code}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">PRECINCT:</td><td style="padding: 1px 0;">{{precinct.code}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">LOCATION:</td><td style="padding: 1px 0;">{{precinct.location_name}}</td></tr>
+                <tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">COORDINATES:</td><td style="padding: 1px 0;">{{precinct.latitude}}, {{precinct.longitude}}</td></tr>
+                {{#if precinct.closed_at}}<tr><td style="font-weight: bold; width: 40%; padding: 1px 0;">CLOSED AT:</td><td style="padding: 1px 0;">{{precinct.closed_at}}</td></tr>{{/if}}
+            </table>
+            
+            <!-- Voting Statistics -->
+            <div style="margin: 15px 0 0 0; padding: 8px 0; border-top: 1px solid #666; border-bottom: 1px solid #666;">
+                <div style="font-size: 8pt; font-weight: bold; margin-bottom: 5px;">VOTING STATISTICS</div>
+                <table style="width: 100%; font-size: 7pt; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Watchers:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.watchers_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Registered Voters:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.registered_voters_count}}</td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Actual Voters:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.actual_voters_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Ballots in Box:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.ballots_in_box_count}}</td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Unused Ballots:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.unused_ballots_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        {{#if precinct.spoiled_ballots_count}}
+                            <td style="font-weight: bold; width: 20%; padding: 1px 0;">Spoiled Ballots:</td>
+                            <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.spoiled_ballots_count}}</td>
+                        {{else}}
+                            <td style="width: 20%; padding: 1px 0;"></td>
+                            <td style="width: 10%; padding: 1px 0;"></td>
+                        {{/if}}
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    {{#if precinct.void_ballots_count}}
+                    <tr>
+                        <td style="font-weight: bold; width: 20%; padding: 1px 0;">Void Ballots:</td>
+                        <td style="width: 10%; padding: 1px 0; text-align: right;">{{precinct.void_ballots_count}}</td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="width: 20%; padding: 1px 0;"></td>
+                        <td style="width: 10%; padding: 1px 0;"></td>
+                        <td style="width: 30%; padding: 1px 0;"></td>
+                    </tr>
+                    {{/if}}
+                </table>
+            </div>
+        </header>
 
-{{#groupBy tallies key="position_code"}}
-  <h3>{{key}}</h3>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 1em;">
-    <thead>
-      <tr>
-        <th style="text-align: left; border-bottom: 1px solid #ccc;">Candidate</th>
-        <th style="text-align: right; border-bottom: 1px solid #ccc;">Votes</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each items}}
-        <tr>
-          <td>{{candidate_name}}</td>
-          <td style="text-align: right;">{{count}}</td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
-{{/groupBy}}
+        <!-- Vote Tallies -->
+        <section class="vote-tallies">
+            {{#groupBy tallies key="position_code"}}
+                <div class="position-title">{{key}}</div>
+                <table class="vote-table">
+                    {{#each items}}
+                        <tr>
+                            <td class="candidate-cell">
+                                <div style="width: 100%; position: relative;">
+                                    <span id="name-{{@index}}" style="background: white; padding-right: 3px; display: inline-block;">{{candidate_name}}</span>
+                                    <span style="position: absolute; left: 0; right: 0; top: 0; color: #666; z-index: -1; overflow: hidden;">................................................................................................................................................................................................</span>
+                                </div>
+                            </td>
+                            <td class="vote-cell">{{count}}</td>
+                        </tr>
+                    {{/each}}
+                </table>
+            {{/groupBy}}
+        </section>
+
+        <!-- Signatures Section -->
+        <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #333;">
+            <div style="font-size: 9pt; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">SIGNATURES</div>
+            {{#if signatures}}
+                {{#each signatures}}
+                    <div class="signature-line">
+                        <span class="signature-name">{{name}} ({{role}})</span>
+                        <span class="signature-value">{{signature}}</span>
+                    </div>
+                    <div style="font-size: 7pt; color: #666; margin: 1px 0 5px 0;">
+                        ID: {{id}} | Signed: {{signed_at}}
+                    </div>
+                {{/each}}
+            {{else}}
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 1</span>
+                    <span class="signature-value">_________________________</span>
+                </div>
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 2</span>
+                    <span class="signature-value">_________________________</span>
+                </div>
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 3</span>
+                    <span class="signature-value">_________________________</span>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>
