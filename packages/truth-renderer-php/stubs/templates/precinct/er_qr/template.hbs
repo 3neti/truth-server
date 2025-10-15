@@ -230,12 +230,17 @@
             {{/groupBy}}
         </section>
 
-        <div class="signatures">
-            {{#if tallyMeta.signatories}}
-                {{#each tallyMeta.signatories}}
+        <!-- Signatures Section -->
+        <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #333;">
+            <div style="font-size: 9pt; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">SIGNATURES</div>
+            {{#if tallyMeta.signatures}}
+                {{#each tallyMeta.signatures}}
                     <div class="signature-line">
-                        <span class="signature-name">{{name}}</span>
+                        <span class="signature-name">{{name}} ({{role}})</span>
                         <span class="signature-value">{{signature}}</span>
+                    </div>
+                    <div style="font-size: 7pt; color: #666; margin: 1px 0 5px 0;">
+                        ID: {{id}} | Signed: {{signed_at}}
                     </div>
                 {{/each}}
             {{else}}
