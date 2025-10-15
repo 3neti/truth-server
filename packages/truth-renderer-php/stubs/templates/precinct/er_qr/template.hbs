@@ -11,10 +11,10 @@
         }
         
         body {
-            font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.4;
-            color: #333;
+            font-family: 'Courier New', 'DejaVu Sans Mono', monospace;
+            font-size: 9pt;
+            line-height: 1.2;
+            color: #000;
             margin: 0;
             padding: 0;
         }
@@ -30,101 +30,86 @@
             page-break-before: always;
         }
         
-        /* Headers */
+        /* Typewritten style header */
         .er-header {
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+            text-align: left;
         }
         
-        .er-header h1 {
-            margin: 0 0 10px 0;
-            font-size: 24pt;
-            color: #1e40af;
+        .er-title {
+            font-size: 12pt;
             font-weight: bold;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .er-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            font-size: 10pt;
+            font-size: 8pt;
+            margin-bottom: 10px;
         }
         
-        .er-meta p {
-            margin: 0;
-            padding: 8px 12px;
-            background: #f8fafc;
-            border-left: 4px solid #3b82f6;
+        .er-meta span {
+            margin-right: 20px;
         }
         
-        /* Vote tallies section */
+        /* Compact typewritten tables */
         .vote-tallies {
-            flex-grow: 1;
+            margin-bottom: 15px;
         }
         
-        .vote-tallies h3 {
-            color: #1e40af;
-            font-size: 14pt;
-            margin: 25px 0 10px 0;
-            padding: 8px 0;
-            border-bottom: 2px solid #e5e7eb;
+        .position-title {
+            font-size: 9pt;
+            font-weight: bold;
+            margin: 10px 0 3px 0;
+            text-transform: uppercase;
+            text-decoration: underline;
         }
         
-        .vote-tallies table {
+        .vote-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            font-size: 8pt;
         }
         
-        .vote-tallies th {
-            background: #f1f5f9;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: bold;
-            border-bottom: 2px solid #cbd5e1;
+        .vote-table td {
+            padding: 1px 0;
+            border: none;
         }
         
-        .vote-tallies td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #e5e7eb;
+        .candidate-cell {
+            width: 70%;
         }
         
-        .vote-tallies tr:hover {
-            background: #f8fafc;
-        }
-        
-        .vote-tallies td:last-child {
+        .vote-cell {
+            width: 30%;
             text-align: right;
             font-weight: bold;
-            color: #1e40af;
+            background: white;
+            padding-left: 5px;
         }
         
-        /* Footer */
-        .er-footer {
-            margin-top: 30px;
-            padding: 20px 0;
-            border-top: 2px solid #e5e7eb;
-        }
-        
+        /* Compact signatures */
         .signatures {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-top: 20px;
-        }
-        
-        .signature-block {
-            text-align: center;
-            padding: 15px;
-            border: 1px dashed #cbd5e1;
+            margin-top: 15px;
+            font-size: 8pt;
         }
         
         .signature-line {
-            border-bottom: 1px solid #000;
-            height: 30px;
-            margin: 10px 0;
+            margin: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dotted #666;
+            padding-bottom: 2px;
+        }
+        
+        .signature-name {
+            font-weight: bold;
+        }
+        
+        .signature-value {
+            font-style: italic;
         }
         
         /* QR Code Pages */
@@ -213,58 +198,52 @@
     <!-- PAGE 1: Election Return Summary -->
     <div class="page summary-page">
         <header class="er-header">
-            <h1>Election Return</h1>
+            <div class="er-title">ELECTION RETURN</div>
             <div class="er-meta">
-                <p><strong>Code:</strong> {{qrMeta.code}}</p>
-                <p><strong>Strategy:</strong> {{qrMeta.by}}</p>
-                <p><strong>QR Codes:</strong> {{qrMeta.qr.length}} parts</p>
+                <span>CODE: {{qrMeta.code}}</span>
+                <span>STRATEGY: {{qrMeta.by}}</span>
+                <span>QR PARTS: {{qrMeta.qr.length}}</span>
             </div>
         </header>
 
         <!-- Vote Tallies -->
         <section class="vote-tallies">
-            <h2>Vote Tallies</h2>
-            
             {{#groupBy tallyMeta.tallies key="position_code"}}
-                <h3>{{key}}</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Candidate</th>
-                        <th style="text-align: right; width: 80px;">Votes</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div class="position-title">{{key}}</div>
+                <table class="vote-table">
                     {{#each items}}
                         <tr>
-                            <td>{{candidate_name}}</td>
-                            <td style="text-align: right;">{{count}}</td>
+                            <td class="candidate-cell">{{candidate_name}} ........................</td>
+                            <td class="vote-cell">{{count}}</td>
                         </tr>
                     {{/each}}
-                    </tbody>
                 </table>
             {{/groupBy}}
         </section>
 
-        <footer class="er-footer">
-            <div class="signatures">
-                <div class="signature-block">
-                    <p><strong>Board Member 1</strong></p>
-                    <div class="signature-line"></div>
-                    <p>Signature & Date</p>
+        <div class="signatures">
+            {{#if tallyMeta.signatories}}
+                {{#each tallyMeta.signatories}}
+                    <div class="signature-line">
+                        <span class="signature-name">{{name}}</span>
+                        <span class="signature-value">{{signature}}</span>
+                    </div>
+                {{/each}}
+            {{else}}
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 1</span>
+                    <span class="signature-value">_________________________</span>
                 </div>
-                <div class="signature-block">
-                    <p><strong>Board Member 2</strong></p>
-                    <div class="signature-line"></div>
-                    <p>Signature & Date</p>
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 2</span>
+                    <span class="signature-value">_________________________</span>
                 </div>
-                <div class="signature-block">
-                    <p><strong>Board Member 3</strong></p>
-                    <div class="signature-line"></div>
-                    <p>Signature & Date</p>
+                <div class="signature-line">
+                    <span class="signature-name">BOARD MEMBER 3</span>
+                    <span class="signature-value">_________________________</span>
                 </div>
-            </div>
-        </footer>
+            {{/if}}
+        </div>
     </div>
 
     <!-- PAGE 2+: QR Code Sheets -->
