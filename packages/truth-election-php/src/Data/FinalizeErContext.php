@@ -15,7 +15,7 @@ class FinalizeErContext extends Data
         public int $maxChars,
         public bool $force,
         public ?string $qrPersistedAbs = null,
-        
+
         // QR encoding preferences
         public string $encodingStrategy = 'count',  // 'size' | 'count'
         public int $chunkCount = 4,                 // when strategy = 'count'
@@ -24,7 +24,7 @@ class FinalizeErContext extends Data
         public int $qrWriterSize = 512,
         public int $qrWriterMargin = 16,
     ) {}
-    
+
     /**
      * Get encoding options for EncodePayload based on the configured strategy.
      *
@@ -32,8 +32,13 @@ class FinalizeErContext extends Data
      */
     public function getEncodeOptions(): array
     {
-        return $this->encodingStrategy === 'count' 
+        return $this->encodingStrategy === 'count'
             ? ['by' => 'count', 'count' => $this->chunkCount]
             : ['by' => 'size', 'size' => $this->chunkSize];
+    }
+
+    public function getMinifiedElectionReturn(): ERData
+    {
+        return ERData::fromElectionReturnData($this->er);
     }
 }

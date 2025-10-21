@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\Storage;
 use TruthQrUi\Actions\EncodePayload;
 use Closure;
 
-final class EncodeElectionReturnLines
+final class EncodeERLines
 {
     public function handle(FinalizeErContext $ctx, Closure $next): FinalizeErContext
     {
-        $erArray = $ctx->er->toArray();
+        $minifiedER = $ctx->getMinifiedElectionReturn();
+        $erArray = $minifiedER->toArray();
 
         $result = app(EncodePayload::class)->handle(
             payload: $erArray,
@@ -29,7 +30,7 @@ final class EncodeElectionReturnLines
         $lines = $result['lines'] ?? [];
 
         Storage::disk($ctx->disk)->put(
-            "{$ctx->folder}/election_return_encoded_lines.txt",
+            "{$ctx->folder}/er_encoded_lines.txt",
             implode(PHP_EOL, $lines)
         );
 

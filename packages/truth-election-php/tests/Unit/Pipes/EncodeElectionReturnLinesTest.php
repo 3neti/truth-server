@@ -87,7 +87,7 @@ uses(ResetsElectionStore::class)->beforeEach(function () {
     $this->return = $this->store->getElectionReturn($return->code);
 });
 
-test('encodes election return into lines and stores as encoded_lines.txt', function () {
+test('encodes election return into lines and stores as election_return_encoded_lines.txt', function () {
     Storage::fake('local');
 
     $ctx = new FinalizeErContext(
@@ -106,9 +106,9 @@ test('encodes election return into lines and stores as encoded_lines.txt', funct
 
     expect($result)->toBeInstanceOf(FinalizeErContext::class);
 
-    Storage::disk('local')->assertExists("ER-{$ctx->er->code}/final/encoded_lines.txt");
+    Storage::disk('local')->assertExists("ER-{$ctx->er->code}/final/election_return_encoded_lines.txt");
 
-    $contents = Storage::disk('local')->get("ER-{$ctx->er->code}/final/encoded_lines.txt");
+    $contents = Storage::disk('local')->get("ER-{$ctx->er->code}/final/election_return_encoded_lines.txt");
 
     expect($contents)->toContain('ER|v1|')->not->toBeEmpty();
 });

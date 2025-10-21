@@ -6,6 +6,7 @@ use TruthElection\Pipes\GenerateElectionReturnPayload;
 use TruthElection\Pipes\PersistElectionReturnJson;
 use TruthElection\Pipes\EncodeElectionReturnLines;
 use TruthElection\Pipes\RenderElectionReturnPdf;
+use TruthElection\Pipes\EncodeERLines;
 use TruthElection\Pipes\PersistERJson;
 
 return [
@@ -14,6 +15,7 @@ return [
             PersistElectionReturnJson::class,
             PersistERJson::class,
             EncodeElectionReturnLines::class,
+            EncodeERLines::class,
             GenerateElectionReturnQRCodes::class,
             GenerateElectionReturnPayload::class,
             RenderElectionReturnPdf::class,

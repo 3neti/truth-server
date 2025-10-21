@@ -13,7 +13,7 @@ final class PersistERJson
     {
         $disk = config('truth-election.storage.disk', 'local');
 
-        $minifiedER = ERData::fromElectionReturnData($ctx->er);
+        $minifiedER = $ctx->getMinifiedElectionReturn();
         $json = json_encode($minifiedER->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         $path = "{$ctx->folder}/er.json";
