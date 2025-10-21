@@ -40,7 +40,8 @@ class GenerateElectionReturnPayload
 
     private function generatePayload(FinalizeErContext $ctx): void
     {
-        $erArray = $ctx->er->toArray();
+        $minifiedER = $ctx->getMinifiedElectionReturn();
+        $erArray = $minifiedER->toArray();
         $code = $ctx->er->code;
 
         // Collaborators

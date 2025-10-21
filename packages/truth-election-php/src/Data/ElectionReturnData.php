@@ -97,10 +97,11 @@ class ElectionReturnData extends Data
                 count: $count
             );
         })
-        // Sort by position order, then by candidate code within each position
+        // Sort by position order, then by vote count (desc), then by candidate code (asc)
         ->sortBy(function (VoteCountData $tally) use ($positionOrder) {
             $positionIndex = $positionOrder[$tally->position_code] ?? 999;
-            return [$positionIndex, $tally->candidate_code];
+            // Use negative count for descending order (highest votes first)
+            return [$positionIndex, -$tally->count, $tally->candidate_code];
         });
         
         // Transform ERElectoralInspectorData to ElectoralInspectorData

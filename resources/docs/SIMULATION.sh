@@ -239,4 +239,5 @@ php artisan election:attest-return BEI:uuid-maria:signature456
 echo "BEI:uuid-pedro:signature789" | php artisan election:attest-return
 php artisan election:record-statistics '{"watchers_count":5,"registered_voters_count":800,"actual_voters_count":700,"ballots_in_box_count":695,"unused_ballots_count":105}'
 echo '{"watchers_count":6,"registered_voters_count":801,"actual_voters_count":701,"ballots_in_box_count":696,"unused_ballots_count":106}' | php artisan election:record-statistics
-php artisan election:wrapup-voting
+# Use increased memory limit for final wrapup (QR generation is memory intensive)
+php -d memory_limit=512M artisan election:wrapup-voting
