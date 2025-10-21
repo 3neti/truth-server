@@ -663,6 +663,28 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
             <span class="font-mono ml-2 text-red-600">{{ result.missing?.join(', ') }}</span>
           </div>
         </div>
+        
+        <!-- TRANSFORMATION INFO -->
+        <div v-if="result.transformed" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <h4 class="text-sm font-semibold text-blue-800 mb-2">🔄 Auto-Transformation Applied</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+            <div>
+              <span class="text-blue-600">From:</span>
+              <span class="ml-2 font-mono text-blue-800">{{ result.transformation?.from }}</span>
+            </div>
+            <div>
+              <span class="text-blue-600">To:</span>
+              <span class="ml-2 font-mono text-blue-800">{{ result.transformation?.to }}</span>
+            </div>
+            <div>
+              <span class="text-blue-600">Expansion:</span>
+              <span class="ml-2 font-mono text-blue-800">{{ result.transformation?.compression }}</span>
+            </div>
+          </div>
+          <div class="mt-2 text-xs text-blue-700">
+            💡 Minified ERData was automatically expanded to full ElectionReturnData for PDF generation.
+          </div>
+        </div>
       </div>
 
       <!-- DECODED PAYLOAD -->

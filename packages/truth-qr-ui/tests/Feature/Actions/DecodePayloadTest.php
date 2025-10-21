@@ -300,3 +300,111 @@ it('controller accepts chunks: [{text: ...}] and alias combos', function () {
     expect($out['complete'])->toBeTrue();
     expect($out['payload'])->toEqual($payload);
 });
+
+/* -------------------------------------------------------------------------- */
+/* 6) ERData auto-transformation                                              */
+/* -------------------------------------------------------------------------- */
+
+it('correctly detects ERData format for transformation', function () {
+    // Test ERData detection logic directly
+    $decodeAction = app(DecodePayload::class);
+    $reflection = new ReflectionClass($decodeAction);
+    $isERDataMethod = $reflection->getMethod('isERData');
+    $isERDataMethod->setAccessible(true);
+    
+    // Mock ERData payload (minified format)
+    $erDataPayload = [
+        'id' => 'test-er-001',
+        'code' => 'ER-2024-TEST',
+        'tallies' => [
+            'AJ_006' => 150,  // candidate_code => count (key-value format)
+            'SJ_002' => 120,
+            'TH_001' => 200,
+        ],
+        'signatures' => [
+            [
+                'id' => 'uuid-juan',
+                'signature' => 'signature123',
+                'signed_at' => '2024-10-21T06:00:00+00:00'
+            ]
+        ],
+        'created_at' => '2024-10-21T06:00:00+00:00',
+        'updated_at' => '2024-10-21T06:00:00+00:00',
+    ];
+    
+    // Mock full ElectionReturnData payload
+    $fullPayload = [
+        'id' => 'test-full-001',
+        'code' => 'ER-2024-FULL',
+        'precinct' => [
+            'code' => 'TEST-001',
+            'location_name' => 'Test School',
+        ],
+        'tallies' => [
+            [
+                'position_code' => 'PRESIDENT',
+                'candidate_code' => 'AJ_006',
+                'candidate_name' => 'Angelina Jolie',
+                'count' => 150
+            ]
+        ],
+        'signatures' => [],
+        'ballots' => [],
+        'created_at' => '2024-10-21T06:00:00+00:00',
+        'updated_at' => '2024-10-21T06:00:00+00:00',
+    ];
+    
+    // Test detection
+    $isERDataDetected = $isERDataMethod->invoke($decodeAction, $erDataPayload);
+    $isFullDetected = $isERDataMethod->invoke($decodeAction, $fullPayload);
+    
+    expect($isERDataDetected)->toBeTrue('ERData payload should be detected as ERData')
+        ->and($isFullDetected)->toBeFalse('Full ElectionReturnData payload should NOT be detected as ERData');
+});
+
+it('does not transform regular ElectionReturnData payloads', function () {
+    $ser = new JsonSerializer();
+    $tx  = new Base64UrlDeflateTransport();
+    $env = new EnvelopeV1Line();
+    
+    // Mock full ElectionReturnData payload
+    $fullPayload = [
+        'id' => 'test-full-001',
+        'code' => 'ER-2024-FULL',
+        'precinct' => [
+            'code' => 'TEST-001',
+            'location_name' => 'Test School',
+        ],
+        'tallies' => [
+            [
+                'position_code' => 'PRESIDENT',
+                'candidate_code' => 'AJ_006',
+                'candidate_name' => 'Angelina Jolie',
+                'count' => 150
+            ]
+        ],
+        'signatures' => [],
+        'ballots' => [],
+        'created_at' => '2024-10-21T06:00:00+00:00',
+        'updated_at' => '2024-10-21T06:00:00+00:00',
+    ];
+    
+    // Encode the full payload
+    $encRes = app(EncodePayload::class)->handle(
+        $fullPayload, 
+        $fullPayload['code'], 
+        $ser, 
+        $tx, 
+        $env, 
+        null, 
+        ['by'=>'size','size'=>200]
+    );
+    $lines = dp_lines_from_encode($encRes);
+    
+    // Decode should NOT transform (already in correct format)
+    $out = app(DecodePayload::class)->handle($lines, $env, $tx, $ser);
+    
+    expect($out['complete'])->toBeTrue()
+        ->and($out['transformed'] ?? false)->toBeFalse()
+        ->and($out['payload'])->toEqual($fullPayload);
+});

@@ -75,6 +75,12 @@ class ElectionReturnData extends Data
             $positions[$position['code']] = $position;
         }
         
+        // Create position order mapping
+        $positionOrder = [];
+        foreach ($electionConfig['positions'] as $index => $position) {
+            $positionOrder[$position['code']] = $index;
+        }
+        
         // Transform associative array to VoteCountData
         $tallies = collect($ERData->tallies)->map(function (int $count, string $candidateCode) use ($candidateToPosition, $candidateDetails) {
             $positionCode = $candidateToPosition[$candidateCode] ?? null;
@@ -90,6 +96,11 @@ class ElectionReturnData extends Data
                 candidate_name: $candidate['name'],
                 count: $count
             );
+        })
+        // Sort by position order, then by candidate code within each position
+        ->sortBy(function (VoteCountData $tally) use ($positionOrder) {
+            $positionIndex = $positionOrder[$tally->position_code] ?? 999;
+            return [$positionIndex, $tally->candidate_code];
         });
         
         // Transform ERElectoralInspectorData to ElectoralInspectorData
@@ -139,8 +150,8 @@ class ElectionReturnData extends Data
             tallies: new DataCollection(VoteCountData::class, $tallies->all()),
             signatures: new DataCollection(ElectoralInspectorData::class, $signatures->all()),
             ballots: $ballots,
-            created_at: $ERData->created_at,
-            updated_at: $ERData->updated_at,
+            created_at: Carbon::parse($ERData->created_at),
+            updated_at: Carbon::parse($ERData->updated_at),
         );
     }
 
