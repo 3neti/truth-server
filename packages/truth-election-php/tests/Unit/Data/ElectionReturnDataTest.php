@@ -7,7 +7,8 @@ use TruthElection\Data\{
     PrecinctData,
     ERData,
     ERVoteCountData,
-    ERElectoralInspectorData
+    ERElectoralInspectorData,
+    BallotData
 };
 use TruthElection\Enums\ElectoralInspectorRole;
 use Illuminate\Support\Carbon;
@@ -248,4 +249,152 @@ it('can create ElectionReturnData from ERData', function () {
     
     // Test that ballots collection is empty as expected
     expect($fullElectionReturn->ballots)->toHaveCount(0);
+});
+
+it('can create ERData from ElectionReturnData (minification)', function () {
+    // Create a full ElectionReturnData with signed inspectors
+    $tallies = new DataCollection(VoteCountData::class, [
+        new VoteCountData('PRESIDENT', 'AJ_006', 'Angelina Jolie', 150),
+        new VoteCountData('PRESIDENT', 'SJ_002', 'Scarlett Johansson', 120),
+        new VoteCountData('VICE-PRESIDENT', 'TH_001', 'Tom Hanks', 200),
+        new VoteCountData('SENATOR', 'ES_002', 'Emma Stone', 180),
+    ]);
+    
+    $signatures = new DataCollection(ElectoralInspectorData::class, [
+        // Signed inspector
+        new ElectoralInspectorData(
+            id: 'uuid-juan',
+            name: 'Juan dela Cruz',
+            role: ElectoralInspectorRole::CHAIRPERSON,
+            signature: 'signature123',
+            signed_at: Carbon::now()
+        ),
+        // Another signed inspector
+        new ElectoralInspectorData(
+            id: 'uuid-maria',
+            name: 'Maria Santos',
+            role: ElectoralInspectorRole::MEMBER,
+            signature: 'signature456',
+            signed_at: Carbon::now()
+        ),
+        // Unsigned inspector (should be filtered out)
+        new ElectoralInspectorData(
+            id: 'uuid-pedro',
+            name: 'Pedro Reyes',
+            role: ElectoralInspectorRole::MEMBER
+            // No signature or signed_at - should be excluded
+        ),
+    ]);
+    
+    $precinct = new PrecinctData(
+        code: 'TEST-001',
+        location_name: 'Test School',
+        latitude: 17.993217,
+        longitude: 120.488902,
+        electoral_inspectors: new DataCollection(ElectoralInspectorData::class, [])
+    );
+    
+    $ballots = new DataCollection(BallotData::class, []);
+    
+    $fullElectionReturn = new ElectionReturnData(
+        id: 'full-er-001',
+        code: 'ER-2024-FULL',
+        precinct: $precinct,
+        tallies: $tallies,
+        signatures: $signatures,
+        ballots: $ballots,
+        created_at: Carbon::now(),
+        updated_at: Carbon::now(),
+    );
+    
+    // Convert full ElectionReturnData to minified ERData
+    $minifiedER = ERData::fromElectionReturnData($fullElectionReturn);
+    
+    // Test basic structure
+    expect($minifiedER)->toBeInstanceOf(ERData::class)
+        ->and($minifiedER->id)->toBe('full-er-001')
+        ->and($minifiedER->code)->toBe('ER-2024-FULL');
+    
+    // Test that tallies were minified (removed position_code and candidate_name)
+    expect($minifiedER->tallies)->toHaveCount(4);
+    
+    $angelinaTally = $minifiedER->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
+    expect($angelinaTally)->not->toBeNull()
+        ->and($angelinaTally)->toBeInstanceOf(ERVoteCountData::class)
+        ->and($angelinaTally->candidate_code)->toBe('AJ_006')
+        ->and($angelinaTally->count)->toBe(150);
+    
+    $tomTally = $minifiedER->tallies->toCollection()->firstWhere('candidate_code', 'TH_001');
+    expect($tomTally)->not->toBeNull()
+        ->and($tomTally->candidate_code)->toBe('TH_001')
+        ->and($tomTally->count)->toBe(200);
+    
+    // Test that only signed inspectors were included (2 out of 3)
+    expect($minifiedER->signatures)->toHaveCount(2);
+    
+    $juanSignature = $minifiedER->signatures->toCollection()->firstWhere('id', 'uuid-juan');
+    expect($juanSignature)->not->toBeNull()
+        ->and($juanSignature)->toBeInstanceOf(ERElectoralInspectorData::class)
+        ->and($juanSignature->id)->toBe('uuid-juan')
+        ->and($juanSignature->signature)->toBe('signature123')
+        ->and($juanSignature->signed_at)->toBeInstanceOf(Carbon::class);
+    
+    $mariaSignature = $minifiedER->signatures->toCollection()->firstWhere('id', 'uuid-maria');
+    expect($mariaSignature)->not->toBeNull()
+        ->and($mariaSignature->id)->toBe('uuid-maria')
+        ->and($mariaSignature->signature)->toBe('signature456');
+    
+    // Verify unsigned inspector was filtered out
+    $pedroSignature = $minifiedER->signatures->toCollection()->firstWhere('id', 'uuid-pedro');
+    expect($pedroSignature)->toBeNull();
+});
+
+it('can perform round-trip conversion ERData → ElectionReturnData → ERData', function () {
+    // Start with minified ERData
+    $originalTallies = new DataCollection(ERVoteCountData::class, [
+        new ERVoteCountData('AJ_006', 150),  // Angelina Jolie - PRESIDENT
+        new ERVoteCountData('TH_001', 200),  // Tom Hanks - VICE-PRESIDENT
+    ]);
+    
+    $originalSignatures = new DataCollection(ERElectoralInspectorData::class, [
+        new ERElectoralInspectorData('uuid-juan', 'signature123', Carbon::now()),
+        new ERElectoralInspectorData('uuid-maria', 'signature456', Carbon::now()),
+    ]);
+    
+    $originalERData = new ERData(
+        id: 'roundtrip-001',
+        code: 'ER-2024-ROUNDTRIP',
+        tallies: $originalTallies,
+        signatures: $originalSignatures,
+        created_at: Carbon::now(),
+        updated_at: Carbon::now(),
+    );
+    
+    // Step 1: ERData → ElectionReturnData (expand)
+    $expandedElectionReturn = ElectionReturnData::fromERData($originalERData);
+    
+    // Step 2: ElectionReturnData → ERData (minify)
+    $minifiedERData = ERData::fromElectionReturnData($expandedElectionReturn);
+    
+    // Test that essential data is preserved through the round trip
+    expect($minifiedERData->id)->toBe($originalERData->id)
+        ->and($minifiedERData->code)->toBe($originalERData->code)
+        ->and($minifiedERData->tallies)->toHaveCount($originalERData->tallies->count())
+        ->and($minifiedERData->signatures)->toHaveCount($originalERData->signatures->count());
+    
+    // Test specific tallies are preserved
+    $originalAngelina = $originalERData->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
+    $roundtripAngelina = $minifiedERData->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
+    
+    expect($roundtripAngelina)->not->toBeNull()
+        ->and($roundtripAngelina->candidate_code)->toBe($originalAngelina->candidate_code)
+        ->and($roundtripAngelina->count)->toBe($originalAngelina->count);
+    
+    // Test specific signatures are preserved
+    $originalJuan = $originalERData->signatures->toCollection()->firstWhere('id', 'uuid-juan');
+    $roundtripJuan = $minifiedERData->signatures->toCollection()->firstWhere('id', 'uuid-juan');
+    
+    expect($roundtripJuan)->not->toBeNull()
+        ->and($roundtripJuan->id)->toBe($originalJuan->id)
+        ->and($roundtripJuan->signature)->toBe($originalJuan->signature);
 });
