@@ -6,18 +6,20 @@ use TruthElection\Pipes\GenerateElectionReturnPayload;
 use TruthElection\Pipes\PersistElectionReturnJson;
 use TruthElection\Pipes\EncodeElectionReturnLines;
 use TruthElection\Pipes\RenderElectionReturnPdf;
+use TruthElection\Pipes\PersistERJson;
 
 return [
     'finalize_election_return' => [
         'pipes' => [
             PersistElectionReturnJson::class,
+            PersistERJson::class,
             EncodeElectionReturnLines::class,
             GenerateElectionReturnQRCodes::class,
             GenerateElectionReturnPayload::class,
             RenderElectionReturnPdf::class,
             RenderElectionReturnPayloadPdf::class,
         ],
-        
+
         // QR encoding configuration
         'qr_encoding' => [
             'strategy' => env('TRUTH_QR_STRATEGY', 'count'),

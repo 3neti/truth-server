@@ -13,8 +13,8 @@ class ERData extends Data
     public function __construct(
         public string $id,
         public string $code,
-        /** @var DataCollection<ERVoteCountData> The sorted vote counts per candidate without the position code and name */
-        public DataCollection $tallies,
+        /** @var array<string, int> Vote counts per candidate code (candidate_code => count) */
+        public array $tallies,
         /** @var DataCollection<ERElectoralInspectorData> Digital signatures from the electoral board without the roles and name */
         public DataCollection $signatures,
         #[WithTransformer(DateTimeInterfaceTransformer::class)]
@@ -27,13 +27,11 @@ class ERData extends Data
 
     public static function fromElectionReturnData(ElectionReturnData $electionReturnData): static
     {
-        // Transform VoteCountData to ERVoteCountData (minify by removing position_code and candidate_name)
-        $minifiedTallies = $electionReturnData->tallies->toCollection()->map(function (VoteCountData $voteCount) {
-            return new ERVoteCountData(
-                candidate_code: $voteCount->candidate_code,
-                count: $voteCount->count
-            );
-        });
+        // Transform VoteCountData to associative array (candidate_code => count)
+        $minifiedTallies = [];
+        foreach ($electionReturnData->tallies as $voteCount) {
+            $minifiedTallies[$voteCount->candidate_code] = $voteCount->count;
+        }
         
         // Transform ElectoralInspectorData to ERElectoralInspectorData (minify by removing name and role)
         // Only include inspectors who have actually signed (have signature and signed_at)
@@ -57,7 +55,7 @@ class ERData extends Data
         return new static(
             id: $electionReturnData->id,
             code: $electionReturnData->code,
-            tallies: new DataCollection(ERVoteCountData::class, $minifiedTallies->all()),
+            tallies: $minifiedTallies,
             signatures: new DataCollection(ERElectoralInspectorData::class, $minifiedSignatures->all()),
             created_at: $electionReturnData->created_at,
             updated_at: $electionReturnData->updated_at,

@@ -6,7 +6,6 @@ use TruthElection\Data\{
     VoteCountData,
     PrecinctData,
     ERData,
-    ERVoteCountData,
     ERElectoralInspectorData,
     BallotData
 };
@@ -178,13 +177,13 @@ it('hydrates ElectionReturnData from JSON and exports to array', function () {
 });
 
 it('can create ElectionReturnData from ERData', function () {
-    // Create sample ERData with minified structure
-    $tallies = new DataCollection(ERVoteCountData::class, [
-        new ERVoteCountData('AJ_006', 150),  // Angelina Jolie - PRESIDENT
-        new ERVoteCountData('SJ_002', 120),  // Scarlett Johansson - PRESIDENT 
-        new ERVoteCountData('TH_001', 200),  // Tom Hanks - VICE-PRESIDENT
-        new ERVoteCountData('ES_002', 180),  // Emma Stone - SENATOR
-    ]);
+    // Create sample ERData with minified structure (key-value format)
+    $tallies = [
+        'AJ_006' => 150,  // Angelina Jolie - PRESIDENT
+        'SJ_002' => 120,  // Scarlett Johansson - PRESIDENT 
+        'TH_001' => 200,  // Tom Hanks - VICE-PRESIDENT
+        'ES_002' => 180,  // Emma Stone - SENATOR
+    ];
     
     $signatures = new DataCollection(ERElectoralInspectorData::class, [
         new ERElectoralInspectorData('uuid-juan', 'signature123', Carbon::now()),
@@ -315,19 +314,15 @@ it('can create ERData from ElectionReturnData (minification)', function () {
         ->and($minifiedER->id)->toBe('full-er-001')
         ->and($minifiedER->code)->toBe('ER-2024-FULL');
     
-    // Test that tallies were minified (removed position_code and candidate_name)
-    expect($minifiedER->tallies)->toHaveCount(4);
+    // Test that tallies were minified to key-value format
+    expect($minifiedER->tallies)->toHaveCount(4)
+        ->and($minifiedER->tallies)->toBeArray();
     
-    $angelinaTally = $minifiedER->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
-    expect($angelinaTally)->not->toBeNull()
-        ->and($angelinaTally)->toBeInstanceOf(ERVoteCountData::class)
-        ->and($angelinaTally->candidate_code)->toBe('AJ_006')
-        ->and($angelinaTally->count)->toBe(150);
-    
-    $tomTally = $minifiedER->tallies->toCollection()->firstWhere('candidate_code', 'TH_001');
-    expect($tomTally)->not->toBeNull()
-        ->and($tomTally->candidate_code)->toBe('TH_001')
-        ->and($tomTally->count)->toBe(200);
+    // Test specific candidate tallies in key-value format
+    expect($minifiedER->tallies['AJ_006'])->toBe(150);
+    expect($minifiedER->tallies['TH_001'])->toBe(200);
+    expect($minifiedER->tallies['SJ_002'])->toBe(120);
+    expect($minifiedER->tallies['ES_002'])->toBe(180);
     
     // Test that only signed inspectors were included (2 out of 3)
     expect($minifiedER->signatures)->toHaveCount(2);
@@ -350,11 +345,11 @@ it('can create ERData from ElectionReturnData (minification)', function () {
 });
 
 it('can perform round-trip conversion ERData → ElectionReturnData → ERData', function () {
-    // Start with minified ERData
-    $originalTallies = new DataCollection(ERVoteCountData::class, [
-        new ERVoteCountData('AJ_006', 150),  // Angelina Jolie - PRESIDENT
-        new ERVoteCountData('TH_001', 200),  // Tom Hanks - VICE-PRESIDENT
-    ]);
+    // Start with minified ERData (key-value format)
+    $originalTallies = [
+        'AJ_006' => 150,  // Angelina Jolie - PRESIDENT
+        'TH_001' => 200,  // Tom Hanks - VICE-PRESIDENT
+    ];
     
     $originalSignatures = new DataCollection(ERElectoralInspectorData::class, [
         new ERElectoralInspectorData('uuid-juan', 'signature123', Carbon::now()),
@@ -379,16 +374,12 @@ it('can perform round-trip conversion ERData → ElectionReturnData → ERData',
     // Test that essential data is preserved through the round trip
     expect($minifiedERData->id)->toBe($originalERData->id)
         ->and($minifiedERData->code)->toBe($originalERData->code)
-        ->and($minifiedERData->tallies)->toHaveCount($originalERData->tallies->count())
+        ->and($minifiedERData->tallies)->toHaveCount(count($originalERData->tallies))
         ->and($minifiedERData->signatures)->toHaveCount($originalERData->signatures->count());
     
-    // Test specific tallies are preserved
-    $originalAngelina = $originalERData->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
-    $roundtripAngelina = $minifiedERData->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
-    
-    expect($roundtripAngelina)->not->toBeNull()
-        ->and($roundtripAngelina->candidate_code)->toBe($originalAngelina->candidate_code)
-        ->and($roundtripAngelina->count)->toBe($originalAngelina->count);
+    // Test specific tallies are preserved in key-value format
+    expect($minifiedERData->tallies['AJ_006'])->toBe($originalERData->tallies['AJ_006'])
+        ->and($minifiedERData->tallies['TH_001'])->toBe($originalERData->tallies['TH_001']);
     
     // Test specific signatures are preserved
     $originalJuan = $originalERData->signatures->toCollection()->firstWhere('id', 'uuid-juan');

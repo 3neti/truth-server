@@ -75,9 +75,8 @@ class ElectionReturnData extends Data
             $positions[$position['code']] = $position;
         }
         
-        // Transform ERVoteCountData to VoteCountData
-        $tallies = $ERData->tallies->toCollection()->map(function (ERVoteCountData $erVote) use ($candidateToPosition, $candidateDetails) {
-            $candidateCode = $erVote->candidate_code;
+        // Transform associative array to VoteCountData
+        $tallies = collect($ERData->tallies)->map(function (int $count, string $candidateCode) use ($candidateToPosition, $candidateDetails) {
             $positionCode = $candidateToPosition[$candidateCode] ?? null;
             $candidate = $candidateDetails[$candidateCode] ?? null;
             
@@ -89,7 +88,7 @@ class ElectionReturnData extends Data
                 position_code: $positionCode,
                 candidate_code: $candidateCode,
                 candidate_name: $candidate['name'],
-                count: $erVote->count
+                count: $count
             );
         });
         
