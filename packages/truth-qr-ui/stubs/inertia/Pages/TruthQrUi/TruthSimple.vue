@@ -754,7 +754,7 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
           <div class="border border-gray-300 rounded-md overflow-hidden">
             <iframe
               :src="pdfUrl"
-              class="w-full h-96"
+              class="w-full h-[1200px] min-h-screen"
               title="Election Return PDF"
             >
               Your browser doesn't support PDF viewing. 
