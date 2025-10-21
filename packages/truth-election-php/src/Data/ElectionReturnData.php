@@ -8,6 +8,8 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Illuminate\Support\{Carbon, Collection};
 use Spatie\LaravelData\{Data, Optional};
 use Spatie\LaravelData\DataCollection;
+use TruthElection\Enums\ElectoralInspectorRole;
+use TruthElection\Services\ConfigFileReader;
 
 /**
  * ElectionReturnData represents a full, persisted election return record,
@@ -41,6 +43,107 @@ class ElectionReturnData extends Data
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d\TH:i:sP')]
         public Carbon $updated_at,
     ) {}
+
+    public static function fromERData(ERData $ERData): static
+    {
+        // Load configuration files using ConfigFileReader
+        $packageConfigPath = __DIR__ . '/../../config';
+        $configReader = new ConfigFileReader(
+            electionPath: $packageConfigPath . '/election.json',
+            precinctPath: $packageConfigPath . '/precinct.yaml',
+            mappingPath: $packageConfigPath . '/mapping.yaml'
+        );
+        $config = $configReader->read();
+        
+        $electionConfig = $config['election'];
+        $precinctConfig = $config['precinct'];
+        
+        // Create candidate lookup maps
+        $candidateToPosition = [];
+        $candidateDetails = [];
+        
+        foreach ($electionConfig['candidates'] as $positionCode => $candidates) {
+            foreach ($candidates as $candidate) {
+                $candidateToPosition[$candidate['code']] = $positionCode;
+                $candidateDetails[$candidate['code']] = $candidate;
+            }
+        }
+        
+        // Create position lookup map
+        $positions = [];
+        foreach ($electionConfig['positions'] as $position) {
+            $positions[$position['code']] = $position;
+        }
+        
+        // Transform ERVoteCountData to VoteCountData
+        $tallies = $ERData->tallies->toCollection()->map(function (ERVoteCountData $erVote) use ($candidateToPosition, $candidateDetails) {
+            $candidateCode = $erVote->candidate_code;
+            $positionCode = $candidateToPosition[$candidateCode] ?? null;
+            $candidate = $candidateDetails[$candidateCode] ?? null;
+            
+            if (!$positionCode || !$candidate) {
+                throw new \InvalidArgumentException("Unknown candidate code: {$candidateCode}");
+            }
+            
+            return new VoteCountData(
+                position_code: $positionCode,
+                candidate_code: $candidateCode,
+                candidate_name: $candidate['name'],
+                count: $erVote->count
+            );
+        });
+        
+        // Transform ERElectoralInspectorData to ElectoralInspectorData
+        $signatures = $ERData->signatures->toCollection()->map(function (ERElectoralInspectorData $erInspector) use ($precinctConfig) {
+            $inspectorConfig = collect($precinctConfig['electoral_inspectors'])
+                ->firstWhere('id', $erInspector->id);
+            
+            if (!$inspectorConfig) {
+                throw new \InvalidArgumentException("Unknown electoral inspector ID: {$erInspector->id}");
+            }
+            
+            return new ElectoralInspectorData(
+                id: $erInspector->id,
+                name: $inspectorConfig['name'],
+                role: ElectoralInspectorRole::from($inspectorConfig['role']),
+                signature: $erInspector->signature,
+                signed_at: $erInspector->signed_at
+            );
+        });
+        
+        // Create electoral inspectors for precinct (from config)
+        $electoralInspectors = collect($precinctConfig['electoral_inspectors'])->map(function ($inspector) {
+            return new ElectoralInspectorData(
+                id: $inspector['id'],
+                name: $inspector['name'],
+                role: ElectoralInspectorRole::from($inspector['role'])
+            );
+        });
+        
+        // Create PrecinctData
+        $precinct = new PrecinctData(
+            code: $precinctConfig['code'],
+            location_name: $precinctConfig['location_name'],
+            latitude: (float) $precinctConfig['latitude'],
+            longitude: (float) $precinctConfig['longitude'],
+            electoral_inspectors: new DataCollection(ElectoralInspectorData::class, $electoralInspectors->all()),
+        );
+        
+        // Create empty ballots collection
+        $ballots = new DataCollection(BallotData::class, []);
+        
+        // Return new ElectionReturnData instance
+        return new static(
+            id: $ERData->id,
+            code: $ERData->code,
+            precinct: $precinct,
+            tallies: new DataCollection(VoteCountData::class, $tallies->all()),
+            signatures: new DataCollection(ElectoralInspectorData::class, $signatures->all()),
+            ballots: $ballots,
+            created_at: $ERData->created_at,
+            updated_at: $ERData->updated_at,
+        );
+    }
 
     public function with(): array
     {

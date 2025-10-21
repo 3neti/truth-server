@@ -4,7 +4,10 @@ use TruthElection\Data\{
     ElectionReturnData,
     ElectoralInspectorData,
     VoteCountData,
-    PrecinctData
+    PrecinctData,
+    ERData,
+    ERVoteCountData,
+    ERElectoralInspectorData
 };
 use TruthElection\Enums\ElectoralInspectorRole;
 use Illuminate\Support\Carbon;
@@ -169,6 +172,80 @@ it('hydrates ElectionReturnData from JSON and exports to array', function () {
             'unused_ballots_count',
             'spoiled_ballots_count',
             'void_ballots_count',
-        ]);
+    ]);
 
+});
+
+it('can create ElectionReturnData from ERData', function () {
+    // Create sample ERData with minified structure
+    $tallies = new DataCollection(ERVoteCountData::class, [
+        new ERVoteCountData('AJ_006', 150),  // Angelina Jolie - PRESIDENT
+        new ERVoteCountData('SJ_002', 120),  // Scarlett Johansson - PRESIDENT 
+        new ERVoteCountData('TH_001', 200),  // Tom Hanks - VICE-PRESIDENT
+        new ERVoteCountData('ES_002', 180),  // Emma Stone - SENATOR
+    ]);
+    
+    $signatures = new DataCollection(ERElectoralInspectorData::class, [
+        new ERElectoralInspectorData('uuid-juan', 'signature123', Carbon::now()),
+        new ERElectoralInspectorData('uuid-maria', 'signature456', Carbon::now()),
+    ]);
+    
+    $erData = new ERData(
+        id: 'test-er-001',
+        code: 'ER-2024-TEST',
+        tallies: $tallies,
+        signatures: $signatures,
+        created_at: Carbon::now(),
+        updated_at: Carbon::now(),
+    );
+    
+    // Convert ERData to full ElectionReturnData
+    $fullElectionReturn = ElectionReturnData::fromERData($erData);
+    
+    // Test basic structure
+    expect($fullElectionReturn)->toBeInstanceOf(ElectionReturnData::class)
+        ->and($fullElectionReturn->id)->toBe('test-er-001')
+        ->and($fullElectionReturn->code)->toBe('ER-2024-TEST')
+        ->and($fullElectionReturn->precinct)->toBeInstanceOf(PrecinctData::class)
+        ->and($fullElectionReturn->tallies)->toBeInstanceOf(DataCollection::class)
+        ->and($fullElectionReturn->signatures)->toBeInstanceOf(DataCollection::class)
+        ->and($fullElectionReturn->ballots)->toBeInstanceOf(DataCollection::class);
+    
+    // Test precinct data was populated from config
+    expect($fullElectionReturn->precinct->code)->toBe('CURRIMAO-001')
+        ->and($fullElectionReturn->precinct->location_name)->toBe('Currimao National High School')
+        ->and($fullElectionReturn->precinct->electoral_inspectors)->toHaveCount(3);
+    
+    // Test that tallies were expanded with position codes and candidate names
+    expect($fullElectionReturn->tallies)->toHaveCount(4);
+    
+    $angelinaTally = $fullElectionReturn->tallies->toCollection()->firstWhere('candidate_code', 'AJ_006');
+    expect($angelinaTally)->not->toBeNull()
+        ->and($angelinaTally->position_code)->toBe('PRESIDENT')
+        ->and($angelinaTally->candidate_name)->toBe('Angelina Jolie')
+        ->and($angelinaTally->count)->toBe(150);
+    
+    $tomTally = $fullElectionReturn->tallies->toCollection()->firstWhere('candidate_code', 'TH_001');
+    expect($tomTally)->not->toBeNull()
+        ->and($tomTally->position_code)->toBe('VICE-PRESIDENT')
+        ->and($tomTally->candidate_name)->toBe('Tom Hanks')
+        ->and($tomTally->count)->toBe(200);
+    
+    // Test that signatures were expanded with names and roles
+    expect($fullElectionReturn->signatures)->toHaveCount(2);
+    
+    $juanSignature = $fullElectionReturn->signatures->toCollection()->firstWhere('id', 'uuid-juan');
+    expect($juanSignature)->not->toBeNull()
+        ->and($juanSignature->name)->toBe('Juan dela Cruz')
+        ->and($juanSignature->role)->toBe(ElectoralInspectorRole::CHAIRPERSON)
+        ->and($juanSignature->signature)->toBe('signature123');
+    
+    $mariaSignature = $fullElectionReturn->signatures->toCollection()->firstWhere('id', 'uuid-maria');
+    expect($mariaSignature)->not->toBeNull()
+        ->and($mariaSignature->name)->toBe('Maria Santos')
+        ->and($mariaSignature->role)->toBe(ElectoralInspectorRole::MEMBER)
+        ->and($mariaSignature->signature)->toBe('signature456');
+    
+    // Test that ballots collection is empty as expected
+    expect($fullElectionReturn->ballots)->toHaveCount(0);
 });
