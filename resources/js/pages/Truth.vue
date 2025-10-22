@@ -59,16 +59,6 @@ function onProgress({
     missingCount.value = missing.length
 }
 
-function onDecoded(payload: any) {
-    console.log('[Truth.vue] Received decoded ER payload:', JSON.stringify(payload, null, 2))
-    try {
-        setFromJson(payload)
-        console.log('[Truth.vue] Successfully set ER')
-        scannerActive.value = false
-    } catch (e) {
-        console.warn('[Truth.vue] Failed to parse decoded payload:', e)
-    }
-}
 </script>
 
 <template>
