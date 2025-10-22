@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "178e117683c8a7e713f7b8a0feab6133",
+    "content-hash": "0865608afa09fd6efea4d661efb3bb94",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2459,6 +2459,57 @@
             "time": "2025-09-08T17:03:10+00:00"
         },
         {
+            "name": "lbhurtado/omr-template",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/omr-template",
+                "reference": "bb9080f0af3ef03e0680cca216cf2b2716f5fee1"
+            },
+            "require": {
+                "dompdf/dompdf": "^3.1",
+                "ext-json": "*",
+                "lorisleiva/laravel-actions": "^2.9",
+                "php": "^8.2",
+                "spatie/laravel-data": "^4.0",
+                "zordius/lightncandy": "^1.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.3",
+                "pestphp/pest": "^3.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LBHurtado\\OMRTemplate\\OMRTemplateServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LBHurtado\\OMRTemplate\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LBHurtado\\OMRTemplate\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + DOMPDF",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "lbhurtado/truth-codec-php",
             "version": "dev-main",
             "dist": {
@@ -2612,7 +2663,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/truth-election-ui",
-                "reference": "95552e1e83d0147c01e77a71116a20f403ef0248"
+                "reference": "9fc30adc9e7193c4f98aa1421f1b09ddd43749cd"
             },
             "require": {
                 "ext-json": "*",
@@ -12463,6 +12514,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "lbhurtado/omr-template": 20,
         "lbhurtado/truth-election-db": 20,
         "lbhurtado/truth-election-ui": 20
     },

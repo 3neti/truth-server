@@ -15,7 +15,8 @@
         { "type": "path", "url": "packages/truth-renderer-php" },
         { "type": "path", "url": "packages/truth-election-php" },
         { "type": "path", "url": "packages/truth-election-db" },
-        { "type": "path", "url": "packages/truth-election-ui" }
+        { "type": "path", "url": "packages/truth-election-ui" },
+        { "type": "path", "url": "packages/omr-template" }
     ],
     "require": {
         "php": "^8.2",
@@ -25,6 +26,7 @@
         "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
+        "lbhurtado/omr-template": "dev-main",
         "lbhurtado/truth-election-db": "dev-main",
         "lbhurtado/truth-election-ui": "dev-main"
     },

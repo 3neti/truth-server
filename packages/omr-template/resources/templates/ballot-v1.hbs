@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ballot - {{template_id}}</title>
+    <style>
+        @page {
+            size: {{layout}};
+            margin: 15mm;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 16pt;
+            margin: 5px 0;
+        }
+        .header h2 {
+            font-size: 12pt;
+            margin: 5px 0;
+            font-weight: normal;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .qr-code img {
+            width: 80px;
+            height: 80px;
+        }
+        .contest {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        .contest-title {
+            font-weight: bold;
+            font-size: 11pt;
+            background: #eee;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .candidate {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px;
+        }
+        .mark-zone {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .candidate-info {
+            flex-grow: 1;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 8pt;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>OFFICIAL BALLOT</h1>
+        <h2>{{document_type}}</h2>
+        {{#if metadata}}
+        <p>{{metadata.precinct}} | {{metadata.election_date}}</p>
+        {{/if}}
+    </div>
+
+    {{#if qr}}
+    <div class="qr-code">
+        <img src="{{qr}}" alt="QR Code">
+    </div>
+    {{/if}}
+
+    {{#each contests_or_sections}}
+    <div class="contest">
+        <div class="contest-title">
+            {{this.title}}
+            {{#if this.instruction}}
+            <br><small>{{this.instruction}}</small>
+            {{/if}}
+        </div>
+        {{#each this.candidates}}
+        <div class="candidate">
+            <div class="mark-zone"></div>
+            <div class="candidate-info">
+                <strong>{{this.name}}</strong>
+                {{#if this.party}}
+                <br><small>{{this.party}}</small>
+                {{/if}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+
+    <div class="footer">
+        Generated: {{metadata.generated_at}} | Template: {{template_id}}
+    </div>
+</body>
+</html>

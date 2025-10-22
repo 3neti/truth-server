@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Paper - {{template_id}}</title>
+    <style>
+        @page {
+            size: {{layout}};
+            margin: 15mm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+        }
+        .student-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .question {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        .question-number {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 10px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        .mark-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #000;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{document_type}}</h1>
+        {{#if metadata}}
+        <p>{{metadata.subject}} | {{metadata.exam_date}}</p>
+        {{/if}}
+    </div>
+
+    <div class="student-info">
+        <p><strong>Name:</strong> _________________________________</p>
+        <p><strong>Student ID:</strong> _________________________________</p>
+    </div>
+
+    {{#each contests_or_sections}}
+    <div class="question">
+        <div class="question-number">{{this.number}}. {{this.text}}</div>
+        {{#each this.options}}
+        <div class="option">
+            <div class="mark-box"></div>
+            <span>{{this.label}}. {{this.text}}</span>
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+</body>
+</html>

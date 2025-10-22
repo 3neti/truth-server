@@ -1,0 +1,45 @@
+{
+    "name": "lbhurtado/omr-template",
+    "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + DOMPDF",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "LBHurtado\\OMRTemplate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LBHurtado\\OMRTemplate\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "dompdf/dompdf": "^3.1",
+        "zordius/lightncandy": "^1.2",
+        "spatie/laravel-data": "^4.0",
+        "lorisleiva/laravel-actions": "^2.9"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LBHurtado\\OMRTemplate\\OMRTemplateServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

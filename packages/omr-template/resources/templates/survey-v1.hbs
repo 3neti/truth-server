@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Survey - {{template_id}}</title>
+    <style>
+        @page {
+            size: {{layout}};
+            margin: 15mm;
+        }
+        body {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #333;
+        }
+        .header h1 {
+            font-size: 18pt;
+            margin: 10px 0;
+        }
+        .instructions {
+            background: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #666;
+        }
+        .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .likert-scale {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .scale-item {
+            text-align: center;
+            flex: 1;
+        }
+        .scale-box {
+            width: 25px;
+            height: 25px;
+            border: 2px solid #000;
+            margin: 0 auto 5px;
+        }
+        .scale-label {
+            font-size: 8pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{document_type}}</h1>
+        {{#if metadata}}
+        <p>{{metadata.title}}</p>
+        <p style="font-size: 9pt;">{{metadata.description}}</p>
+        {{/if}}
+    </div>
+
+    {{#if metadata.instructions}}
+    <div class="instructions">
+        <strong>Instructions:</strong> {{metadata.instructions}}
+    </div>
+    {{/if}}
+
+    {{#each contests_or_sections}}
+    <div class="section">
+        {{#if this.title}}
+        <div class="section-title">{{this.title}}</div>
+        {{/if}}
+        
+        {{#each this.questions}}
+        <div class="question">
+            <div class="question-text">{{this.number}}. {{this.text}}</div>
+            
+            {{#if this.scale}}
+            <div class="likert-scale">
+                {{#each this.scale}}
+                <div class="scale-item">
+                    <div class="scale-box"></div>
+                    <div class="scale-label">{{this.label}}</div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            {{#each this.options}}
+            <div style="display: flex; align-items: center; margin-left: 20px; margin-bottom: 8px;">
+                <div style="width: 18px; height: 18px; border: 2px solid #000; margin-right: 10px;"></div>
+                <span>{{this.text}}</span>
+            </div>
+            {{/each}}
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+
+    <div style="margin-top: 40px; text-align: center; font-size: 9pt; color: #666;">
+        Thank you for your participation!
+    </div>
+</body>
+</html>
