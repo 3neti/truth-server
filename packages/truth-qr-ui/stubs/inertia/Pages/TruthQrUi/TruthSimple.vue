@@ -16,6 +16,9 @@ const pdfError = ref('')
 const pdfUrl = ref('')
 const pdfBlob = ref<Blob | null>(null)
 
+// File input ref
+const fileInputRef = ref<HTMLInputElement | null>(null)
+
 // Scanner state
 const scannerMode = ref<'manual' | 'keyboard' | 'camera'>('manual')
 const scannerActive = ref(false)
@@ -378,6 +381,79 @@ function loadSample() {
   chunks.value = `ER|v1|317537|1/6|7Z1bc-LIkoD_SoVfdjdOewIwbl_eAMlgjDAhNOM5s9tBlFHZ1LFQOSRhNz0x_31T2IjUzRc1I2tMvsw0BpRJqpSVlV9l1p9719xxVODvnf7vn3tTZYu90712a7Bfq9X2vuzde2Iq3WkweX6n86tpnhutS3i7Dm8_qEA8f5O7trT5-iV3JId_7Q00-NTzdwfa5OlbLp-vXgvlcs9WTJMdfu9JFcpTvgykcvdOI2VGpj4-1_ShtbrSwg32Tutf9hzxIBx41-Xhx7mzuezIE760hRswdcOCmWCjmXTk_b10Qbe__vpWhpAvuQaxehuDWL24QSw1Zz3u3vnZhvjtvKPvv1fR3-QUlCtikr9NXL5x-mi09BOjpa9mrrtkmri_zzbPWB-2rEsTKdp4SdOxgL8pL1fFtU4da6NTx5rU6rXNNToz7jnyh2DWTHigTJl6XZgbvS5M0AvZ6kJwd8FMAUL8UpUaXmyUGl6AUo3NNYZyqhzBLqQ95-WaSh9vtNLHMKyQVvp8ztk4UK4oVSXjbKOScQYqHWyuYSjvlrvszBOibEv1B-gBHIBaTfQACteVN8JjA_7oCXdarsE6bfQYtkGzQ_wYetIPJNiszZ1y1RojtcahWl_RNcDJeZy1FzC_Tu9KVesKjfircMQfba5xJR2HjecymJU7tJC_6oO_qh2jobWADzFTXQsvKNdhGWjGMcIZ5wQ9hzwImMbnZTj2b2X86JxZVx8i9ziMz7q6_QghGhsqL8gzQ_fyN90cXpr754NhZpQAox9r2VUPwnNBzf9bNGr1JjuH95W_EiFyLbFlIfnGGF6hGewqbowhV3PJrmBYvBShvVfVVchUyCh_m7h885jIPGbCPBBv-IJdgWMRnn-v8sZL-7JlavuGbrT1hNKNXKVHnnqAZYjkDmurcEAaYg7OIl_9tb495J977fjU34OFj2Bt4XnLj9L028dZKC8ER4FJ_ywZgttSsDPlB8LLtpiphwsGWC60rPPf9FD3_XrmoLRhwvbkNNhcXHv-C4StsOj0YfUA_u1BZP0A9t91Hzzz8xf-J9eOH6VNvnXbnY112524ddswLy9Zx1vYi5wVjtH699Nzvr9ehr_lgTcWrpzKexgYBl9uHvnOwvPknKsvbxuT5ch-YZJC4YNuJiepcFyaAhYWy7w4vnP567BzPsj9Dce5vwHCuNtb-B3wP4gvlxBl
 ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5Aj5zRiS9pDO6BqqyjAnj2wGlWUn8Uyhvj-MLHkNMZFxDNz7jrqkqav6OjdZseXyB1ZvJRBKC__h-pbpRXRf27Bhr88CK-luoubhfMuObBjO-b_LGKP0C73OivXcbXXRp_kDa7XApHParKKP-tMoqs5iOcEq9vISXe6m9uSKsffyJa7q1wpMtZXzlSUD58x_PhFUxcDlCyYDCc1JrInQwW9zLgbLhU7u1_qVLVarXQQ9Wa1OpIrdZ8yVo2n5ebWeqikK8LIV8dPeZdCIi73FZBqRolFx91FEm0hSvscL3TWYSuEWa06WwnE3HVTqIaaJgbMMwPcDDIw7zLjDuctRxJWfDTvbPRRq2zEVgLOYUzR60gBhstbsu9h5doWF3CsGogrS6nAYRk4NfvQ928nUVSH5kOh89O5jzw5HccmegTo2WZ57_HA2gLrmusP_t6BmrUMq1_7w_Ox28Oq7gXLPcd6ScTUW_NeW1VIiGEN6WqUg9SI71iP-O-fy1cO-8Z__wkQUPOWRvF8zKaeGAj-IZTAYLQ1tAGEHgRz8BA3CSnUjEN7qmlPEUggUBCGSBBRxxOv4pP1vpcOssQU_p5_naXQUL_AsVf8CIxMn-5-IWN5RzWGi9lHX72R6xc589YsWwtCMwQmCEwQ2CGwAyBmSqCmQaBmS2DmRYCM61e0hquYL3w4Xrky50tVkDzVx_mr-Yh3ivt-3LKWWfG_YBLl5LEYBMD2cuY1BrIXfc5rFWYoeaKExKJ9lqi2NSE2LSBkIgZesuu8sEn3VJOvYL4r4qlTJUsGaoqDtER09LboFcjmWFpO6G4Uoc5GuUw4aAFU-vx7pHfQIDyydkM-OQAYRl9qFtgCFSSZz1_gmAMwZjVKgtVJGoX8RSJxl0Ji9wL7iwWS76rIKbiJRJf_mHFJ9UjMRoKcrVEok0Ls2wzwe28ukkCMVTR8TeBmGStcQOvBz1hs4EIFEEYgjAEYQjCEIQhCEMQptoQ5mALEEZDMb6W2NiiCfcHPA9X3J9J9zZ3Afu5OIypISwFL-I-7qlnBtPUoyuWrO_9srM0BsUQ_bDcIkYX7mB9vISlrDvj3KFGP-myq-ZRouxKwZTv2uVWESCdxqDTQQ17KWfOWY8vxR2xtKo200n2`
 }
+
+// File loading functions
+function loadFromFile() {
+  fileInputRef.value?.click()
+}
+
+async function handleFileSelected(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+  
+  error.value = ''
+  
+  try {
+    const text = await readFileAsText(file)
+    const parsedChunks = parseFileContent(text)
+    
+    if (!parsedChunks || parsedChunks.length === 0) {
+      error.value = 'No valid chunks found in file'
+      return
+    }
+    
+    chunks.value = parsedChunks.join('\n')
+    console.log(`📂 Loaded ${parsedChunks.length} chunks from file: ${file.name}`)
+    
+  } catch (err: any) {
+    console.error('File loading error:', err)
+    error.value = err.message || 'Failed to read file'
+  } finally {
+    // Reset file input so same file can be selected again
+    if (target) target.value = ''
+  }
+}
+
+function readFileAsText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target?.result as string)
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsText(file)
+  })
+}
+
+function parseFileContent(content: string): string[] {
+  // Try parsing as JSON first
+  try {
+    const json = JSON.parse(content)
+    
+    // Handle JSON array of chunks
+    if (Array.isArray(json)) {
+      return json.filter(item => typeof item === 'string' && item.trim().length > 0)
+    }
+    
+    // Handle JSON object with chunks property
+    if (json.chunks && Array.isArray(json.chunks)) {
+      return json.chunks.filter(item => typeof item === 'string' && item.trim().length > 0)
+    }
+    
+    // Handle JSON object with lines property
+    if (json.lines && Array.isArray(json.lines)) {
+      return json.lines.filter(item => typeof item === 'string' && item.trim().length > 0)
+    }
+  } catch {
+    // Not JSON, continue with text parsing
+  }
+  
+  // Parse as newline-separated text
+  return content
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+}
 </script>
 
 <template>
@@ -562,11 +638,19 @@ ER|v1|317537|2/6|xh-tl35MFCZ2UZjYjbuhcSDuZ8JlXY_P-LyS2iPbj834YmXMlfTA7ZsQirhVVN5
           </button>
           
           <button
-            @click="loadSample"
+            @click="loadFromFile"
             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
-            📝 Load Sample (2/6)
+            📂 Load from File
           </button>
+          
+          <input
+            ref="fileInputRef"
+            type="file"
+            accept=".txt,.json"
+            @change="handleFileSelected"
+            class="hidden"
+          />
         </template>
         
         <!-- Scanner Mode Controls -->
