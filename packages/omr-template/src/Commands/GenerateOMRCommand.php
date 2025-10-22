@@ -5,6 +5,7 @@ namespace LBHurtado\OMRTemplate\Commands;
 use Illuminate\Console\Command;
 use LBHurtado\OMRTemplate\Data\TemplateData;
 use LBHurtado\OMRTemplate\Data\ZoneMapData;
+use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
 
@@ -19,7 +20,8 @@ class GenerateOMRCommand extends Command
 
     public function handle(
         TemplateRenderer $renderer,
-        TemplateExporter $exporter
+        TemplateExporter $exporter,
+        FiducialHelper $fiducialHelper
     ): int {
         $templateId = $this->argument('template');
         $identifier = $this->argument('identifier');
@@ -38,14 +40,23 @@ class GenerateOMRCommand extends Command
             }
         }
 
+        // Determine layout and DPI
+        $layout = $data['layout'] ?? 'A4';
+        $dpi = $data['dpi'] ?? 300;
+
+        // Generate fiducials if not provided
+        $fiducials = $data['fiducials'] ?? $fiducialHelper->generateFiducials($layout, $dpi);
+
         // Create template data
         $templateData = new TemplateData(
             template_id: $templateId,
             document_type: $data['document_type'] ?? 'document',
             contests_or_sections: $data['contests_or_sections'] ?? [],
-            layout: $data['layout'] ?? 'A4',
+            layout: $layout,
+            dpi: $dpi,
             qr: $data['qr'] ?? null,
             metadata: $data['metadata'] ?? null,
+            fiducials: $fiducials,
         );
 
         // Render HTML
@@ -57,11 +68,14 @@ class GenerateOMRCommand extends Command
             return self::FAILURE;
         }
 
-        // Create zone map (for now, empty - would be populated from template or external source)
+        // Create zone map with fiducials
         $zoneMap = new ZoneMapData(
             template_id: $templateId,
             document_type: $templateData->document_type,
             zones: $data['zones'] ?? [],
+            fiducials: $fiducials,
+            size: $layout,
+            dpi: $dpi,
         );
 
         // Export to PDF and JSON

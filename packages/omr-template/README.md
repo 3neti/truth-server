@@ -7,7 +7,8 @@ A Laravel package for generating printable, scan-friendly documents (ballots, te
 - 📄 Dynamic templating with Handlebars
 - 🎯 Deterministic layouts for OMR
 - 📍 Precise mark zone mapping output (JSON)
-- 🔒 Support for alignment anchors and QR codes
+- 🎯 **Fiducial markers for image alignment** (automatic perspective correction)
+- 🔒 Support for QR codes
 - 🌐 Compatible with airgapped systems
 - 📦 Reusable across multiple applications
 
@@ -132,13 +133,67 @@ Templates use Handlebars syntax. Example:
 - `test-paper-v1.hbs` - Exam/test paper template
 - `survey-v1.hbs` - Survey form with Likert scales
 
+## Fiducial Markers (Alignment Anchors)
+
+All templates include **fiducial markers** - black squares positioned at the four corners of each page. These enable:
+
+- 🎯 **Perspective correction** for skewed or rotated scans
+- 📐 **Automatic template-to-image alignment** during OMR processing
+- 🎥 **Improved ROI detection accuracy**
+- 📱 **Reliable real-time appreciation** via webcam
+
+### How It Works
+
+The package automatically:
+1. Places 4 black squares (6mm × 6mm) at page corners (10mm margin)
+2. Calculates exact pixel coordinates based on page size and DPI
+3. Exports fiducial positions in the JSON zone map
+
+### Zone Map with Fiducials
+
+```json
+{
+  "template_id": "ballot-v1",
+  "document_type": "ballot",
+  "size": "A4",
+  "dpi": 300,
+  "fiducials": [
+    { "id": "top_left", "x": 118, "y": 118, "width": 71, "height": 71 },
+    { "id": "top_right", "x": 2291, "y": 118, "width": 71, "height": 71 },
+    { "id": "bottom_left", "x": 118, "y": 3319, "width": 71, "height": 71 },
+    { "id": "bottom_right", "x": 2291, "y": 3319, "width": 71, "height": 71 }
+  ],
+  "zones": [...]
+}
+```
+
+### Using Fiducials in OMR Processing
+
+In your image processing pipeline (OpenCV, etc.):
+
+```python
+# 1. Detect the 4 black squares
+contours = detect_fiducials(image)
+
+# 2. Match to expected positions from JSON
+matched = match_fiducials(contours, zone_map['fiducials'])
+
+# 3. Compute perspective transform
+matrix = cv2.getPerspectiveTransform(matched, expected)
+
+# 4. Warp image to template dimensions
+aligned = cv2.warpPerspective(image, matrix, (width, height))
+
+# 5. Now process mark zones with accurate coordinates
+```
+
 ## Output
 
 Each generation produces:
 
 ```
-ballot-ABC-001.pdf          ✅ Printable document
-ballot-ABC-001.json         ✅ Mark zone mapping
+ballot-ABC-001.pdf          ✅ Printable document with fiducial markers
+ballot-ABC-001.json         ✅ Mark zone mapping with fiducial coordinates
 ballot-ABC-001.meta.json    ✅ Metadata (hash, timestamp)
 ```
 

@@ -11,7 +11,9 @@ class TemplateData extends Data
         public string $document_type,
         public array $contests_or_sections,
         public string $layout = 'A4',
+        public int $dpi = 300,
         public ?array $qr = null,
         public ?array $metadata = null,
+        public ?array $fiducials = null,
     ) {}
 }

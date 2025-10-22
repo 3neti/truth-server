@@ -2,6 +2,7 @@
 
 use LBHurtado\OMRTemplate\Data\TemplateData;
 use LBHurtado\OMRTemplate\Data\ZoneMapData;
+use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
 
@@ -73,4 +74,38 @@ test('zone map data can be converted to json', function () {
     $decoded = json_decode($json, true);
     expect($decoded)->toHaveKey('template_id');
     expect($decoded['zones'])->toHaveCount(1);
+});
+
+test('zone map includes fiducials when provided', function () {
+    $fiducials = [
+        ['id' => 'top_left', 'x' => 100, 'y' => 100, 'width' => 50, 'height' => 50],
+        ['id' => 'top_right', 'x' => 2000, 'y' => 100, 'width' => 50, 'height' => 50],
+    ];
+
+    $zoneMap = new ZoneMapData(
+        template_id: 'test',
+        document_type: 'ballot',
+        zones: [],
+        fiducials: $fiducials,
+        size: 'A4',
+        dpi: 300,
+    );
+
+    $json = $zoneMap->toJson();
+    $decoded = json_decode($json, true);
+
+    expect($decoded)->toHaveKey('fiducials');
+    expect($decoded['fiducials'])->toHaveCount(2);
+    expect($decoded['size'])->toBe('A4');
+    expect($decoded['dpi'])->toBe(300);
+});
+
+test('fiducial helper generates correct number of markers', function () {
+    $helper = app(FiducialHelper::class);
+    
+    $fiducials = $helper->generateFiducials('A4', 300);
+    
+    expect($fiducials)->toHaveCount(4);
+    expect($fiducials[0]['id'])->toBe('top_left');
+    expect($fiducials[3]['id'])->toBe('bottom_right');
 });

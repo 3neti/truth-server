@@ -12,6 +12,29 @@
             font-family: Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.6;
+            position: relative;
+        }
+        .fiducial {
+            position: absolute;
+            background: #000;
+            width: 6mm;
+            height: 6mm;
+        }
+        .fiducial-top-left {
+            top: 10mm;
+            left: 10mm;
+        }
+        .fiducial-top-right {
+            top: 10mm;
+            right: 10mm;
+        }
+        .fiducial-bottom-left {
+            bottom: 10mm;
+            left: 10mm;
+        }
+        .fiducial-bottom-right {
+            bottom: 10mm;
+            right: 10mm;
         }
         .header {
             text-align: center;
@@ -49,6 +72,12 @@
     </style>
 </head>
 <body>
+    <!-- Fiducial Markers for Image Alignment -->
+    <div class="fiducial fiducial-top-left"></div>
+    <div class="fiducial fiducial-top-right"></div>
+    <div class="fiducial fiducial-bottom-left"></div>
+    <div class="fiducial fiducial-bottom-right"></div>
+
     <div class="header">
         <h1>{{document_type}}</h1>
         {{#if metadata}}

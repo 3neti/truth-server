@@ -1,0 +1,62 @@
+{
+    "template_id": "ballot-v1",
+    "document_type": "Precinct Ballot",
+    "size": "A4",
+    "dpi": 300,
+    "fiducials": [
+        {
+            "id": "top_left",
+            "x": 118,
+            "y": 118,
+            "width": 71,
+            "height": 71
+        },
+        {
+            "id": "top_right",
+            "x": 2291,
+            "y": 118,
+            "width": 71,
+            "height": 71
+        },
+        {
+            "id": "bottom_left",
+            "x": 118,
+            "y": 3319,
+            "width": 71,
+            "height": 71
+        },
+        {
+            "id": "bottom_right",
+            "x": 2291,
+            "y": 3319,
+            "width": 71,
+            "height": 71
+        }
+    ],
+    "zones": [
+        {
+            "section": "PRESIDENT",
+            "code": "PRES_001",
+            "x": 50,
+            "y": 200,
+            "width": 20,
+            "height": 20
+        },
+        {
+            "section": "PRESIDENT",
+            "code": "PRES_002",
+            "x": 50,
+            "y": 230,
+            "width": 20,
+            "height": 20
+        },
+        {
+            "section": "PRESIDENT",
+            "code": "PRES_003",
+            "x": 50,
+            "y": 260,
+            "width": 20,
+            "height": 20
+        }
+    ]
+}
