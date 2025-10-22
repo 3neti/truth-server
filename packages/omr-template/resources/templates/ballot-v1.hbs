@@ -139,6 +139,12 @@
     </div>
     {{/each}}
 
+    {{#if barcode_base64}}
+    <div style="position: absolute; bottom: 15mm; right: 10mm;">
+        <img src="{{barcode_base64}}" style="height: 40px;" alt="Barcode" />
+    </div>
+    {{/if}}
+
     <div class="footer">
         <strong>Document ID: {{document_id}}</strong><br>
         Generated: {{metadata.generated_at}} | Template: {{template_id}}

@@ -5,6 +5,7 @@ namespace LBHurtado\OMRTemplate\Commands;
 use Illuminate\Console\Command;
 use LBHurtado\OMRTemplate\Data\TemplateData;
 use LBHurtado\OMRTemplate\Data\ZoneMapData;
+use LBHurtado\OMRTemplate\Services\BarcodeGenerator;
 use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
@@ -23,7 +24,8 @@ class GenerateOMRCommand extends Command
         TemplateRenderer $renderer,
         TemplateExporter $exporter,
         FiducialHelper $fiducialHelper,
-        DocumentIdGenerator $idGenerator
+        DocumentIdGenerator $idGenerator,
+        BarcodeGenerator $barcodeGenerator
     ): int {
         $templateId = $this->argument('template');
         $identifier = $this->argument('identifier');
@@ -56,6 +58,12 @@ class GenerateOMRCommand extends Command
             strtoupper($documentType)
         );
 
+        // Generate barcode if enabled
+        $barcodeBase64 = null;
+        if (config('omr-template.barcode.enabled', true)) {
+            $barcodeBase64 = $barcodeGenerator->generate($documentId);
+        }
+
         // Create template data
         $templateData = new TemplateData(
             template_id: $templateId,
@@ -67,6 +75,7 @@ class GenerateOMRCommand extends Command
             qr: $data['qr'] ?? null,
             metadata: $data['metadata'] ?? null,
             fiducials: $fiducials,
+            barcode_base64: $barcodeBase64,
         );
 
         // Render HTML

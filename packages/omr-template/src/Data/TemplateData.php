@@ -16,5 +16,6 @@ class TemplateData extends Data
         public ?array $qr = null,
         public ?array $metadata = null,
         public ?array $fiducials = null,
+        public ?string $barcode_base64 = null,
     ) {}
 }

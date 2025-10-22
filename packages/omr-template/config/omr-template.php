@@ -41,4 +41,19 @@ return [
     |
     */
     'dpi' => 300,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Barcode Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for barcode generation (Code 128 by default).
+    |
+    */
+    'barcode' => [
+        'enabled' => true,
+        'type' => 'C128', // C128 (Code 128) or C39 (Code 39)
+        'width_scale' => 2,
+        'height' => 40,
+    ],
 ];

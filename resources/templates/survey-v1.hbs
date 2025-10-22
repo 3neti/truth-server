@@ -143,6 +143,12 @@
     </div>
     {{/each}}
 
+    {{#if barcode_base64}}
+    <div style="position: absolute; bottom: 10mm; right: 10mm;">
+        <img src="{{barcode_base64}}" style="height: 40px;" alt="Barcode" />
+    </div>
+    {{/if}}
+
     <div style="margin-top: 40px; text-align: center; font-size: 9pt; color: #666;">
         Thank you for your participation!<br>
         <strong>Document ID: {{document_id}}</strong>

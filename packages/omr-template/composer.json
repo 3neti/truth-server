@@ -19,7 +19,8 @@
         "dompdf/dompdf": "^3.1",
         "zordius/lightncandy": "^1.2",
         "spatie/laravel-data": "^4.0",
-        "lorisleiva/laravel-actions": "^2.9"
+        "lorisleiva/laravel-actions": "^2.9",
+        "picqer/php-barcode-generator": "^3.2"
     },
     "require-dev": {
         "orchestra/testbench": "^10.3",
