@@ -4,6 +4,7 @@ namespace LBHurtado\OMRTemplate;
 
 use Illuminate\Support\ServiceProvider;
 use LBHurtado\OMRTemplate\Commands\GenerateOMRCommand;
+use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\HandlebarsEngine;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
@@ -22,6 +23,7 @@ class OMRTemplateServiceProvider extends ServiceProvider
         $this->app->singleton(TemplateRenderer::class);
         $this->app->singleton(TemplateExporter::class);
         $this->app->singleton(FiducialHelper::class);
+        $this->app->singleton(DocumentIdGenerator::class);
     }
 
     public function boot(): void

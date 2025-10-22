@@ -10,6 +10,7 @@ class ZoneMapData extends Data
         public string $template_id,
         public string $document_type,
         public array $zones,
+        public ?string $document_id = null,
         public ?array $fiducials = null,
         public ?string $size = 'A4',
         public ?int $dpi = 300,
@@ -23,6 +24,10 @@ class ZoneMapData extends Data
             'size' => $this->size,
             'dpi' => $this->dpi,
         ];
+
+        if ($this->document_id) {
+            $data['document_id'] = $this->document_id;
+        }
 
         if ($this->fiducials) {
             $data['fiducials'] = $this->fiducials;

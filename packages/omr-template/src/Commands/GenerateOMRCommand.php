@@ -5,6 +5,7 @@ namespace LBHurtado\OMRTemplate\Commands;
 use Illuminate\Console\Command;
 use LBHurtado\OMRTemplate\Data\TemplateData;
 use LBHurtado\OMRTemplate\Data\ZoneMapData;
+use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
@@ -21,7 +22,8 @@ class GenerateOMRCommand extends Command
     public function handle(
         TemplateRenderer $renderer,
         TemplateExporter $exporter,
-        FiducialHelper $fiducialHelper
+        FiducialHelper $fiducialHelper,
+        DocumentIdGenerator $idGenerator
     ): int {
         $templateId = $this->argument('template');
         $identifier = $this->argument('identifier');
@@ -47,11 +49,19 @@ class GenerateOMRCommand extends Command
         // Generate fiducials if not provided
         $fiducials = $data['fiducials'] ?? $fiducialHelper->generateFiducials($layout, $dpi);
 
+        // Generate document ID if not provided
+        $documentType = $data['document_type'] ?? 'document';
+        $documentId = $data['document_id'] ?? $idGenerator->fromIdentifier(
+            $identifier,
+            strtoupper($documentType)
+        );
+
         // Create template data
         $templateData = new TemplateData(
             template_id: $templateId,
-            document_type: $data['document_type'] ?? 'document',
+            document_type: $documentType,
             contests_or_sections: $data['contests_or_sections'] ?? [],
+            document_id: $documentId,
             layout: $layout,
             dpi: $dpi,
             qr: $data['qr'] ?? null,
@@ -68,11 +78,12 @@ class GenerateOMRCommand extends Command
             return self::FAILURE;
         }
 
-        // Create zone map with fiducials
+        // Create zone map with fiducials and document ID
         $zoneMap = new ZoneMapData(
             template_id: $templateId,
             document_type: $templateData->document_type,
             zones: $data['zones'] ?? [],
+            document_id: $documentId,
             fiducials: $fiducials,
             size: $layout,
             dpi: $dpi,
@@ -84,6 +95,7 @@ class GenerateOMRCommand extends Command
 
         $metadata = [
             'template_id' => $templateId,
+            'document_id' => $documentId,
             'identifier' => $identifier,
             'generated_at' => now()->toIso8601String(),
             'hash' => hash('sha256', $html),

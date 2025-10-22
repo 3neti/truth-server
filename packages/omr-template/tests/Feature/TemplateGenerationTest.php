@@ -19,6 +19,7 @@ test('can generate complete output bundle', function () {
                 ],
             ],
         ],
+        document_id: 'BALLOT-TEST-001-PDF-123',
         layout: 'A4',
     );
 
@@ -52,6 +53,7 @@ test('template data properties are accessible', function () {
         template_id: 'test',
         document_type: 'ballot',
         contests_or_sections: [],
+        document_id: 'TEST-DOC-001-PDF-001',
     );
 
     expect($templateData->template_id)->toBe('test');

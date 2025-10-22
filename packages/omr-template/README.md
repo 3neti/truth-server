@@ -133,6 +133,66 @@ Templates use Handlebars syntax. Example:
 - `test-paper-v1.hbs` - Exam/test paper template
 - `survey-v1.hbs` - Survey form with Likert scales
 
+## Unique Document Identifiers
+
+Every generated document includes a **unique document ID** for traceability and auditability.
+
+### ID Format
+
+```
+<TYPE>-<GROUP>-PDF-<SERIAL>
+
+Examples:
+- BALLOT-ABC-001-PDF-147
+- TEST-CLASS9-PDF-007
+- SURVEY-ROOMA-PDF-023
+```
+
+### Auto-Generation
+
+Document IDs are automatically generated from the identifier:
+
+```bash
+php artisan omr:generate ballot-v1 ABC-001
+# Generates: BALLOT-ABC-001-PDF-123 (random serial)
+```
+
+### Custom Document ID
+
+Provide a custom document ID in your data file:
+
+```json
+{
+  "document_id": "BALLOT-ABC-001-PDF-147",
+  "document_type": "Precinct Ballot",
+  "contests_or_sections": [...]
+}
+```
+
+### Benefits
+
+✅ **Traceability** - Every printed form has a unique fingerprint  
+✅ **Auditability** - Link scanned images to exact output  
+✅ **Duplicate Detection** - Prevent double submissions  
+✅ **Chain of Custody** - Support recounts and validation  
+
+### Document ID in Output
+
+The document ID appears in:
+1. **Printed footer** - Visible on every page
+2. **Zone map JSON** - Included in metadata
+3. **Meta JSON** - Stored with hash and timestamp
+
+```json
+{
+  "document_id": "BALLOT-ABC-001-PDF-147",
+  "template_id": "ballot-v1",
+  "size": "A4",
+  "dpi": 300,
+  "zones": [...]
+}
+```
+
 ## Fiducial Markers (Alignment Anchors)
 
 All templates include **fiducial markers** - black squares positioned at the four corners of each page. These enable:
