@@ -48,12 +48,17 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configuration for barcode generation (Code 128 by default).
+    | Supported types: C128 (Code 128), C39 (Code 39), PDF417
+    |
+    | Note: For 1D barcodes (C128, C39), width_scale and height control
+    |       the bar width and total height. For 2D barcodes (PDF417),
+    |       these represent the size of each individual cell/module.
     |
     */
     'barcode' => [
         'enabled' => true,
-        'type' => 'C128', // C128 (Code 128) or C39 (Code 39)
-        'width_scale' => 2,
-        'height' => 40,
+        'type' => 'PDF417', // C128 (Code 128), C39 (Code 39), or PDF417 (2D barcode)
+        'width_scale' => 2,  // For 1D: bar width; For 2D: cell width
+        'height' => 2,       // For 1D: total height (40px recommended); For 2D: cell height (2-3px recommended)
     ],
 ];
