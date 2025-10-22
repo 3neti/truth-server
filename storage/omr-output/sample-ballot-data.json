@@ -1,0 +1,74 @@
+{
+  "document_type": "Precinct Ballot",
+  "layout": "A4",
+  "dpi": 300,
+  "metadata": {
+    "precinct": "Precinct 0001A",
+    "election_date": "May 13, 2025",
+    "generated_at": "2025-10-22"
+  },
+  "contests_or_sections": [
+    {
+      "title": "PRESIDENT",
+      "instruction": "Vote for ONE (1)",
+      "candidates": [
+        {
+          "name": "John Anderson Doe",
+          "party": "Party of Progress"
+        },
+        {
+          "name": "Maria Santos-Cruz",
+          "party": "People's Alliance"
+        },
+        {
+          "name": "Robert Chen Williams",
+          "party": "Unity Coalition"
+        }
+      ]
+    },
+    {
+      "title": "VICE PRESIDENT",
+      "instruction": "Vote for ONE (1)",
+      "candidates": [
+        {
+          "name": "Sarah Johnson",
+          "party": "Party of Progress"
+        },
+        {
+          "name": "Miguel Reyes",
+          "party": "People's Alliance"
+        }
+      ]
+    },
+    {
+      "title": "SENATOR",
+      "instruction": "Vote for not more than TWELVE (12)",
+      "candidates": [
+        {
+          "name": "Alice Brown",
+          "party": "Party of Progress"
+        },
+        {
+          "name": "David Garcia",
+          "party": "People's Alliance"
+        },
+        {
+          "name": "Emma Martinez",
+          "party": "Unity Coalition"
+        },
+        {
+          "name": "Frank Wilson",
+          "party": "Independent"
+        },
+        {
+          "name": "Grace Lee",
+          "party": "Party of Progress"
+        },
+        {
+          "name": "Henry Rodriguez",
+          "party": "People's Alliance"
+        }
+      ]
+    }
+  ]
+}

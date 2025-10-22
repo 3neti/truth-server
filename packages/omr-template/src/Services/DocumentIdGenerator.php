@@ -43,6 +43,9 @@ class DocumentIdGenerator
      */
     public function fromIdentifier(string $identifier, string $type = 'DOCUMENT'): string
     {
+        // Sanitize type: remove spaces, keep only first word if multiple
+        $type = $this->sanitizeType($type);
+
         // If identifier already looks like a full document ID, return it
         if (preg_match('/^[A-Z]+-[A-Z0-9]+-[A-Z]+-\d+$/i', $identifier)) {
             return strtoupper($identifier);
@@ -56,6 +59,37 @@ class DocumentIdGenerator
 
         // Otherwise, sanitize and use as-is
         return strtoupper(preg_replace('/[^A-Z0-9-]/i', '', $identifier));
+    }
+
+    /**
+     * Sanitize document type for use in IDs
+     * Extracts key word from multi-word types
+     */
+    protected function sanitizeType(string $type): string
+    {
+        $type = trim($type);
+        
+        // Map common multi-word types to single word
+        $typeMap = [
+            'precinct ballot' => 'BALLOT',
+            'test paper' => 'TEST',
+            'exam paper' => 'EXAM',
+            'survey form' => 'SURVEY',
+        ];
+        
+        $lowerType = strtolower($type);
+        if (isset($typeMap[$lowerType])) {
+            return $typeMap[$lowerType];
+        }
+        
+        // Extract last word (usually the type: "Precinct Ballot" → "BALLOT")
+        $words = preg_split('/\s+/', $type);
+        $lastWord = end($words);
+        
+        // Sanitize and return
+        $sanitized = preg_replace('/[^A-Z0-9]/i', '', $lastWord);
+        
+        return strtoupper($sanitized) ?: 'DOCUMENT';
     }
 
     /**
