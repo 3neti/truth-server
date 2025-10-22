@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import ErOfficialsSignatures from '@/components/ErOfficialsSignatures.vue'
+import ErOfficialsSignatures from '@/TruthElectionUi/components/ErOfficialsSignatures.vue'
 import { computed, ref, watch, onBeforeUnmount, onMounted } from 'vue'
-import ErPrecinctCard from '@/components/ErPrecinctCard.vue'
-import ErTalliesTable from '@/components/ErTalliesTable.vue'
-import type { ElectionReturnData } from '@/types/election'
+import ErPrecinctCard from '@/TruthElectionUi/components/ErPrecinctCard.vue'
+import ErTalliesTable from '@/TruthElectionUi/components/ErTalliesTable.vue'
+import type { ElectionReturnData } from '@/TruthElectionUi/types/election'
 import { useEchoPublic } from '@laravel/echo-vue'
 
 /** ---------------- Props ---------------- */

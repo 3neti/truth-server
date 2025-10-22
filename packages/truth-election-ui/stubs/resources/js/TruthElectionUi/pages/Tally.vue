@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useElectionReturn } from '@/composables/useElectionReturn'
-import ErTallyView from '@/components/ErTallyView.vue'
-import type { PrecinctData } from '@/types/election'
+import { useElectionReturn } from '@/TruthElectionUi/composables/useElectionReturn'
+import ErTallyView from '@/TruthElectionUi/components/ErTallyView.vue'
+import type { PrecinctData } from '@/TruthElectionUi/types/election'
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 

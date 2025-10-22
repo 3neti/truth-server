@@ -41,29 +41,8 @@ class TruthElectionUiServiceProvider extends ServiceProvider
     protected function publishesViews(): void
     {
         $this->publishes([
-            __DIR__ . '/../stubs/resources/js/pages/Tally.vue'
-            => resource_path('js/pages/Tally.vue'),
-
-            __DIR__ . '/../stubs/resources/js/types/election.ts'
-            => resource_path('js/types/election.ts'),
-
-            __DIR__ . '/../stubs/resources/js/composables/useElectionReturn.ts'
-            => resource_path('js/composables/useElectionReturn.ts'),
-            __DIR__ . '/../stubs/resources/js/composables/useBasicUtils.ts'
-            => resource_path('js/composables/useBasicUtils.ts'),
-            __DIR__ . '/../stubs/resources/js/composables/usePrecinctPeople.ts'
-            => resource_path('js/composables/usePrecinctPeople.ts'),
-
-            __DIR__ . '/../stubs/resources/js/components/ErTallyView.vue'
-            => resource_path('js/components/ErTallyView.vue'),
-            __DIR__ . '/../stubs/resources/js/components/ErOfficialsSignatures.vue'
-            => resource_path('js/components/ErOfficialsSignatures.vue'),
-            __DIR__ . '/../stubs/resources/js/components/ErPrecinctCard.vue'
-            => resource_path('js/components/ErPrecinctCard.vue'),
-            __DIR__ . '/../stubs/resources/js/components/ErTalliesTable.vue'
-            => resource_path('js/components/ErTalliesTable.vue'),
-            __DIR__ . '/../stubs/resources/js/components/TallyMarks.vue'
-            => resource_path('js/components/TallyMarks.vue'),
+            __DIR__ . '/../stubs/resources/js/TruthElectionUi'
+            => resource_path('js/TruthElectionUi'),
         ], 'truth-election-ui-stubs');
     }
 
