@@ -1,6 +1,7 @@
 {
   "document_type": "Precinct Ballot",
   "layout": "A4",
+  "dpi": 300,
   "metadata": {
     "precinct": "Precinct 0001A",
     "election_date": "May 13, 2025",
@@ -66,66 +67,8 @@
         {
           "name": "Henry Rodriguez",
           "party": "People's Alliance"
-        },
-        {
-          "name": "Isabel Nguyen",
-          "party": "Unity Coalition"
-        },
-        {
-          "name": "James Taylor",
-          "party": "Independent"
-        },
-        {
-          "name": "Karen Smith",
-          "party": "Party of Progress"
-        },
-        {
-          "name": "Luis Hernandez",
-          "party": "People's Alliance"
-        },
-        {
-          "name": "Nancy White",
-          "party": "Unity Coalition"
-        },
-        {
-          "name": "Oscar Kim",
-          "party": "Independent"
-        },
-        {
-          "name": "Patricia Moore",
-          "party": "Party of Progress"
-        },
-        {
-          "name": "Quincy Jackson",
-          "party": "People's Alliance"
         }
       ]
-    }
-  ],
-  "zones": [
-    {
-      "section": "PRESIDENT",
-      "code": "PRES_001",
-      "x": 50,
-      "y": 200,
-      "width": 20,
-      "height": 20
-    },
-    {
-      "section": "PRESIDENT",
-      "code": "PRES_002",
-      "x": 50,
-      "y": 230,
-      "width": 20,
-      "height": 20
-    },
-    {
-      "section": "PRESIDENT",
-      "code": "PRES_003",
-      "x": 50,
-      "y": 260,
-      "width": 20,
-      "height": 20
     }
   ]
 }

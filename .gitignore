@@ -35,3 +35,10 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# OMR Template Generator outputs (generated files, not sample data)
+/storage/omr-output/*.pdf
+/storage/omr-output/*.meta.json
+/storage/omr-output/ABC-*.json
+/storage/omr-output/BALLOT-*.json
+/storage/omr-output/*-WITH-*.json
