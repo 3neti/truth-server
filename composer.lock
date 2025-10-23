@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0865608afa09fd6efea4d661efb3bb94",
+    "content-hash": "60eac497b6cc770c01c58d9b34e6205e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2457,6 +2457,56 @@
                 "source": "https://github.com/laravel/wayfinder"
             },
             "time": "2025-09-08T17:03:10+00:00"
+        },
+        {
+            "name": "lbhurtado/omr-appreciation",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/omr-appreciation",
+                "reference": "48dc10db664cc7215f3d2691ef97062f274d5cc9"
+            },
+            "require": {
+                "ext-gd": "*",
+                "ext-json": "*",
+                "lbhurtado/omr-template": "@dev",
+                "lorisleiva/laravel-actions": "^2.9",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.3",
+                "pestphp/pest": "^3.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LBHurtado\\OMRAppreciation\\OMRAppreciationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LBHurtado\\OMRAppreciation\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LBHurtado\\OMRAppreciation\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "OMR Mark Detection and Appreciation: Detect marks on scanned documents using fiducial alignment",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "lbhurtado/omr-template",
@@ -12590,6 +12640,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "lbhurtado/omr-appreciation": 20,
         "lbhurtado/omr-template": 20,
         "lbhurtado/truth-election-db": 20,
         "lbhurtado/truth-election-ui": 20

@@ -42,3 +42,11 @@ yarn-error.log
 /storage/omr-output/ABC-*.json
 /storage/omr-output/BALLOT-*.json
 /storage/omr-output/*-WITH-*.json
+/storage/omr-output/TEST-*.json
+/storage/omr-output/TEST-*.pdf
+/storage/omr-output/CALIB-*.json
+/storage/omr-output/CALIB-*.pdf
+
+# OMR Test artifacts from test scripts
+/storage/omr-test/
+/storage/omr-calibration/

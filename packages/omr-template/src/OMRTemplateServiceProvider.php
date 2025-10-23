@@ -10,6 +10,7 @@ use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\HandlebarsEngine;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
+use LBHurtado\OMRTemplate\Services\ZoneGenerator;
 
 class OMRTemplateServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,7 @@ class OMRTemplateServiceProvider extends ServiceProvider
         $this->app->singleton(FiducialHelper::class);
         $this->app->singleton(DocumentIdGenerator::class);
         $this->app->singleton(BarcodeGenerator::class);
+        $this->app->singleton(ZoneGenerator::class);
     }
 
     public function boot(): void

@@ -10,6 +10,7 @@ use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
+use LBHurtado\OMRTemplate\Services\ZoneGenerator;
 
 class GenerateOMRCommand extends Command
 {
@@ -25,7 +26,8 @@ class GenerateOMRCommand extends Command
         TemplateExporter $exporter,
         FiducialHelper $fiducialHelper,
         DocumentIdGenerator $idGenerator,
-        BarcodeGenerator $barcodeGenerator
+        BarcodeGenerator $barcodeGenerator,
+        ZoneGenerator $zoneGenerator
     ): int {
         $templateId = $this->argument('template');
         $identifier = $this->argument('identifier');
@@ -87,11 +89,18 @@ class GenerateOMRCommand extends Command
             return self::FAILURE;
         }
 
+        // Generate zones automatically if not provided
+        $zones = $data['zones'] ?? $zoneGenerator->generateZones(
+            $data['contests_or_sections'] ?? [],
+            $layout,
+            $dpi
+        );
+        
         // Create zone map with fiducials and document ID
         $zoneMap = new ZoneMapData(
             template_id: $templateId,
             document_type: $templateData->document_type,
-            zones: $data['zones'] ?? [],
+            zones: $zones,
             document_id: $documentId,
             fiducials: $fiducials,
             size: $layout,

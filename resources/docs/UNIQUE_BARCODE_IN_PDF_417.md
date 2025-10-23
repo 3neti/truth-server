@@ -1,4 +1,4 @@
-# 🏷️ Unique Document Identifier as Barcode (e.g. `PDF-147`)
+# 🏷️ Unique Document Identifier as Barcode (e.g. `PDF-417`)
 *Add barcode to printable PDF via `omr-template` package*
 
 This plan adds a **1D barcode** (e.g., Code 128 or Code 39) encoding the document ID (e.g., `BALLOT-ABC-001-PDF-147`) into the generated PDF output — for fast machine-scanning and pairing during ballot appreciation or document intake.

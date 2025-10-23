@@ -1,0 +1,47 @@
+{
+    "name": "lbhurtado/omr-appreciation",
+    "description": "OMR Mark Detection and Appreciation: Detect marks on scanned documents using fiducial alignment",
+    "type": "library",
+    "license": "proprietary",
+    "repositories": [
+        { "type": "path", "url": "../omr-template" }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LBHurtado\\OMRAppreciation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LBHurtado\\OMRAppreciation\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "lbhurtado/omr-template": "@dev",
+        "lorisleiva/laravel-actions": "^2.9"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LBHurtado\\OMRAppreciation\\OMRAppreciationServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
