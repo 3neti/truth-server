@@ -5,23 +5,37 @@
     "layout": "{{layout}}"
   },
   "sections": [
-    {{#each positions}}
-    {{#if (eq level 'local')}}
-    {{#if (eq @index 4)}}
-    {
-      "type": "page_break"
-    },
-    {{/if}}
-    {{/if}}
+    {{#each page1.positions}}
     {
       "type": "multiple_choice",
       "code": "{{code}}",
       "title": "{{name}}",
       "question": "Vote for {{#if (compare count '>' 1)}}up to {{count}}{{else}}one{{/if}}",
       "maxSelections": {{count}},
-      "layout": "{{../layout}}",
+      "layout": "{{@root.layout}}",
       "choices": [
-        {{#each (lookup ../candidates code)}}
+        {{#each (lookup @root.candidates code)}}
+        {
+          "code": "{{code}}",
+          "label": "{{name}}"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    },
+    {{/each}}
+    {
+      "type": "page_break"
+    },
+    {{#each page2.positions}}
+    {
+      "type": "multiple_choice",
+      "code": "{{code}}",
+      "title": "{{name}}",
+      "question": "Vote for {{#if (compare count '>' 1)}}up to {{count}}{{else}}one{{/if}}",
+      "maxSelections": {{count}},
+      "layout": "{{@root.layout}}",
+      "choices": [
+        {{#each (lookup @root.candidates code)}}
         {
           "code": "{{code}}",
           "label": "{{name}}"
