@@ -1,0 +1,78 @@
+{
+  "election": {
+    "title": "2025 General Election",
+    "id": "BAL-2025-001"
+  },
+  "layout": "2-col",
+  "positions": [
+    {
+      "code": "PRESIDENT",
+      "title": "President",
+      "question": "Vote for one",
+      "maxSelections": 1,
+      "candidates": [
+        {
+          "code": "P-A",
+          "name": "Alice Johnson",
+          "party": "Democratic Party"
+        },
+        {
+          "code": "P-B",
+          "name": "Bob Williams",
+          "party": "Republican Party"
+        },
+        {
+          "code": "P-C",
+          "name": "Carol Smith",
+          "party": "Independent"
+        }
+      ]
+    },
+    {
+      "code": "VICE_PRESIDENT",
+      "title": "Vice President",
+      "question": "Vote for one",
+      "maxSelections": 1,
+      "candidates": [
+        {
+          "code": "VP-A",
+          "name": "David Brown",
+          "party": "Democratic Party"
+        },
+        {
+          "code": "VP-B",
+          "name": "Emma Davis",
+          "party": "Republican Party"
+        }
+      ]
+    },
+    {
+      "code": "SENATOR",
+      "title": "Senator",
+      "question": "Vote for up to two",
+      "maxSelections": 2,
+      "candidates": [
+        {
+          "code": "SEN-A",
+          "name": "Frank Miller",
+          "party": "Democratic Party"
+        },
+        {
+          "code": "SEN-B",
+          "name": "Grace Wilson",
+          "party": "Republican Party"
+        },
+        {
+          "code": "SEN-C",
+          "name": "Henry Martinez",
+          "party": "Independent"
+        },
+        {
+          "code": "SEN-D",
+          "name": "Iris Garcia",
+          "party": "Green Party"
+        }
+      ]
+    }
+  ]
+}

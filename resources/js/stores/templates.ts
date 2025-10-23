@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from 'axios'
+import axios from '@/lib/axios'
 
 export interface DocumentSpec {
   title: string
@@ -31,7 +31,7 @@ export interface TemplateSpec {
 }
 
 export const useTemplatesStore = defineStore('templates', () => {
-  // State
+  // State - Simple Mode
   const spec = ref<TemplateSpec>({
     document: {
       title: 'New Document',
@@ -41,6 +41,14 @@ export const useTemplatesStore = defineStore('templates', () => {
     sections: [],
   })
 
+  // State - Advanced Mode
+  const mode = ref<'simple' | 'advanced'>('simple')
+  const handlebarsTemplate = ref<string>('')
+  const templateData = ref<Record<string, any>>({})
+  const mergedSpec = ref<TemplateSpec | null>(null)
+  const compilationError = ref<string | null>(null)
+
+  // State - Common
   const pdfUrl = ref<string | null>(null)
   const coordsUrl = ref<string | null>(null)
   const documentId = ref<string | null>(null)
@@ -195,27 +203,174 @@ export const useTemplatesStore = defineStore('templates', () => {
     }
   }
 
+  // Advanced Mode Actions
+  async function compileTemplate() {
+    loading.value = true
+    compilationError.value = null
+
+    try {
+      const response = await axios.post('/api/templates/compile', {
+        template: handlebarsTemplate.value,
+        data: templateData.value,
+      })
+
+      if (response.data.success) {
+        mergedSpec.value = response.data.spec
+        return response.data.spec
+      }
+    } catch (err: any) {
+      compilationError.value = err.response?.data?.error || err.message || 'Compilation failed'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function saveTemplateToLibrary(name: string, description: string, category: string, isPublic: boolean = true) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.post('/api/templates/library', {
+        name,
+        description,
+        category,
+        handlebars_template: handlebarsTemplate.value,
+        sample_data: templateData.value,
+        is_public: isPublic,
+      })
+
+      if (response.data.success) {
+        return response.data.template
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to save template'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updateTemplateInLibrary(id: number, name: string, description: string, category: string, isPublic: boolean = true) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.put(`/api/templates/library/${id}`, {
+        name,
+        description,
+        category,
+        handlebars_template: handlebarsTemplate.value,
+        sample_data: templateData.value,
+        is_public: isPublic,
+      })
+
+      if (response.data.success) {
+        return response.data.template
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to update template'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loadTemplateFromLibrary(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.get(`/api/templates/library/${id}`)
+
+      if (response.data.success) {
+        const template = response.data.template
+        handlebarsTemplate.value = template.handlebars_template
+        templateData.value = template.sample_data || {}
+        return template
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to load template'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getTemplateLibrary(category?: string) {
+    try {
+      const url = category
+        ? `/api/templates/library?category=${category}`
+        : '/api/templates/library'
+      const response = await axios.get(url)
+      return response.data.templates || []
+    } catch (err: any) {
+      error.value = err.message || 'Failed to get templates'
+      return []
+    }
+  }
+
+  function setMode(newMode: 'simple' | 'advanced') {
+    mode.value = newMode
+  }
+
+  function updateHandlebarsTemplate(template: string) {
+    handlebarsTemplate.value = template
+  }
+
+  function updateTemplateData(data: Record<string, any>) {
+    templateData.value = data
+  }
+
   // Local storage
   function saveToLocalStorage() {
-    localStorage.setItem('omr-template', JSON.stringify(spec.value))
+    if (mode.value === 'simple') {
+      localStorage.setItem('omr-template', JSON.stringify(spec.value))
+    } else {
+      localStorage.setItem('omr-template-advanced', JSON.stringify({
+        template: handlebarsTemplate.value,
+        data: templateData.value,
+      }))
+    }
   }
 
   function loadFromLocalStorage() {
-    const saved = localStorage.getItem('omr-template')
-    if (saved) {
-      try {
-        spec.value = JSON.parse(saved)
-        return true
-      } catch {
-        return false
+    if (mode.value === 'simple') {
+      const saved = localStorage.getItem('omr-template')
+      if (saved) {
+        try {
+          spec.value = JSON.parse(saved)
+          return true
+        } catch {
+          return false
+        }
+      }
+    } else {
+      const saved = localStorage.getItem('omr-template-advanced')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          handlebarsTemplate.value = parsed.template || ''
+          templateData.value = parsed.data || {}
+          return true
+        } catch {
+          return false
+        }
       }
     }
     return false
   }
 
   return {
-    // State
+    // State - Simple Mode
     spec,
+    // State - Advanced Mode
+    mode,
+    handlebarsTemplate,
+    templateData,
+    mergedSpec,
+    compilationError,
+    // State - Common
     pdfUrl,
     coordsUrl,
     documentId,
@@ -224,7 +379,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     validationErrors,
     // Computed
     isValid,
-    // Actions
+    // Actions - Simple Mode
     renderTemplate,
     validateTemplate,
     loadSample,
@@ -237,6 +392,16 @@ export const useTemplatesStore = defineStore('templates', () => {
     clearSpec,
     exportJson,
     importJson,
+    // Actions - Advanced Mode
+    compileTemplate,
+    saveTemplateToLibrary,
+    updateTemplateInLibrary,
+    loadTemplateFromLibrary,
+    getTemplateLibrary,
+    setMode,
+    updateHandlebarsTemplate,
+    updateTemplateData,
+    // Actions - Common
     saveToLocalStorage,
     loadFromLocalStorage,
   }

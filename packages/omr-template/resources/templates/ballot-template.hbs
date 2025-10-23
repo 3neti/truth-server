@@ -1,0 +1,32 @@
+{
+  "document": {
+    "title": "{{election.title}}",
+    "unique_id": "{{election.id}}",
+    "layout": "{{layout}}",
+    "orientation": "portrait",
+    "paper_size": "letter"
+  },
+  "sections": [
+    {{#each positions}}
+    {
+      "type": "multiple_choice",
+      "code": "{{code}}",
+      "title": "{{title}}",
+      "question": "{{question}}",
+      "maxSelections": {{maxSelections}},
+      "layout": "{{../layout}}",
+      "choices": [
+        {{#each candidates}}
+        {
+          "code": "{{code}}",
+          "label": "{{name}}"{{#if party}},
+          "metadata": {
+            "party": "{{party}}"
+          }{{/if}}
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}

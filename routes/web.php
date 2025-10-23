@@ -19,5 +19,9 @@ Route::get('/templates/editor', function () {
     return Inertia::render('Templates/Editor');
 })->name('templates.editor');
 
+Route::get('/templates/advanced', function () {
+    return Inertia::render('Templates/AdvancedEditor');
+})->name('templates.advanced');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

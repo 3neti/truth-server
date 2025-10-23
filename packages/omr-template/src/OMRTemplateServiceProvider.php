@@ -8,6 +8,7 @@ use LBHurtado\OMRTemplate\Commands\RenderOMRCommand;
 use LBHurtado\OMRTemplate\Services\BarcodeGenerator;
 use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
+use LBHurtado\OMRTemplate\Services\HandlebarsCompiler;
 use LBHurtado\OMRTemplate\Services\HandlebarsEngine;
 use LBHurtado\OMRTemplate\Services\TemplateExporter;
 use LBHurtado\OMRTemplate\Services\TemplateRenderer;
@@ -23,6 +24,7 @@ class OMRTemplateServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(HandlebarsEngine::class);
+        $this->app->singleton(HandlebarsCompiler::class);
         $this->app->singleton(TemplateRenderer::class);
         $this->app->singleton(TemplateExporter::class);
         $this->app->singleton(FiducialHelper::class);

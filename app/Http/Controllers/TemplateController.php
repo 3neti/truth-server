@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OmrTemplate;
+use App\Models\TemplateInstance;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use LBHurtado\OMRTemplate\Engine\SmartLayoutRenderer;
+use LBHurtado\OMRTemplate\Services\HandlebarsCompiler;
 
 class TemplateController extends Controller
 {
@@ -183,5 +186,229 @@ class TemplateController extends Controller
             'document_id' => $documentId,
             'coordinates' => $coords,
         ]);
+    }
+
+    /**
+     * Compile a Handlebars template with data to produce JSON specification.
+     */
+    public function compile(Request $request, HandlebarsCompiler $compiler): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'template' => 'required|string',
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $spec = $compiler->compile(
+                $request->input('template'),
+                $request->input('data')
+            );
+
+            return response()->json([
+                'success' => true,
+                'spec' => $spec,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * List all templates accessible by the current user.
+     */
+    public function listTemplates(Request $request): JsonResponse
+    {
+        $query = OmrTemplate::query();
+
+        // Filter by category if provided
+        if ($request->has('category')) {
+            $query->category($request->input('category'));
+        }
+
+        // Get templates accessible by user (public + owned)
+        $userId = $request->user()?->id;
+        $query->accessibleBy($userId);
+
+        $templates = $query->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'templates' => $templates,
+        ]);
+    }
+
+    /**
+     * Get a specific template by ID.
+     */
+    public function getTemplate(string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'template' => $template,
+        ]);
+    }
+
+    /**
+     * Save a new template.
+     */
+    public function saveTemplate(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'required|string|max:255',
+            'handlebars_template' => 'required|string',
+            'sample_data' => 'nullable|array',
+            'schema' => 'nullable|array',
+            'is_public' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $template = OmrTemplate::create([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'category' => $request->input('category'),
+                'handlebars_template' => $request->input('handlebars_template'),
+                'sample_data' => $request->input('sample_data'),
+                'schema' => $request->input('schema'),
+                'is_public' => $request->input('is_public', false),
+                'user_id' => $request->user()?->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'template' => $template,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing template.
+     */
+    public function updateTemplate(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        // Check if user owns the template
+        if ($template->user_id !== $request->user()?->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'sometimes|string|max:255',
+            'handlebars_template' => 'sometimes|string',
+            'sample_data' => 'nullable|array',
+            'schema' => 'nullable|array',
+            'is_public' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $template->update($request->only([
+                'name',
+                'description',
+                'category',
+                'handlebars_template',
+                'sample_data',
+                'schema',
+                'is_public',
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'template' => $template->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a template.
+     */
+    public function deleteTemplate(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        // Check if user owns the template
+        if ($template->user_id !== $request->user()?->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+            ], 403);
+        }
+
+        try {
+            $template->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Template deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
