@@ -6,6 +6,13 @@
   },
   "sections": [
     {{#each positions}}
+    {{#if (eq level 'local')}}
+    {{#if (eq @index 4)}}
+    {
+      "type": "page_break"
+    },
+    {{/if}}
+    {{/if}}
     {
       "type": "multiple_choice",
       "code": "{{code}}",

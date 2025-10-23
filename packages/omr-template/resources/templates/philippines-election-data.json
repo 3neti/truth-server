@@ -9,43 +9,50 @@
       "code": "PRESIDENT",
       "name": "President of the Philippines",
       "level": "national",
-      "count": 1
+      "count": 1,
+      "page": 1
     },
     {
       "code": "VICE-PRESIDENT",
       "name": "Vice President of the Philippines",
       "level": "national",
-      "count": 1
+      "count": 1,
+      "page": 1
     },
     {
       "code": "SENATOR",
       "name": "Senator of the Philippines",
       "level": "national",
-      "count": 12
+      "count": 12,
+      "page": 1
     },
     {
       "code": "REPRESENTATIVE-PARTY-LIST",
       "name": "Party-list Representative",
       "level": "national",
-      "count": 1
+      "count": 1,
+      "page": 1
     },
     {
       "code": "GOVERNOR-ILN",
       "name": "Governor — Ilocos Norte",
       "level": "local",
-      "count": 1
+      "count": 1,
+      "page": 2
     },
     {
       "code": "VICE-GOVERNOR-ILN",
       "name": "Vice Governor — Ilocos Norte",
       "level": "local",
-      "count": 1
+      "count": 1,
+      "page": 2
     },
     {
       "code": "MAYOR-ILN-CURRIMAO",
       "name": "Municipal Mayor — Currimao, Ilocos Norte",
       "level": "local",
-      "count": 1
+      "count": 1,
+      "page": 2
     }
   ],
   "candidates": {
