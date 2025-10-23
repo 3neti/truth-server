@@ -24,6 +24,7 @@ const showSaveDialog = ref(false)
 const showUpdateDialog = ref(false)
 const showLibraryDrawer = ref(false)
 const showShortcutsHelp = ref(false)
+const showSampleMenu = ref(false)
 const libraryKey = ref(0)
 const saveTemplateName = ref('')
 const saveTemplateDescription = ref('')
@@ -152,7 +153,15 @@ async function handleUpdateTemplate() {
   }
 }
 
-function loadSampleTemplate() {
+async function loadSampleTemplate(sampleName = 'simple') {
+  if (sampleName === 'philippines') {
+    await loadPhilippinesSample()
+  } else {
+    loadSimpleSample()
+  }
+}
+
+function loadSimpleSample() {
   handlebarsTemplate.value = `{
   "document": {
     "title": "{{election.title}}",
@@ -199,6 +208,25 @@ function loadSampleTemplate() {
         ],
       },
     ],
+  }
+}
+
+async function loadPhilippinesSample() {
+  try {
+    // Load template file
+    const templateResponse = await fetch('/packages/omr-template/resources/templates/philippines-election-template.hbs')
+    const template = await templateResponse.text()
+    
+    // Load data file
+    const dataResponse = await fetch('/packages/omr-template/resources/templates/philippines-election-data.json')
+    const data = await dataResponse.json()
+    
+    handlebarsTemplate.value = template
+    templateData.value = data
+  } catch (e) {
+    console.error('Failed to load Philippine election sample:', e)
+    alert('Failed to load sample. Using default instead.')
+    loadSimpleSample()
   }
 }
 
@@ -353,12 +381,35 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
           📚 Browse Library
         </button>
 
-        <button
-          @click="loadSampleTemplate"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Load Sample
-        </button>
+        <div class="relative">
+          <button
+            @click="showSampleMenu = !showSampleMenu"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+          >
+            Load Sample
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div
+            v-if="showSampleMenu"
+            class="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+          >
+            <button
+              @click="loadSampleTemplate('simple'); showSampleMenu = false"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 first:rounded-t-md"
+            >
+              Simple Election Ballot
+            </button>
+            <button
+              @click="loadSampleTemplate('philippines'); showSampleMenu = false"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 last:rounded-b-md"
+            >
+              🇵🇭 Philippine General Election
+            </button>
+          </div>
+        </div>
 
         <button
           @click="clearTemplate"

@@ -1,0 +1,287 @@
+{
+  "election": {
+    "title": "2025 Philippine General Election",
+    "id": "BAL-2025-PH-001"
+  },
+  "layout": "2-col",
+  "positions": [
+    {
+      "code": "PRESIDENT",
+      "name": "President of the Philippines",
+      "level": "national",
+      "count": 1
+    },
+    {
+      "code": "VICE-PRESIDENT",
+      "name": "Vice President of the Philippines",
+      "level": "national",
+      "count": 1
+    },
+    {
+      "code": "SENATOR",
+      "name": "Senator of the Philippines",
+      "level": "national",
+      "count": 12
+    },
+    {
+      "code": "REPRESENTATIVE-PARTY-LIST",
+      "name": "Party-list Representative",
+      "level": "national",
+      "count": 1
+    },
+    {
+      "code": "GOVERNOR-ILN",
+      "name": "Governor — Ilocos Norte",
+      "level": "local",
+      "count": 1
+    },
+    {
+      "code": "VICE-GOVERNOR-ILN",
+      "name": "Vice Governor — Ilocos Norte",
+      "level": "local",
+      "count": 1
+    },
+    {
+      "code": "MAYOR-ILN-CURRIMAO",
+      "name": "Municipal Mayor — Currimao, Ilocos Norte",
+      "level": "local",
+      "count": 1
+    }
+  ],
+  "candidates": {
+    "PRESIDENT": [
+      {
+        "code": "LD_001",
+        "name": "Leonardo DiCaprio",
+        "alias": "LD"
+      },
+      {
+        "code": "SJ_002",
+        "name": "Scarlett Johansson",
+        "alias": "SJ"
+      },
+      {
+        "code": "DW_003",
+        "name": "Denzel Washington",
+        "alias": "DW"
+      },
+      {
+        "code": "MS_004",
+        "name": "Meryl Streep",
+        "alias": "MS"
+      },
+      {
+        "code": "BP_005",
+        "name": "Brad Pitt",
+        "alias": "BP"
+      },
+      {
+        "code": "AJ_006",
+        "name": "Angelina Jolie",
+        "alias": "AJ"
+      }
+    ],
+    "VICE-PRESIDENT": [
+      {
+        "code": "TH_001",
+        "name": "Tom Hanks",
+        "alias": "TH"
+      },
+      {
+        "code": "VD_002",
+        "name": "Viola Davis",
+        "alias": "VD"
+      },
+      {
+        "code": "CH_003",
+        "name": "Chris Hemsworth",
+        "alias": "CH"
+      },
+      {
+        "code": "NP_004",
+        "name": "Natalie Portman",
+        "alias": "NP"
+      },
+      {
+        "code": "RDJ_005",
+        "name": "Robert Downey Jr.",
+        "alias": "RDJ"
+      },
+      {
+        "code": "AH_006",
+        "name": "Anne Hathaway",
+        "alias": "AH"
+      }
+    ],
+    "SENATOR": [
+      {
+        "code": "JD_001",
+        "name": "Johnny Depp",
+        "alias": "JD"
+      },
+      {
+        "code": "ES_002",
+        "name": "Emma Stone",
+        "alias": "ES"
+      },
+      {
+        "code": "MF_003",
+        "name": "Morgan Freeman",
+        "alias": "MF"
+      },
+      {
+        "code": "JL_004",
+        "name": "Jennifer Lawrence",
+        "alias": "JL"
+      },
+      {
+        "code": "CB_005",
+        "name": "Christian Bale",
+        "alias": "CB"
+      },
+      {
+        "code": "SB_006",
+        "name": "Sandra Bullock",
+        "alias": "SB"
+      },
+      {
+        "code": "WS_007",
+        "name": "Will Smith",
+        "alias": "WS"
+      },
+      {
+        "code": "JR_008",
+        "name": "Julia Roberts",
+        "alias": "JR"
+      },
+      {
+        "code": "MD_009",
+        "name": "Matt Damon",
+        "alias": "MD"
+      },
+      {
+        "code": "CT_010",
+        "name": "Charlize Theron",
+        "alias": "CT"
+      },
+      {
+        "code": "KR_011",
+        "name": "Keanu Reeves",
+        "alias": "KR"
+      },
+      {
+        "code": "NK_012",
+        "name": "Nicole Kidman",
+        "alias": "NK"
+      }
+    ],
+    "REPRESENTATIVE-PARTY-LIST": [
+      {
+        "code": "THE_GODFATHER_001",
+        "name": "The Godfather",
+        "alias": "the_godfather"
+      },
+      {
+        "code": "TITANIC_002",
+        "name": "Titanic",
+        "alias": "titanic"
+      },
+      {
+        "code": "THE_DARK_KNIGHT_003",
+        "name": "The Dark Knight",
+        "alias": "the_dark_knight"
+      },
+      {
+        "code": "INCEPTION_006",
+        "name": "Inception",
+        "alias": "inception"
+      },
+      {
+        "code": "THE_MATRIX_008",
+        "name": "The Matrix",
+        "alias": "the_matrix"
+      },
+      {
+        "code": "AVATAR_011",
+        "name": "Avatar",
+        "alias": "avatar"
+      },
+      {
+        "code": "THE_AVENGERS_016",
+        "name": "The Avengers",
+        "alias": "the_avengers"
+      },
+      {
+        "code": "BLACK_PANTHER_020",
+        "name": "Black Panther",
+        "alias": "black_panther"
+      },
+      {
+        "code": "PARASITE_021",
+        "name": "Parasite",
+        "alias": "parasite"
+      },
+      {
+        "code": "OPPENHEIMER_032",
+        "name": "Oppenheimer",
+        "alias": "oppenheimer"
+      }
+    ],
+    "GOVERNOR-ILN": [
+      {
+        "code": "EN_001",
+        "name": "Edward Norton",
+        "alias": "EN"
+      },
+      {
+        "code": "JB_002",
+        "name": "Jeff Bridges",
+        "alias": "JB"
+      },
+      {
+        "code": "RP_003",
+        "name": "Rosamund Pike",
+        "alias": "RP"
+      }
+    ],
+    "VICE-GOVERNOR-ILN": [
+      {
+        "code": "NW_001",
+        "name": "Naomi Watts",
+        "alias": "NW"
+      },
+      {
+        "code": "MF_002",
+        "name": "Michael Fassbender",
+        "alias": "MF"
+      },
+      {
+        "code": "DK_003",
+        "name": "Daniel Kaluuya",
+        "alias": "DK"
+      },
+      {
+        "code": "JH_004",
+        "name": "Jennifer Hudson",
+        "alias": "JH"
+      }
+    ],
+    "MAYOR-ILN-CURRIMAO": [
+      {
+        "code": "BC_001",
+        "name": "Billy Crudup",
+        "alias": "BC"
+      },
+      {
+        "code": "LJ_002",
+        "name": "Lily James",
+        "alias": "LJ"
+      },
+      {
+        "code": "EW_003",
+        "name": "Emily Watson",
+        "alias": "EW"
+      }
+    ]
+  }
+}

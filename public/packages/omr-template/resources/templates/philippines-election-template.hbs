@@ -1,0 +1,27 @@
+{
+  "document": {
+    "title": "{{election.title}}",
+    "unique_id": "{{election.id}}",
+    "layout": "{{layout}}"
+  },
+  "sections": [
+    {{#each positions}}
+    {
+      "type": "multiple_choice",
+      "code": "{{code}}",
+      "title": "{{name}}",
+      "question": "Vote for {{#if (compare count '>' 1)}}up to {{count}}{{else}}one{{/if}}",
+      "maxSelections": {{count}},
+      "layout": "{{../layout}}",
+      "choices": [
+        {{#each (lookup ../candidates code)}}
+        {
+          "code": "{{code}}",
+          "label": "{{name}}"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}
