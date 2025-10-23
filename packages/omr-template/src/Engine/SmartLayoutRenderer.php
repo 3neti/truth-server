@@ -127,6 +127,12 @@ class SmartLayoutRenderer
     {
         $type = $section['type'] ?? 'unknown';
         
+        // Handle page break explicitly
+        if ($type === 'page_break') {
+            $this->paginator->addPage();
+            return;
+        }
+        
         // Find appropriate renderer
         $renderer = null;
         foreach ($this->renderers as $r) {
