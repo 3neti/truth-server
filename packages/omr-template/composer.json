@@ -1,6 +1,6 @@
 {
     "name": "lbhurtado/omr-template",
-    "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + DOMPDF",
+    "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + TCPDF",
     "type": "library",
     "license": "proprietary",
     "autoload": {
@@ -16,11 +16,10 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "dompdf/dompdf": "^3.1",
+        "elibyy/tcpdf-laravel": "^11.0",
         "zordius/lightncandy": "^1.2",
         "spatie/laravel-data": "^4.0",
-        "lorisleiva/laravel-actions": "^2.9",
-        "milon/barcode": "^12.0"
+        "lorisleiva/laravel-actions": "^2.9"
     },
     "require-dev": {
         "orchestra/testbench": "^10.3",

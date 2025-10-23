@@ -64,6 +64,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mark Box Rendering
+    |--------------------------------------------------------------------------
+    |
+    | Controls how mark boxes are rendered in generated PDFs.
+    | These boxes must align perfectly with OpenCV detection zones.
+    |
+    */
+    'mark_boxes' => [
+        'enabled' => env('OMR_MARK_BOXES_ENABLED', true),
+        'style' => env('OMR_MARK_BOX_STYLE', 'circle'), // circle, square, or rounded
+        'border_width' => env('OMR_MARK_BOX_BORDER_WIDTH', 2),
+        'border_color' => env('OMR_MARK_BOX_BORDER_COLOR', '#000000'),
+        'background' => env('OMR_MARK_BOX_BACKGROUND', '#FFFFFF'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Zone Layout Configuration
     |--------------------------------------------------------------------------
     |

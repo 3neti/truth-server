@@ -2,8 +2,7 @@
 
 namespace LBHurtado\OMRTemplate\Services;
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use TCPDF;
 use LBHurtado\OMRTemplate\Data\OutputBundle;
 use LBHurtado\OMRTemplate\Data\ZoneMapData;
 
@@ -24,18 +23,29 @@ class TemplateExporter
         );
     }
 
-    protected function generatePdf(string $html): Dompdf
+    protected function generatePdf(string $html): TCPDF
     {
-        $options = new Options;
-        $options->set('isRemoteEnabled', true);
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('dpi', config('omr-template.dpi', 300));
+        $pdf = new TCPDF(
+            config('omr-template.default_orientation', 'P'),
+            'mm',
+            config('omr-template.default_layout', 'A4'),
+            true,
+            'UTF-8',
+            false
+        );
 
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper(config('omr-template.default_layout', 'A4'), 'portrait');
-        $dompdf->render();
+        // Remove default header/footer
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
 
-        return $dompdf;
+        // Set margins
+        $pdf->SetMargins(0, 0, 0, true);
+        $pdf->SetAutoPageBreak(false, 0);
+        
+        // Add page and write HTML content
+        $pdf->AddPage();
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        return $pdf;
     }
 }

@@ -1,0 +1,180 @@
+{
+  "identifier": "BALLOT-2024-001",
+  "fiducials": [
+    {
+      "x": 10,
+      "y": 10,
+      "width": 10,
+      "height": 10,
+      "label": "top_left"
+    },
+    {
+      "x": 190,
+      "y": 10,
+      "width": 10,
+      "height": 10,
+      "label": "top_right"
+    },
+    {
+      "x": 10,
+      "y": 277,
+      "width": 10,
+      "height": 10,
+      "label": "bottom_left"
+    },
+    {
+      "x": 190,
+      "y": 277,
+      "width": 10,
+      "height": 10,
+      "label": "bottom_right"
+    }
+  ],
+  "barcode": {
+    "content": "BALLOT-2024-001",
+    "type": "PDF417",
+    "x": 10,
+    "y": 260,
+    "width": 80,
+    "height": 20
+  },
+  "bubbles": [
+    {
+      "x": 30,
+      "y": 50,
+      "radius": 2.5,
+      "label": "question_1_option_a"
+    },
+    {
+      "x": 30,
+      "y": 60,
+      "radius": 2.5,
+      "label": "question_1_option_b"
+    },
+    {
+      "x": 30,
+      "y": 70,
+      "radius": 2.5,
+      "label": "question_1_option_c"
+    },
+    {
+      "x": 30,
+      "y": 80,
+      "radius": 2.5,
+      "label": "question_1_option_d"
+    },
+    {
+      "x": 30,
+      "y": 100,
+      "radius": 2.5,
+      "label": "question_2_option_a"
+    },
+    {
+      "x": 30,
+      "y": 110,
+      "radius": 2.5,
+      "label": "question_2_option_b"
+    },
+    {
+      "x": 30,
+      "y": 120,
+      "radius": 2.5,
+      "label": "question_2_option_c"
+    },
+    {
+      "x": 30,
+      "y": 130,
+      "radius": 2.5,
+      "label": "question_2_option_d"
+    }
+  ],
+  "text_elements": [
+    {
+      "x": 25,
+      "y": 30,
+      "content": "Question 1: What is your preferred option?",
+      "font": "helvetica",
+      "style": "B",
+      "size": 12
+    },
+    {
+      "x": 35,
+      "y": 50,
+      "content": "A. Option A",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 60,
+      "content": "B. Option B",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 70,
+      "content": "C. Option C",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 80,
+      "content": "D. Option D",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 25,
+      "y": 90,
+      "content": "Question 2: Select your answer:",
+      "font": "helvetica",
+      "style": "B",
+      "size": 12
+    },
+    {
+      "x": 35,
+      "y": 100,
+      "content": "A. Answer A",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 110,
+      "content": "B. Answer B",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 120,
+      "content": "C. Answer C",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    },
+    {
+      "x": 35,
+      "y": 130,
+      "content": "D. Answer D",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    }
+  ],
+  "metadata": {
+    "dpi": 300,
+    "format": "A4",
+    "orientation": "portrait",
+    "description": "Sample ballot layout with two multiple-choice questions",
+    "version": "1.0"
+  }
+}

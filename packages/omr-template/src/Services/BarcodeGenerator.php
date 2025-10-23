@@ -2,50 +2,75 @@
 
 namespace LBHurtado\OMRTemplate\Services;
 
-use Milon\Barcode\DNS1D;
-use Milon\Barcode\DNS2D;
+use TCPDF;
 
 class BarcodeGenerator
 {
     /**
-     * Generate a Code 128 barcode as HTML (better for DOMPDF)
+     * Generate a barcode using TCPDF and return as SVG string
+     * TCPDF supports various 1D and 2D barcodes natively
+     */
+    public function generateBarcodeSvg(string $content, string $type = 'C128'): string
+    {
+        try {
+            // Map common barcode type names to TCPDF types
+            $tcpdfType = match (strtoupper($type)) {
+                'C39', 'CODE39' => 'C39',
+                'C128', 'CODE128' => 'C128',
+                'PDF417' => 'PDF417',
+                'QRCODE', 'QR' => 'QRCODE,H',
+                'DATAMATRIX' => 'DATAMATRIX',
+                default => 'C128',
+            };
+
+            // For 1D barcodes
+            if (in_array(strtoupper($type), ['C39', 'CODE39', 'C128', 'CODE128'])) {
+                $barcodeObj = new \TCPDFBarcode($content, $tcpdfType);
+                return $barcodeObj->getBarcodeSVGcode(2, 40, 'black');
+            }
+
+            // For 2D barcodes
+            $barcodeObj = new \TCPDF2DBarcode($content, $tcpdfType);
+            return $barcodeObj->getBarcodeSVGcode(2, 2, 'black');
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Generate a Code 128 barcode as SVG
      */
     public function generateCode128(string $content, int $widthScale = 2, int $height = 40): string
     {
         try {
-            $generator = new DNS1D();
-            $generator->setStorPath(storage_path('app/barcodes'));
-            return $generator->getBarcodeHTML($content, 'C128', $widthScale, $height, 'black', 0);
+            $barcodeObj = new \TCPDFBarcode($content, 'C128');
+            return $barcodeObj->getBarcodeSVGcode($widthScale, $height, 'black');
         } catch (\Exception $e) {
-            // Return empty string if barcode generation fails
             return '';
         }
     }
 
     /**
-     * Generate a Code 39 barcode as HTML (better for DOMPDF)
+     * Generate a Code 39 barcode as SVG
      */
     public function generateCode39(string $content, int $widthScale = 2, int $height = 40): string
     {
         try {
-            $generator = new DNS1D();
-            $generator->setStorPath(storage_path('app/barcodes'));
-            return $generator->getBarcodeHTML($content, 'C39', $widthScale, $height, 'black', 0);
+            $barcodeObj = new \TCPDFBarcode($content, 'C39');
+            return $barcodeObj->getBarcodeSVGcode($widthScale, $height, 'black');
         } catch (\Exception $e) {
             return '';
         }
     }
 
     /**
-     * Generate a PDF417 2D barcode as HTML (better for DOMPDF)
-     * For PDF417, width and height are per-cell dimensions, not total size
+     * Generate a PDF417 2D barcode as SVG
      */
     public function generatePDF417(string $content, int $width = 2, int $height = 2): string
     {
         try {
-            $generator = new DNS2D();
-            $generator->setStorPath(storage_path('app/barcodes'));
-            return $generator->getBarcodeHTML($content, 'PDF417', $width, $height, 'black');
+            $barcodeObj = new \TCPDF2DBarcode($content, 'PDF417');
+            return $barcodeObj->getBarcodeSVGcode($width, $height, 'black');
         } catch (\Exception $e) {
             return '';
         }
@@ -69,5 +94,23 @@ class BarcodeGenerator
             'PDF417' => $this->generatePDF417($content, $widthScale, $height),
             default => $this->generateCode128($content, $widthScale, $height),
         };
+    }
+
+    /**
+     * Generate barcode as PNG image data URL
+     */
+    public function generatePngDataUrl(string $content, string $type = 'C128', int $width = 2, int $height = 40): string
+    {
+        try {
+            $barcodeObj = match (strtoupper($type)) {
+                'PDF417', 'QRCODE' => new \TCPDF2DBarcode($content, strtoupper($type)),
+                default => new \TCPDFBarcode($content, strtoupper($type)),
+            };
+
+            $png = $barcodeObj->getBarcodePngData($width, $height);
+            return 'data:image/png;base64,' . base64_encode($png);
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 }

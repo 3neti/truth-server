@@ -1,6 +1,6 @@
 # OMR Template Generator
 
-A Laravel package for generating printable, scan-friendly documents (ballots, test papers, surveys) using Handlebars templating and DOMPDF rendering, with zone mapping support for Optical Mark Recognition (OMR).
+A Laravel package for generating printable, scan-friendly documents (ballots, test papers, surveys) using Handlebars templating and TCPDF rendering, with zone mapping support for Optical Mark Recognition (OMR).
 
 ## Features
 

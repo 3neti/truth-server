@@ -2,14 +2,14 @@
 
 namespace LBHurtado\OMRTemplate\Data;
 
-use Dompdf\Dompdf;
+use TCPDF;
 use Spatie\LaravelData\Data;
 
 class OutputBundle extends Data
 {
     public function __construct(
         public string $html,
-        public Dompdf $pdf,
+        public TCPDF $pdf,
         public ZoneMapData $zoneMap,
         public ?array $metadata = null,
     ) {}
@@ -21,7 +21,7 @@ class OutputBundle extends Data
             mkdir($directory, 0755, true);
         }
 
-        file_put_contents($path, $this->pdf->output());
+        file_put_contents($path, $this->pdf->Output('', 'S'));
     }
 
     public function saveJson(string $path): void
