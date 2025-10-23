@@ -195,4 +195,136 @@ class OMRTemplateGenerator
         $baseDir = __DIR__ . '/../../storage';
         return realpath($baseDir) ? realpath($baseDir) . '/' . ltrim($path, '/') : $baseDir . '/' . ltrim($path, '/');
     }
+
+    /**
+     * Get configuration value (works in Laravel and standalone)
+     */
+    protected function getConfigValue(string $key, $default = null)
+    {
+        // Try Laravel config (only if app is properly bootstrapped)
+        if (function_exists('config')) {
+            try {
+                if (function_exists('app') && app()->bound('config')) {
+                    return config("omr-template.{$key}", $default);
+                }
+            } catch (\Exception $e) {
+                // Fall through to file-based config
+            }
+        }
+
+        // Fallback: load config file directly with standalone helpers
+        $config = $this->loadConfigFile();
+        if ($config) {
+            $keys = explode('.', $key);
+            $value = $config;
+            foreach ($keys as $k) {
+                if (isset($value[$k])) {
+                    $value = $value[$k];
+                } else {
+                    return $default;
+                }
+            }
+            return $value;
+        }
+
+        return $default;
+    }
+
+    /**
+     * Load config file with standalone helper functions
+     */
+    protected function loadConfigFile(): ?array
+    {
+        $configPath = __DIR__ . '/../../config/omr-template.php';
+        if (!file_exists($configPath)) {
+            return null;
+        }
+
+        // Read config file content and replace Laravel helper calls
+        $configContent = file_get_contents($configPath);
+        
+        // Replace resource_path() and storage_path() with hardcoded paths
+        $resourcePath = __DIR__ . '/../../resources';
+        $storagePath = __DIR__ . '/../../storage';
+        
+        // Replace function calls with actual paths
+        $configContent = preg_replace(
+            '/resource_path\(([^)]+)\)/',
+            "'" . $resourcePath . "' . $1",
+            $configContent
+        );
+        $configContent = preg_replace(
+            '/storage_path\(([^)]+)\)/',
+            "'" . $storagePath . "' . $1",
+            $configContent
+        );
+        $configContent = preg_replace(
+            '/env\([^)]+,\s*([^)]+)\)/',
+            '$1',
+            $configContent
+        );
+        
+        try {
+            // Evaluate the modified config
+            $config = eval('?>' . $configContent);
+            return is_array($config) ? $config : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get fiducials for a specific layout
+     * 
+     * @param string $layout Layout name ('default', 'asymmetrical_right', 'asymmetrical_diagonal')
+     * @return array Array of fiducial markers with positions
+     */
+    public function getFiducialsForLayout(string $layout = 'default'): array
+    {
+        $fiducials = $this->getConfigValue("fiducials.{$layout}");
+        $markerSize = $this->getConfigValue('marker_size', 10);
+
+        if (!$fiducials) {
+            // Return default fiducials
+            return [
+                ['x' => 10, 'y' => 10, 'width' => $markerSize, 'height' => $markerSize, 'position' => 'top_left'],
+                ['x' => 190, 'y' => 10, 'width' => $markerSize, 'height' => $markerSize, 'position' => 'top_right'],
+                ['x' => 10, 'y' => 277, 'width' => $markerSize, 'height' => $markerSize, 'position' => 'bottom_left'],
+                ['x' => 190, 'y' => 277, 'width' => $markerSize, 'height' => $markerSize, 'position' => 'bottom_right'],
+            ];
+        }
+
+        // Convert config format to array format
+        $result = [];
+        foreach ($fiducials as $position => $coords) {
+            $result[] = [
+                'x' => $coords['x'],
+                'y' => $coords['y'],
+                'width' => $markerSize,
+                'height' => $markerSize,
+                'position' => $position,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate PDF with specific fiducial layout
+     * 
+     * @param array $data PDF data
+     * @param string $fiducialLayout Fiducial layout name
+     * @param array $config Additional config
+     * @return string Path to generated PDF
+     */
+    public function generateWithFiducialLayout(array $data, string $fiducialLayout = 'default', array $config = []): string
+    {
+        // Get fiducials for the specified layout
+        $fiducials = $this->getFiducialsForLayout($fiducialLayout);
+        
+        // Merge fiducials into data
+        $data['fiducials'] = $fiducials;
+        
+        return $this->generateWithConfig($data, $config);
+    }
 }

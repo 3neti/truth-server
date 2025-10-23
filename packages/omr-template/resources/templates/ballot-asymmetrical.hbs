@@ -1,0 +1,48 @@
+{
+  "identifier": "{{identifier}}",
+  "title": "{{title}}",
+  "fiducials": [
+    { "x": 10, "y": 10, "width": 10, "height": 10 },
+    { "x": 180, "y": 12, "width": 10, "height": 10 },
+    { "x": 10, "y": 277, "width": 10, "height": 10 },
+    { "x": 180, "y": 270, "width": 10, "height": 10 }
+  ],
+  "barcode": {
+    "content": "{{identifier}}",
+    "type": "PDF417",
+    "x": 10,
+    "y": 260,
+    "width": 80,
+    "height": 20
+  },
+  "bubbles": [
+    {{#each candidates}}
+    {
+      "x": {{x}},
+      "y": {{y}},
+      "radius": 2.5,
+      "label": "{{label}}"
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ],
+  "text_elements": [
+    {
+      "x": 70,
+      "y": 30,
+      "content": "{{title}}",
+      "font": "helvetica",
+      "style": "B",
+      "size": 16
+    }{{#if candidates}},{{/if}}
+    {{#each candidates}}
+    {
+      "x": {{add x 5}},
+      "y": {{y}},
+      "content": "{{label}}",
+      "font": "helvetica",
+      "style": "",
+      "size": 10
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}

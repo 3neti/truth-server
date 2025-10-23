@@ -116,4 +116,64 @@ return [
             'contest_spacing' => 0.5,
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fiducial Markers (Orientation Detection)
+    |--------------------------------------------------------------------------
+    |
+    | Fiducial markers are black squares positioned at page corners to help
+    | OpenCV detect page orientation (0°, 90°, 180°, 270°).
+    |
+    | Layouts:
+    | - default: Symmetrical corners (basic alignment only)
+    | - asymmetrical_right: Right side offset for orientation detection
+    | - asymmetrical_diagonal: Diagonal pattern for robust detection
+    |
+    | Coordinates are in millimeters for A4 (210mm x 297mm).
+    | At 300 DPI: 1mm ≈ 11.811 pixels
+    |
+    */
+    'fiducials' => [
+        'default' => [
+            'top_left' => ['x' => 10, 'y' => 10],
+            'top_right' => ['x' => 190, 'y' => 10],
+            'bottom_left' => ['x' => 10, 'y' => 277],
+            'bottom_right' => ['x' => 190, 'y' => 277],
+        ],
+        'asymmetrical_right' => [
+            'top_left' => ['x' => 10, 'y' => 10],
+            'top_right' => ['x' => 180, 'y' => 12],      // Offset right & down
+            'bottom_left' => ['x' => 10, 'y' => 277],
+            'bottom_right' => ['x' => 180, 'y' => 270],   // Offset right & up
+        ],
+        'asymmetrical_diagonal' => [
+            'top_left' => ['x' => 10, 'y' => 10],
+            'top_right' => ['x' => 188, 'y' => 12],      // Slight diagonal
+            'bottom_left' => ['x' => 12, 'y' => 275],    // Slight diagonal
+            'bottom_right' => ['x' => 190, 'y' => 277],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fiducial Marker Size
+    |--------------------------------------------------------------------------
+    |
+    | Size of each fiducial marker square in millimeters.
+    | Default: 10mm x 10mm (≈ 118px x 118px at 300 DPI)
+    |
+    */
+    'marker_size' => 10,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Fiducial Layout
+    |--------------------------------------------------------------------------
+    |
+    | Which fiducial layout to use by default.
+    | Options: 'default', 'asymmetrical_right', 'asymmetrical_diagonal'
+    |
+    */
+    'default_fiducial_layout' => env('OMR_FIDUCIAL_LAYOUT', 'default'),
 ];
