@@ -41,6 +41,14 @@ class ZoneGenerator
                     'height' => $markHeight,
                     'contest' => $contest['title'] ?? "Contest $index",
                     'candidate' => $candidate['name'] ?? "Candidate $candidateIndex",
+                    // Render properties for visible mark boxes in PDF
+                    'render' => [
+                        'enabled' => config('omr-template.mark_boxes.enabled', true),
+                        'style' => config('omr-template.mark_boxes.style', 'circle'),
+                        'border_width' => config('omr-template.mark_boxes.border_width', 2),
+                        'border_color' => config('omr-template.mark_boxes.border_color', '#000000'),
+                        'background' => config('omr-template.mark_boxes.background', '#FFFFFF'),
+                    ],
                 ];
                 
                 // Move to next candidate position

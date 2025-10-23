@@ -12,8 +12,8 @@ echo "This test demonstrates the complete end-to-end OMR workflow:"
 echo "  1. PDF Generation with fiducial markers and auto-generated zones"
 echo "  2. PDF to Image conversion"
 echo "  3. Mark simulation at actual zone positions"
-echo "  4. Fiducial detection for alignment"
-echo "  5. Mark detection and appreciation"
+echo "  4. Python OpenCV fiducial detection for alignment"
+echo "  5. Python OpenCV mark detection and appreciation"
 echo ""
 echo "Zones are automatically generated from candidate data!"
 echo ""
@@ -105,7 +105,7 @@ if ! command -v magick &> /dev/null && ! command -v convert &> /dev/null; then
     echo "   3. Scan or photograph the filled ballot"
     echo "   4. Save as: ${OUTPUT_DIR}/filled-ballot.jpg"
     echo "   5. Run appreciation command:"
-    echo "      php artisan omr:appreciate ${OUTPUT_DIR}/filled-ballot.jpg $JSON_FILE --output=${OUTPUT_DIR}/results.json"
+    echo "      php artisan omr:appreciate-python ${OUTPUT_DIR}/filled-ballot.jpg $JSON_FILE --output=${OUTPUT_DIR}/results.json"
     echo ""
     exit 0
 fi
@@ -120,7 +120,7 @@ if ! command -v gs &> /dev/null; then
     echo "   3. Scan or photograph the filled ballot"
     echo "   4. Save as: ${OUTPUT_DIR}/filled-ballot.jpg"
     echo "   5. Run appreciation command:"
-    echo "      php artisan omr:appreciate ${OUTPUT_DIR}/filled-ballot.jpg $JSON_FILE --output=${OUTPUT_DIR}/results.json"
+    echo "      php artisan omr:appreciate-python ${OUTPUT_DIR}/filled-ballot.jpg $JSON_FILE --output=${OUTPUT_DIR}/results.json"
     echo ""
     exit 0
 fi
@@ -142,84 +142,38 @@ echo "✅ PDF converted to image: $SCAN_IMAGE"
 echo ""
 
 echo "✏️  Step 4: Marking zones (simulating voter marks)..."
-echo "   Note: Without predefined zones, we'll mark at estimated ballot positions"
-echo "   Marking: President - Alice Johnson, Vice President - Emma Davis"
+echo "   Using Python OpenCV to draw realistic marks"
+echo "   Marking: President - Alice Johnson (zone 0), Vice President - Emma Davis (zone 3)"
 
-# Extract actual zone positions from the generated template
-if command -v jq &> /dev/null && [ -f "$JSON_FILE" ]; then
-    # Try to get zone info from template if zones exist
-    ZONES_EXIST=$(jq '.zones | length' "$JSON_FILE" 2>/dev/null || echo "0")
-    
-    if [ "$ZONES_EXIST" -gt 0 ]; then
-        # Get first candidate position for President (index 0)
-        PRES_X=$(jq -r '.zones[0].x' "$JSON_FILE" 2>/dev/null || echo "350")
-        PRES_Y=$(jq -r '.zones[0].y' "$JSON_FILE" 2>/dev/null || echo "950")
-        PRES_W=$(jq -r '.zones[0].width' "$JSON_FILE" 2>/dev/null || echo "60")
-        PRES_H=$(jq -r '.zones[0].height' "$JSON_FILE" 2>/dev/null || echo "60")
-        
-        # Get second candidate position for Vice President (index 3)
-        VP_X=$(jq -r '.zones[3].x' "$JSON_FILE" 2>/dev/null || echo "350")
-        VP_Y=$(jq -r '.zones[3].y' "$JSON_FILE" 2>/dev/null || echo "1650")
-        VP_W=$(jq -r '.zones[3].width' "$JSON_FILE" 2>/dev/null || echo "60")
-        VP_H=$(jq -r '.zones[3].height' "$JSON_FILE" 2>/dev/null || echo "60")
-        
-        echo "   Using zone positions from template: President($PRES_X,$PRES_Y) VP($VP_X,$VP_Y)"
-    else
-        # Fallback: estimated positions based on typical A4 ballot at 300 DPI
-        # First checkbox is typically around 350px from left, 950px from top
-        PRES_X=350
-        PRES_Y=950
-        PRES_W=60
-        PRES_H=60
-        
-        # VP section typically 700px below President section
-        VP_X=350
-        VP_Y=1650
-        VP_W=60
-        VP_H=60
-        
-        echo "   Using estimated positions (no zones in template): President($PRES_X,$PRES_Y) VP($VP_X,$VP_Y)"
-    fi
-else
-    # Fallback if jq not available
-    PRES_X=350
-    PRES_Y=950
-    PRES_W=60
-    PRES_H=60
-    VP_X=350
-    VP_Y=1650
-    VP_W=60
-    VP_H=60
-    echo "   Using estimated positions (jq not available)"
+# Use Python script to draw realistic marks at exact zone positions
+PYTHON_VENV="packages/omr-appreciation/omr-python/venv/bin/python"
+MARK_SCRIPT="packages/omr-appreciation/omr-python/simulate_marks.py"
+
+if [ ! -f "$PYTHON_VENV" ]; then
+    echo "❌ Error: Python virtual environment not found. Run: cd packages/omr-appreciation/omr-python && python3 -m venv venv"
+    exit 1
 fi
 
-# Calculate end coordinates
-PRES_X2=$((PRES_X + PRES_W))
-PRES_Y2=$((PRES_Y + PRES_H))
-VP_X2=$((VP_X + VP_W))
-VP_Y2=$((VP_Y + VP_H))
-
-# Draw the marks
-if command -v magick &> /dev/null; then
-    magick "$SCAN_IMAGE" \
-        -fill black \
-        -draw "rectangle $PRES_X,$PRES_Y $PRES_X2,$PRES_Y2" \
-        -draw "rectangle $VP_X,$VP_Y $VP_X2,$VP_Y2" \
-        "$SCAN_IMAGE"
-else
-    convert "$SCAN_IMAGE" \
-        -fill black \
-        -draw "rectangle $PRES_X,$PRES_Y $PRES_X2,$PRES_Y2" \
-        -draw "rectangle $VP_X,$VP_Y $VP_X2,$VP_Y2" \
-        "$SCAN_IMAGE"
+if [ ! -f "$MARK_SCRIPT" ]; then
+    echo "❌ Error: Mark simulation script not found: $MARK_SCRIPT"
+    exit 1
 fi
 
-echo "✅ Marked: President - Alice Johnson (1st option), Vice President - Emma Davis (2nd option)"
+# Draw marks at zones 0 (President - Alice Johnson) and 3 (Vice President - Emma Davis)
+$PYTHON_VENV $MARK_SCRIPT "$SCAN_IMAGE" "$JSON_FILE" --mark-zones "0,3" --fill 0.75
+
+if [ $? -ne 0 ]; then
+    echo "❌ Error: Failed to draw marks"
+    exit 1
+fi
+
+echo "✅ Marked: President - Alice Johnson (zone 0), Vice President - Emma Davis (zone 3)"
 echo ""
 
-echo "🔍 Step 5: Appreciating the filled ballot..."
+echo "🔍 Step 5: Appreciating the filled ballot (Python OpenCV)..."
 RESULT_FILE="${OUTPUT_DIR}/appreciation-results.json"
-php artisan omr:appreciate "$SCAN_IMAGE" "$JSON_FILE" --output="$RESULT_FILE" --threshold=0.3
+# Use lower threshold (0.25) to be more sensitive to marks
+php artisan omr:appreciate-python "$SCAN_IMAGE" "$JSON_FILE" --output="$RESULT_FILE" --threshold=0.25
 
 if [ ! -f "$RESULT_FILE" ]; then
     echo "❌ Error: Appreciation results were not generated"
@@ -247,13 +201,16 @@ echo ""
 if command -v jq &> /dev/null; then
     echo "📈 Quick Summary:"
     echo "   Document ID: $(jq -r '.document_id' "$RESULT_FILE")"
-    echo "   Total Zones: $(jq -r '.summary.total_zones' "$RESULT_FILE")"
-    echo "   Filled Count: $(jq -r '.summary.filled_count' "$RESULT_FILE")"
-    echo "   Unfilled Count: $(jq -r '.summary.unfilled_count' "$RESULT_FILE")"
-    echo "   Avg Confidence: $(jq -r '.summary.average_confidence' "$RESULT_FILE")"
+    echo "   Template ID: $(jq -r '.template_id' "$RESULT_FILE")"
+    TOTAL_ZONES=$(jq '.results | length' "$RESULT_FILE")
+    FILLED_COUNT=$(jq '[.results[] | select(.filled == true)] | length' "$RESULT_FILE")
+    UNFILLED_COUNT=$((TOTAL_ZONES - FILLED_COUNT))
+    echo "   Total Zones: $TOTAL_ZONES"
+    echo "   Filled Count: $FILLED_COUNT"
+    echo "   Unfilled Count: $UNFILLED_COUNT"
     echo ""
     echo "🗳️  Detected Marks:"
-    jq -r '.marks[] | select(.filled == true) | "   ✓ \(.id) (confidence: \(.confidence), fill: \(.fill_ratio))"' "$RESULT_FILE"
+    jq -r '.results[] | select(.filled == true) | "   ✓ \(.contest): \(.code) (fill ratio: \(.fill_ratio))"' "$RESULT_FILE"
 fi
 
 echo ""

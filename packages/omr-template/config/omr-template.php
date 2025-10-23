@@ -3,7 +3,100 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Default Template Path
+    | Page Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for PDF page size, orientation, margins, and resolution.
+    |
+    */
+    'page' => [
+        'size' => 'A4',
+        'orientation' => 'P',
+        'margins' => ['l' => 18, 't' => 18, 'r' => 18, 'b' => 18],
+        'dpi' => 300,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Font Presets
+    |--------------------------------------------------------------------------
+    |
+    | Predefined font configurations for different text types.
+    |
+    */
+    'fonts' => [
+        'header' => ['family' => 'helvetica', 'style' => 'B', 'size' => 12],
+        'body'   => ['family' => 'helvetica', 'style' => '', 'size' => 10],
+        'small'  => ['family' => 'helvetica', 'style' => '', 'size' => 8],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Layout Presets
+    |--------------------------------------------------------------------------
+    |
+    | Column layouts with gutter, row spacing, and cell padding.
+    |
+    */
+    'layouts' => [
+        '1-col' => ['cols' => 1, 'gutter' => 6, 'row_gap' => 3, 'cell_pad' => 2],
+        '2-col' => ['cols' => 2, 'gutter' => 10, 'row_gap' => 3, 'cell_pad' => 2],
+        '3-col' => ['cols' => 3, 'gutter' => 10, 'row_gap' => 2, 'cell_pad' => 2],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OMR Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for OMR bubbles, fiducials, timing marks, and barcodes.
+    |
+    */
+    'omr' => [
+        'bubble' => [
+            'diameter_mm' => 4.0,
+            'stroke' => 0.2,
+            'fill' => false,
+            'label_gap_mm' => 2.0,
+        ],
+        'fiducials' => [
+            'enable' => true,
+            'size_mm' => 5.0,
+            'margin_mm' => 3.0,  // Distance from page edge in millimeters (default was 10mm)
+            'positions' => ['tl','tr','bl','br'],
+        ],
+        'timing_marks' => [
+            'enable' => true,
+            'edges' => ['left','bottom'],
+            'pitch_mm' => 5.0,
+            'size_mm'  => 1.5,
+        ],
+        'quiet_zone_mm' => 6.0,
+        'barcode' => [
+            'enable' => true,
+            'type' => 'PDF417',
+            'height_mm' => 10.0,
+            'width_mm' => 50.0,  // Approximate width for centering (adjust as needed)
+            'region' => 'footer',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coordinates Export
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for exporting bubble coordinates for OpenCV appreciation.
+    |
+    */
+    'coords' => [
+        'emit_json' => true,
+        'path' => storage_path('app/omr/coords'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Template Path
     |--------------------------------------------------------------------------
     |
     | The default directory where template files (.hbs) are stored.
@@ -16,28 +109,17 @@ return [
     | Output Path
     |--------------------------------------------------------------------------
     |
-    | The default directory where generated PDFs and JSON files will be saved.
+    | The default directory where generated PDFs will be saved.
     |
     */
     'output_path' => storage_path('omr-output'),
 
     /*
     |--------------------------------------------------------------------------
-    | Default Layout
+    | DPI (Dots Per Inch) - Deprecated
     |--------------------------------------------------------------------------
     |
-    | The default paper size for PDF generation (e.g., 'A4', 'letter').
-    |
-    */
-    'default_layout' => 'A4',
-
-    /*
-    |--------------------------------------------------------------------------
-    | DPI (Dots Per Inch)
-    |--------------------------------------------------------------------------
-    |
-    | The resolution for PDF rendering. Higher values produce sharper output
-    | but increase file size and processing time.
+    | Use 'page.dpi' instead. Kept for backward compatibility.
     |
     */
     'dpi' => 300,

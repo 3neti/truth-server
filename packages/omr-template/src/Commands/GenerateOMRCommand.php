@@ -80,6 +80,16 @@ class GenerateOMRCommand extends Command
             barcode_base64: $barcodeBase64,
         );
 
+        // Generate zones automatically if not provided (do this BEFORE rendering)
+        $zones = $data['zones'] ?? $zoneGenerator->generateZones(
+            $data['contests_or_sections'] ?? [],
+            $layout,
+            $dpi
+        );
+        
+        // Add zones to template data for rendering mark boxes
+        $templateData->zones = $zones;
+        
         // Render HTML
         try {
             $html = $renderer->render($templateData);
@@ -88,13 +98,6 @@ class GenerateOMRCommand extends Command
 
             return self::FAILURE;
         }
-
-        // Generate zones automatically if not provided
-        $zones = $data['zones'] ?? $zoneGenerator->generateZones(
-            $data['contests_or_sections'] ?? [],
-            $layout,
-            $dpi
-        );
         
         // Create zone map with fiducials and document ID
         $zoneMap = new ZoneMapData(

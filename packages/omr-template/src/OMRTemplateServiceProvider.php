@@ -4,6 +4,7 @@ namespace LBHurtado\OMRTemplate;
 
 use Illuminate\Support\ServiceProvider;
 use LBHurtado\OMRTemplate\Commands\GenerateOMRCommand;
+use LBHurtado\OMRTemplate\Commands\RenderOMRCommand;
 use LBHurtado\OMRTemplate\Services\BarcodeGenerator;
 use LBHurtado\OMRTemplate\Services\DocumentIdGenerator;
 use LBHurtado\OMRTemplate\Services\FiducialHelper;
@@ -43,6 +44,7 @@ class OMRTemplateServiceProvider extends ServiceProvider
 
             $this->commands([
                 GenerateOMRCommand::class,
+                RenderOMRCommand::class,
             ]);
         }
     }

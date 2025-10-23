@@ -17,5 +17,6 @@ class TemplateData extends Data
         public ?array $metadata = null,
         public ?array $fiducials = null,
         public ?string $barcode_base64 = null,
+        public ?array $zones = null, // Zone data for rendering mark boxes
     ) {}
 }

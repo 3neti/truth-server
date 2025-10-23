@@ -15,5 +15,9 @@ Route::get('/truth', function () {
     return Inertia::render('Truth');
 });
 
+Route::get('/templates/editor', function () {
+    return Inertia::render('Templates/Editor');
+})->name('templates.editor');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

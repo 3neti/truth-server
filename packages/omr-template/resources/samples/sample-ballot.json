@@ -1,0 +1,38 @@
+{
+  "document": {
+    "title": "Sample Ballot",
+    "locale": "en-PH",
+    "unique_id": "BAL-2025-0000123",
+    "layout": "2-col"
+  },
+  "sections": [
+    {
+      "type": "multiple_choice",
+      "code": "PRESIDENT",
+      "title": "President of the Philippines",
+      "maxSelections": 1,
+      "layout": "2-col",
+      "choices": [
+        { "code": "P-A1", "label": "Candidate A" },
+        { "code": "P-A2", "label": "Candidate B" },
+        { "code": "P-A3", "label": "Candidate C" },
+        { "code": "P-A4", "label": "Candidate D" }
+      ]
+    },
+    {
+      "type": "multiple_choice",
+      "code": "SENATOR",
+      "title": "Senator (Vote for up to 12)",
+      "maxSelections": 12,
+      "layout": "3-col",
+      "choices": [
+        { "code": "S-01", "label": "Senator Alpha" },
+        { "code": "S-02", "label": "Senator Beta" },
+        { "code": "S-03", "label": "Senator Gamma" },
+        { "code": "S-04", "label": "Senator Delta" },
+        { "code": "S-05", "label": "Senator Epsilon" },
+        { "code": "S-06", "label": "Senator Zeta" }
+      ]
+    }
+  ]
+}

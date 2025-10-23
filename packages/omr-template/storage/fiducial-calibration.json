@@ -1,0 +1,40 @@
+{
+    "dpi": 300,
+    "conversion_factor": 11.811023622047244,
+    "fiducials_mm": {
+        "top_left": {
+            "x": 10,
+            "y": 10
+        },
+        "top_right": {
+            "x": 180,
+            "y": 12
+        },
+        "bottom_left": {
+            "x": 10,
+            "y": 277
+        },
+        "bottom_right": {
+            "x": 180,
+            "y": 270
+        }
+    },
+    "fiducials_px": {
+        "top_left": {
+            "x": 118,
+            "y": 118
+        },
+        "top_right": {
+            "x": 2126,
+            "y": 142
+        },
+        "bottom_left": {
+            "x": 118,
+            "y": 3272
+        },
+        "bottom_right": {
+            "x": 2126,
+            "y": 3189
+        }
+    }
+}

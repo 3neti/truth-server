@@ -21,6 +21,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "elibyy/tcpdf-laravel": "^11.5",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",

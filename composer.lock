@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "60eac497b6cc770c01c58d9b34e6205e",
+    "content-hash": "44702a4d98780e357c0d871ed9d92a4d",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1033,6 +1033,62 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "elibyy/tcpdf-laravel",
+            "version": "11.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/elibyy/tcpdf-laravel.git",
+                "reference": "25d076d5f50eef9702dfa1ae889b1a599250f951"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/25d076d5f50eef9702dfa1ae889b1a599250f951",
+                "reference": "25d076d5f50eef9702dfa1ae889b1a599250f951",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "tecnickcom/tcpdf": "6.2.*|6.3.*|6.4.*|6.5.*|6.6.*|6.7.*|6.8.*|6.9.*|6.10.*|dev-main"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "PDF": "Elibyy\\TCPDF\\Facades\\TCPDF"
+                    },
+                    "providers": [
+                        "Elibyy\\TCPDF\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Elibyy\\TCPDF\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "eli y",
+                    "email": "elibyy@gmail.com"
+                }
+            ],
+            "description": "tcpdf support for Laravel 6, 7, 8, 9, 10, 11",
+            "keywords": [
+                "TCPDF",
+                "laravel",
+                "pdf"
+            ],
+            "support": {
+                "issues": "https://github.com/elibyy/tcpdf-laravel/issues",
+                "source": "https://github.com/elibyy/tcpdf-laravel/tree/11.5.0"
+            },
+            "time": "2025-06-06T08:27:48+00:00"
         },
         {
             "name": "endroid/qr-code",
@@ -2464,7 +2520,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/omr-appreciation",
-                "reference": "48dc10db664cc7215f3d2691ef97062f274d5cc9"
+                "reference": "d82474b745b090c7db6078c7d36c906a462d8d55"
             },
             "require": {
                 "ext-gd": "*",
@@ -2514,13 +2570,12 @@
             "dist": {
                 "type": "path",
                 "url": "packages/omr-template",
-                "reference": "3799f2fe926f194590324f81cad4d42dc898b9aa"
+                "reference": "16b2158e0c0e66b3710ff0f82ab9cb37bdac9c9c"
             },
             "require": {
-                "dompdf/dompdf": "^3.1",
+                "elibyy/tcpdf-laravel": "^11.0",
                 "ext-json": "*",
                 "lorisleiva/laravel-actions": "^2.9",
-                "milon/barcode": "^12.0",
                 "php": "^8.2",
                 "spatie/laravel-data": "^4.0",
                 "zordius/lightncandy": "^1.2"
@@ -2555,7 +2610,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + DOMPDF",
+            "description": "OMR Template Generator: Generate printable, scan-friendly documents for ballots, tests, surveys with Handlebars + TCPDF",
             "transport-options": {
                 "relative": true
             }
@@ -3755,81 +3810,6 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
             "time": "2025-07-25T09:04:22+00:00"
-        },
-        {
-            "name": "milon/barcode",
-            "version": "v12.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/milon/barcode.git",
-                "reference": "252dc9a530c72454bc6cefb8d274c2acaba24f15"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/milon/barcode/zipball/252dc9a530c72454bc6cefb8d274c2acaba24f15",
-                "reference": "252dc9a530c72454bc6cefb8d274c2acaba24f15",
-                "shasum": ""
-            },
-            "require": {
-                "ext-gd": "*",
-                "illuminate/support": "^7.0|^8.0|^9.0|^10.0 | ^11.0 | ^12.0",
-                "php": "^7.3 | ^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "DNS1D": "Milon\\Barcode\\Facades\\DNS1DFacade",
-                        "DNS2D": "Milon\\Barcode\\Facades\\DNS2DFacade"
-                    },
-                    "providers": [
-                        "Milon\\Barcode\\BarcodeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Milon\\Barcode": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Nuruzzaman Milon",
-                    "email": "contact@milon.im"
-                }
-            ],
-            "description": "Barcode generator like Qr Code, PDF417, C39, C39+, C39E, C39E+, C93, S25, S25+, I25, I25+, C128, C128A, C128B, C128C, 2-Digits UPC-Based Extention, 5-Digits UPC-Based Extention, EAN 8, EAN 13, UPC-A, UPC-E, MSI (Variation of Plessey code)",
-            "keywords": [
-                "CODABAR",
-                "CODE 128",
-                "CODE 39",
-                "barcode",
-                "datamatrix",
-                "ean",
-                "laravel",
-                "pdf417",
-                "qr code",
-                "qrcode"
-            ],
-            "support": {
-                "issues": "https://github.com/milon/barcode/issues",
-                "source": "https://github.com/milon/barcode/tree/v12.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://paypal.me/nuruzzamanmilon",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/milon",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-02-24T18:09:25+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -9379,6 +9359,77 @@
                 }
             ],
             "time": "2025-08-27T11:34:33+00:00"
+        },
+        {
+            "name": "tecnickcom/tcpdf",
+            "version": "6.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tecnickcom/TCPDF.git",
+                "reference": "ca5b6de294512145db96bcbc94e61696599c391d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/ca5b6de294512145db96bcbc94e61696599c391d",
+                "reference": "ca5b6de294512145db96bcbc94e61696599c391d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=7.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "config",
+                    "include",
+                    "tcpdf.php",
+                    "tcpdf_barcodes_1d.php",
+                    "tcpdf_barcodes_2d.php",
+                    "include/tcpdf_colors.php",
+                    "include/tcpdf_filters.php",
+                    "include/tcpdf_font_data.php",
+                    "include/tcpdf_fonts.php",
+                    "include/tcpdf_images.php",
+                    "include/tcpdf_static.php",
+                    "include/barcodes/datamatrix.php",
+                    "include/barcodes/pdf417.php",
+                    "include/barcodes/qrcode.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "PDFD32000-2008",
+                "TCPDF",
+                "barcodes",
+                "datamatrix",
+                "pdf",
+                "pdf417",
+                "qrcode"
+            ],
+            "support": {
+                "issues": "https://github.com/tecnickcom/TCPDF/issues",
+                "source": "https://github.com/tecnickcom/TCPDF/tree/6.10.0"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ",
+                    "type": "custom"
+                }
+            ],
+            "time": "2025-05-27T18:02:28+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",

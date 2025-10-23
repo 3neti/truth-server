@@ -1,0 +1,35 @@
+{
+  "document": {
+    "title": "Satisfaction Survey",
+    "unique_id": "SURV-2025-0000456",
+    "layout": "1-col"
+  },
+  "sections": [
+    {
+      "type": "rating_scale",
+      "code": "SAT-EXP",
+      "title": "Rate your experience",
+      "scale": [1, 2, 3, 4, 5],
+      "question": "Overall satisfaction"
+    },
+    {
+      "type": "rating_scale",
+      "code": "SAT-PRODUCT",
+      "title": "Product Quality",
+      "scale": [1, 2, 3, 4, 5],
+      "question": "How would you rate the product quality?"
+    },
+    {
+      "type": "multiple_choice",
+      "code": "RECOMMEND",
+      "title": "Would you recommend us?",
+      "maxSelections": 1,
+      "layout": "1-col",
+      "choices": [
+        { "code": "REC-YES", "label": "Yes, definitely" },
+        { "code": "REC-MAYBE", "label": "Maybe" },
+        { "code": "REC-NO", "label": "No" }
+      ]
+    }
+  ]
+}
