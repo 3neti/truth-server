@@ -310,6 +310,79 @@ export const useTemplatesStore = defineStore('templates', () => {
     }
   }
 
+  // Template Families
+  async function getTemplateFamilies(params?: { category?: string; search?: string }) {
+    try {
+      const queryParams = new URLSearchParams()
+      if (params?.category) queryParams.append('category', params.category)
+      if (params?.search) queryParams.append('search', params.search)
+      
+      const url = `/api/template-families${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const response = await axios.get(url)
+      return response.data || []
+    } catch (err: any) {
+      error.value = err.message || 'Failed to get template families'
+      return []
+    }
+  }
+
+  async function getTemplateFamily(id: string) {
+    try {
+      const response = await axios.get(`/api/template-families/${id}`)
+      return response.data
+    } catch (err: any) {
+      error.value = err.message || 'Failed to get template family'
+      throw err
+    }
+  }
+
+  async function getFamilyVariants(id: string) {
+    try {
+      const response = await axios.get(`/api/template-families/${id}/variants`)
+      return response.data
+    } catch (err: any) {
+      error.value = err.message || 'Failed to get family variants'
+      throw err
+    }
+  }
+
+  async function createTemplateFamily(data: {
+    name: string
+    description?: string
+    category: string
+    repo_url?: string
+    version?: string
+    is_public?: boolean
+  }) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.post('/api/template-families', data)
+      return response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to create family'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteTemplateFamily(id: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await axios.delete(`/api/template-families/${id}`)
+      return true
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to delete family'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   function setMode(newMode: 'simple' | 'advanced') {
     mode.value = newMode
   }
@@ -401,6 +474,12 @@ export const useTemplatesStore = defineStore('templates', () => {
     setMode,
     updateHandlebarsTemplate,
     updateTemplateData,
+    // Actions - Template Families
+    getTemplateFamilies,
+    getTemplateFamily,
+    getFamilyVariants,
+    createTemplateFamily,
+    deleteTemplateFamily,
     // Actions - Common
     saveToLocalStorage,
     loadFromLocalStorage,

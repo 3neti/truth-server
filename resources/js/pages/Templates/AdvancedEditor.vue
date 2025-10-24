@@ -7,6 +7,7 @@ import TemplatePane from './Components/TemplatePane.vue'
 import DataPane from './Components/DataPane.vue'
 import PreviewPane from './Components/PreviewPane.vue'
 import TemplateLibrary from './Components/TemplateLibrary.vue'
+import FamilyBrowser from './Components/FamilyBrowser.vue'
 
 const store = useTemplatesStore()
 const {
@@ -23,6 +24,7 @@ const autoCompileEnabled = ref(true)
 const showSaveDialog = ref(false)
 const showUpdateDialog = ref(false)
 const showLibraryDrawer = ref(false)
+const showFamilyBrowser = ref(false)
 const showShortcutsHelp = ref(false)
 const showSampleMenu = ref(false)
 const libraryKey = ref(0)
@@ -327,6 +329,34 @@ function openLibrary() {
   libraryKey.value++
 }
 
+function openFamilyBrowser() {
+  showFamilyBrowser.value = true
+}
+
+async function handleLoadFromFamily(family: any, variant: string) {
+  try {
+    // Get the specific variant template
+    const variantData = await store.getFamilyVariants(family.id.toString())
+    const template = variantData.variants.find((v: any) => v.layout_variant === variant)
+    
+    if (template) {
+      handlebarsTemplate.value = template.handlebars_template
+      templateData.value = template.sample_data || {}
+      showFamilyBrowser.value = false
+
+      // Trigger compilation
+      if (autoCompileEnabled.value) {
+        setTimeout(() => {
+          debouncedCompile()
+        }, 100)
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load from family:', e)
+    alert('Failed to load template from family')
+  }
+}
+
 function handleKeyboardShortcut(e: KeyboardEvent) {
   // Cmd/Ctrl + S: Save template
   if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -363,6 +393,7 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
     showSaveDialog.value = false
     showUpdateDialog.value = false
     showLibraryDrawer.value = false
+    showFamilyBrowser.value = false
     showShortcutsHelp.value = false
   }
   
@@ -417,6 +448,13 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
           class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100"
         >
           📚 Browse Library
+        </button>
+
+        <button
+          @click="openFamilyBrowser"
+          class="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100"
+        >
+          👨‍👩‍👧‍👦 Template Families
         </button>
 
         <div class="relative">
@@ -550,6 +588,24 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
             @load="handleLoadFromLibrary"
             @update="handleUpdateFromLibrary"
             @close="showLibraryDrawer = false"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Family Browser Drawer -->
+    <div
+      v-if="showFamilyBrowser"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center"
+      @click.self="showFamilyBrowser = false"
+    >
+      <div
+        class="bg-white w-full h-[90vh] sm:max-w-6xl sm:rounded-lg shadow-xl overflow-hidden"
+      >
+        <div class="h-full p-6">
+          <FamilyBrowser
+            @load="handleLoadFromFamily"
+            @close="showFamilyBrowser = false"
           />
         </div>
       </div>
