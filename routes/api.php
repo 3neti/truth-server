@@ -28,6 +28,10 @@ Route::prefix('templates')->name('templates.')->group(function () {
     Route::post('/library', [TemplateController::class, 'saveTemplate'])->name('library.store');
     Route::put('/library/{id}', [TemplateController::class, 'updateTemplate'])->name('library.update');
     Route::delete('/library/{id}', [TemplateController::class, 'deleteTemplate'])->name('library.delete');
+    
+    // Version history
+    Route::get('/library/{id}/versions', [TemplateController::class, 'getVersionHistory'])->name('library.versions');
+    Route::post('/library/{templateId}/rollback/{versionId}', [TemplateController::class, 'rollbackToVersion'])->name('library.rollback');
 });
 
 // Template Families API

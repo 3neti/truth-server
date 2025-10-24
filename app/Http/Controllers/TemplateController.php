@@ -299,7 +299,11 @@ class TemplateController extends Controller
                 'schema' => $request->input('schema'),
                 'is_public' => $request->input('is_public', false),
                 'user_id' => $request->user()?->id,
+                'version' => '1.0.0', // Initial version
             ]);
+
+            // Create initial version snapshot
+            $template->createVersion('Initial version', $request->user()?->id);
 
             return response()->json([
                 'success' => true,
@@ -353,6 +357,20 @@ class TemplateController extends Controller
         }
 
         try {
+            // Check if template content changed
+            $contentChanged = $request->has('handlebars_template') && 
+                $request->input('handlebars_template') !== $template->handlebars_template;
+
+            // Create version before updating if content changed
+            if ($contentChanged) {
+                $template->createVersion(
+                    $request->input('changelog', 'Template updated'),
+                    $request->user()?->id
+                );
+                // Auto-increment patch version
+                $template->incrementVersion('patch');
+            }
+
             $template->update($request->only([
                 'name',
                 'description',
@@ -403,6 +421,73 @@ class TemplateController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Template deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get version history for a template.
+     */
+    public function getVersionHistory(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        $versions = $template->getVersionHistory();
+
+        return response()->json([
+            'success' => true,
+            'versions' => $versions,
+        ]);
+    }
+
+    /**
+     * Rollback template to a specific version.
+     */
+    public function rollbackToVersion(Request $request, string $templateId, string $versionId): JsonResponse
+    {
+        $template = OmrTemplate::find($templateId);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        // Check if user owns the template
+        if ($template->user_id !== $request->user()?->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+            ], 403);
+        }
+
+        try {
+            $success = $template->rollbackToVersion((int)$versionId);
+
+            if (!$success) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Version not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'template' => $template->fresh(),
+                'message' => 'Successfully rolled back to previous version',
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -56,6 +56,14 @@ class OmrTemplate extends Model
     }
 
     /**
+     * Get all versions of this template.
+     */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(TemplateVersion::class, 'template_id')->latest();
+    }
+
+    /**
      * Scope to get public templates.
      */
     public function scopePublic($query)
@@ -104,5 +112,83 @@ class OmrTemplate extends Model
         return static::where('family_id', $this->family_id)
             ->where('id', '!=', $this->id)
             ->get();
+    }
+
+    /**
+     * Create a new version snapshot of this template.
+     */
+    public function createVersion(string $changelog = null, int $userId = null): TemplateVersion
+    {
+        $userId = $userId ?? auth()->id();
+        
+        return $this->versions()->create([
+            'version' => $this->version,
+            'handlebars_template' => $this->handlebars_template,
+            'sample_data' => $this->sample_data,
+            'changelog' => $changelog,
+            'created_by' => $userId,
+        ]);
+    }
+
+    /**
+     * Increment the version number.
+     */
+    public function incrementVersion(string $type = 'patch'): string
+    {
+        preg_match('/(\d+)\.(\d+)\.(\d+)/', $this->version, $matches);
+        $major = (int)($matches[1] ?? 0);
+        $minor = (int)($matches[2] ?? 0);
+        $patch = (int)($matches[3] ?? 0);
+
+        switch ($type) {
+            case 'major':
+                $major++;
+                $minor = 0;
+                $patch = 0;
+                break;
+            case 'minor':
+                $minor++;
+                $patch = 0;
+                break;
+            case 'patch':
+            default:
+                $patch++;
+                break;
+        }
+
+        $newVersion = "{$major}.{$minor}.{$patch}";
+        $this->version = $newVersion;
+        return $newVersion;
+    }
+
+    /**
+     * Rollback to a specific version.
+     */
+    public function rollbackToVersion(int $versionId): bool
+    {
+        $version = $this->versions()->find($versionId);
+        
+        if (!$version) {
+            return false;
+        }
+
+        // Create a version of current state before rollback
+        $this->createVersion('Backup before rollback to v' . $version->version);
+
+        // Restore from version
+        $this->handlebars_template = $version->handlebars_template;
+        $this->sample_data = $version->sample_data;
+        $this->version = $version->version;
+        $this->save();
+
+        return true;
+    }
+
+    /**
+     * Get version history.
+     */
+    public function getVersionHistory()
+    {
+        return $this->versions()->with('creator')->get();
     }
 }
