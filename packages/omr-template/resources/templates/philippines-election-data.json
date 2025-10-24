@@ -50,236 +50,426 @@
   "candidates": {
     "PRESIDENT": [
       {
-        "code": "LD_001",
-        "name": "Leonardo DiCaprio",
-        "alias": "LD"
+        "code": "AJ_001",
+        "name": "1. Angelina Jolie",
+        "alias": "AJ"
       },
       {
-        "code": "SJ_002",
-        "name": "Scarlett Johansson",
-        "alias": "SJ"
-      },
-      {
-        "code": "DW_003",
-        "name": "Denzel Washington",
-        "alias": "DW"
-      },
-      {
-        "code": "MS_004",
-        "name": "Meryl Streep",
-        "alias": "MS"
-      },
-      {
-        "code": "BP_005",
-        "name": "Brad Pitt",
+        "code": "BP_002",
+        "name": "2. Brad Pitt",
         "alias": "BP"
       },
       {
-        "code": "AJ_006",
-        "name": "Angelina Jolie",
-        "alias": "AJ"
+        "code": "DW_003",
+        "name": "3. Denzel Washington",
+        "alias": "DW"
+      },
+      {
+        "code": "LD_004",
+        "name": "4. Leonardo DiCaprio",
+        "alias": "LD"
+      },
+      {
+        "code": "MS_005",
+        "name": "5. Meryl Streep",
+        "alias": "MS"
+      },
+      {
+        "code": "SJ_006",
+        "name": "6. Scarlett Johansson",
+        "alias": "SJ"
       }
     ],
     "VICE-PRESIDENT": [
       {
-        "code": "TH_001",
-        "name": "Tom Hanks",
-        "alias": "TH"
+        "code": "AH_001",
+        "name": "1. Anne Hathaway",
+        "alias": "AH"
       },
       {
-        "code": "VD_002",
-        "name": "Viola Davis",
-        "alias": "VD"
-      },
-      {
-        "code": "CH_003",
-        "name": "Chris Hemsworth",
+        "code": "CH_002",
+        "name": "2. Chris Hemsworth",
         "alias": "CH"
       },
       {
-        "code": "NP_004",
-        "name": "Natalie Portman",
+        "code": "NP_003",
+        "name": "3. Natalie Portman",
         "alias": "NP"
       },
       {
-        "code": "RDJ_005",
-        "name": "Robert Downey Jr.",
+        "code": "RDJ_004",
+        "name": "4. Robert Downey Jr.",
         "alias": "RDJ"
       },
       {
-        "code": "AH_006",
-        "name": "Anne Hathaway",
-        "alias": "AH"
+        "code": "TH_005",
+        "name": "5. Tom Hanks",
+        "alias": "TH"
+      },
+      {
+        "code": "VD_006",
+        "name": "6. Viola Davis",
+        "alias": "VD"
       }
     ],
     "SENATOR": [
       {
-        "code": "JD_001",
-        "name": "Johnny Depp",
-        "alias": "JD"
+        "code": "AA_001",
+        "name": "1. Amy Adams",
+        "alias": "AA"
       },
       {
-        "code": "ES_002",
-        "name": "Emma Stone",
-        "alias": "ES"
+        "code": "AG_002",
+        "name": "2. Andrew Garfield",
+        "alias": "AG"
       },
       {
-        "code": "MF_003",
-        "name": "Morgan Freeman",
-        "alias": "MF"
+        "code": "ATJ_003",
+        "name": "3. Anya Taylor-Joy",
+        "alias": "ATJ"
       },
       {
-        "code": "JL_004",
-        "name": "Jennifer Lawrence",
-        "alias": "JL"
+        "code": "A_004",
+        "name": "4. Awkwafina",
+        "alias": "A"
       },
       {
-        "code": "CB_005",
-        "name": "Christian Bale",
+        "code": "BC_005",
+        "name": "5. Benedict Cumberbatch",
+        "alias": "BC"
+      },
+      {
+        "code": "BC_006",
+        "name": "6. Bryan Cranston",
+        "alias": "BC"
+      },
+      {
+        "code": "CB_007",
+        "name": "7. Chadwick Boseman",
         "alias": "CB"
       },
       {
-        "code": "SB_006",
-        "name": "Sandra Bullock",
-        "alias": "SB"
-      },
-      {
-        "code": "WS_007",
-        "name": "Will Smith",
-        "alias": "WS"
-      },
-      {
-        "code": "JR_008",
-        "name": "Julia Roberts",
-        "alias": "JR"
-      },
-      {
-        "code": "MD_009",
-        "name": "Matt Damon",
-        "alias": "MD"
-      },
-      {
-        "code": "CT_010",
-        "name": "Charlize Theron",
+        "code": "CT_008",
+        "name": "8. Charlize Theron",
         "alias": "CT"
       },
       {
-        "code": "KR_011",
-        "name": "Keanu Reeves",
+        "code": "CB_009",
+        "name": "9. Christian Bale",
+        "alias": "CB"
+      },
+      {
+        "code": "CE_010",
+        "name": "10. Chris Evans",
+        "alias": "CE"
+      },
+      {
+        "code": "DC_011",
+        "name": "11. Daniel Craig",
+        "alias": "DC"
+      },
+      {
+        "code": "EB_012",
+        "name": "12. Emily Blunt",
+        "alias": "EB"
+      },
+      {
+        "code": "ES_013",
+        "name": "13. Emma Stone",
+        "alias": "ES"
+      },
+      {
+        "code": "EG_014",
+        "name": "14. Eva Green",
+        "alias": "EG"
+      },
+      {
+        "code": "FP_015",
+        "name": "15. Florence Pugh",
+        "alias": "FP"
+      },
+      {
+        "code": "GG_016",
+        "name": "16. Gal Gadot",
+        "alias": "GG"
+      },
+      {
+        "code": "HM_017",
+        "name": "17. Helen Mirren",
+        "alias": "HM"
+      },
+      {
+        "code": "HJ_018",
+        "name": "18. Hugh Jackman",
+        "alias": "HJ"
+      },
+      {
+        "code": "IE_019",
+        "name": "19. Idris Elba",
+        "alias": "IE"
+      },
+      {
+        "code": "JG_020",
+        "name": "20. Jake Gyllenhaal",
+        "alias": "JG"
+      },
+      {
+        "code": "JM_021",
+        "name": "21. Jason Momoa",
+        "alias": "JM"
+      },
+      {
+        "code": "JB_022",
+        "name": "22. Javier Bardem",
+        "alias": "JB"
+      },
+      {
+        "code": "JL_023",
+        "name": "23. Jennifer Lawrence",
+        "alias": "JL"
+      },
+      {
+        "code": "JR_024",
+        "name": "24. Jeremy Renner",
+        "alias": "JR"
+      },
+      {
+        "code": "JC_025",
+        "name": "25. Jessica Chastain",
+        "alias": "JC"
+      },
+      {
+        "code": "JD_026",
+        "name": "26. Johnny Depp",
+        "alias": "JD"
+      },
+      {
+        "code": "JR_027",
+        "name": "27. Julia Roberts",
+        "alias": "JR"
+      },
+      {
+        "code": "KW_028",
+        "name": "28. Kate Winslet",
+        "alias": "KW"
+      },
+      {
+        "code": "KR_029",
+        "name": "29. Keanu Reeves",
         "alias": "KR"
       },
       {
-        "code": "NK_012",
-        "name": "Nicole Kidman",
+        "code": "LN_030",
+        "name": "30. Lupita Nyong'o",
+        "alias": "LN"
+      },
+      {
+        "code": "MA_031",
+        "name": "31. Mahershala Ali",
+        "alias": "MA"
+      },
+      {
+        "code": "MR_032",
+        "name": "32. Mark Ruffalo",
+        "alias": "MR"
+      },
+      {
+        "code": "MD_033",
+        "name": "33. Matt Damon",
+        "alias": "MD"
+      },
+      {
+        "code": "MY_034",
+        "name": "34. Michelle Yeoh",
+        "alias": "MY"
+      },
+      {
+        "code": "MF_035",
+        "name": "35. Morgan Freeman",
+        "alias": "MF"
+      },
+      {
+        "code": "NK_036",
+        "name": "36. Nicole Kidman",
         "alias": "NK"
+      },
+      {
+        "code": "OS_037",
+        "name": "37. Octavia Spencer",
+        "alias": "OS"
+      },
+      {
+        "code": "PD_038",
+        "name": "38. Paul Dano",
+        "alias": "PD"
+      },
+      {
+        "code": "PP_039",
+        "name": "39. Pedro Pascal",
+        "alias": "PP"
+      },
+      {
+        "code": "RM_040",
+        "name": "40. Rachel McAdams",
+        "alias": "RM"
+      },
+      {
+        "code": "RM_041",
+        "name": "41. Rami Malek",
+        "alias": "RM"
+      },
+      {
+        "code": "RG_042",
+        "name": "42. Ryan Gosling",
+        "alias": "RG"
+      },
+      {
+        "code": "SH_043",
+        "name": "43. Salma Hayek",
+        "alias": "SH"
+      },
+      {
+        "code": "SB_044",
+        "name": "44. Sandra Bullock",
+        "alias": "SB"
+      },
+      {
+        "code": "TS_045",
+        "name": "45. Tilda Swinton",
+        "alias": "TS"
+      },
+      {
+        "code": "TC_046",
+        "name": "46. Timothee Chalamet",
+        "alias": "TC"
+      },
+      {
+        "code": "TH_047",
+        "name": "47. Tom Holland",
+        "alias": "TH"
+      },
+      {
+        "code": "WS_048",
+        "name": "48. Will Smith",
+        "alias": "WS"
+      },
+      {
+        "code": "Z_049",
+        "name": "49. Zendaya",
+        "alias": "Z"
+      },
+      {
+        "code": "ZS_050",
+        "name": "50. Zoe Saldana",
+        "alias": "ZS"
       }
     ],
     "REPRESENTATIVE-PARTY-LIST": [
       {
-        "code": "THE_GODFATHER_001",
-        "name": "The Godfather",
-        "alias": "the_godfather"
-      },
-      {
-        "code": "TITANIC_002",
-        "name": "Titanic",
-        "alias": "titanic"
-      },
-      {
-        "code": "THE_DARK_KNIGHT_003",
-        "name": "The Dark Knight",
-        "alias": "the_dark_knight"
-      },
-      {
-        "code": "INCEPTION_006",
-        "name": "Inception",
-        "alias": "inception"
-      },
-      {
-        "code": "THE_MATRIX_008",
-        "name": "The Matrix",
-        "alias": "the_matrix"
-      },
-      {
-        "code": "AVATAR_011",
-        "name": "Avatar",
+        "code": "AVATAR_001",
+        "name": "1. Avatar",
         "alias": "avatar"
       },
       {
-        "code": "THE_AVENGERS_016",
-        "name": "The Avengers",
-        "alias": "the_avengers"
-      },
-      {
-        "code": "BLACK_PANTHER_020",
-        "name": "Black Panther",
+        "code": "BLACK_PANTHER_002",
+        "name": "2. Black Panther",
         "alias": "black_panther"
       },
       {
-        "code": "PARASITE_021",
-        "name": "Parasite",
+        "code": "INCEPTION_003",
+        "name": "3. Inception",
+        "alias": "inception"
+      },
+      {
+        "code": "OPPENHEIMER_004",
+        "name": "4. Oppenheimer",
+        "alias": "oppenheimer"
+      },
+      {
+        "code": "PARASITE_005",
+        "name": "5. Parasite",
         "alias": "parasite"
       },
       {
-        "code": "OPPENHEIMER_032",
-        "name": "Oppenheimer",
-        "alias": "oppenheimer"
+        "code": "THE_AVENGERS_006",
+        "name": "6. The Avengers",
+        "alias": "the_avengers"
+      },
+      {
+        "code": "THE_DARK_KNIGHT_007",
+        "name": "7. The Dark Knight",
+        "alias": "the_dark_knight"
+      },
+      {
+        "code": "THE_GODFATHER_008",
+        "name": "8. The Godfather",
+        "alias": "the_godfather"
+      },
+      {
+        "code": "THE_MATRIX_009",
+        "name": "9. The Matrix",
+        "alias": "the_matrix"
+      },
+      {
+        "code": "TITANIC_010",
+        "name": "10. Titanic",
+        "alias": "titanic"
       }
     ],
     "GOVERNOR-ILN": [
       {
         "code": "EN_001",
-        "name": "Edward Norton",
+        "name": "1. Edward Norton",
         "alias": "EN"
       },
       {
         "code": "JB_002",
-        "name": "Jeff Bridges",
+        "name": "2. Jeff Bridges",
         "alias": "JB"
       },
       {
         "code": "RP_003",
-        "name": "Rosamund Pike",
+        "name": "3. Rosamund Pike",
         "alias": "RP"
       }
     ],
     "VICE-GOVERNOR-ILN": [
       {
-        "code": "NW_001",
-        "name": "Naomi Watts",
-        "alias": "NW"
-      },
-      {
-        "code": "MF_002",
-        "name": "Michael Fassbender",
-        "alias": "MF"
-      },
-      {
-        "code": "DK_003",
-        "name": "Daniel Kaluuya",
+        "code": "DK_001",
+        "name": "1. Daniel Kaluuya",
         "alias": "DK"
       },
       {
-        "code": "JH_004",
-        "name": "Jennifer Hudson",
+        "code": "JH_002",
+        "name": "2. Jennifer Hudson",
         "alias": "JH"
+      },
+      {
+        "code": "MF_003",
+        "name": "3. Michael Fassbender",
+        "alias": "MF"
+      },
+      {
+        "code": "NW_004",
+        "name": "4. Naomi Watts",
+        "alias": "NW"
       }
     ],
     "MAYOR-ILN-CURRIMAO": [
       {
         "code": "BC_001",
-        "name": "Billy Crudup",
+        "name": "1. Billy Crudup",
         "alias": "BC"
       },
       {
-        "code": "LJ_002",
-        "name": "Lily James",
-        "alias": "LJ"
+        "code": "EW_002",
+        "name": "2. Emily Watson",
+        "alias": "EW"
       },
       {
-        "code": "EW_003",
-        "name": "Emily Watson",
-        "alias": "EW"
+        "code": "LJ_003",
+        "name": "3. Lily James",
+        "alias": "LJ"
       }
     ]
   }

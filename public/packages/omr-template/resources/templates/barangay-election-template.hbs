@@ -1,0 +1,27 @@
+{
+  "document": {
+    "title": "{{barangay.name}} — {{election.title}}",
+    "unique_id": "{{election.id}}",
+    "layout": "{{layout}}"
+  },
+  "sections": [
+    {{#each positions}}
+    {
+      "type": "multiple_choice",
+      "code": "{{code}}",
+      "title": "{{name}}",
+      "question": "Vote for {{#if (compare maxVotes '>' 1)}}up to {{maxVotes}}{{else}}one{{/if}}",
+      "maxSelections": {{maxVotes}},
+      "layout": "{{@root.layout}}",
+      "choices": [
+        {{#each (lookup @root.candidates code)}}
+        {
+          "code": "{{code}}",
+          "label": "{{number}}"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}

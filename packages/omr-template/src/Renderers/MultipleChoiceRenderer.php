@@ -78,7 +78,8 @@ class MultipleChoiceRenderer implements SectionRenderer
         // Calculate consumed height
         $rows = $choicesPerCol;
         $sectionSpacing = $this->config['section_spacing'] ?? 5;
-        $consumedHeight = ($pdf->GetY() - $startY) + ($rows * ($bubbleDiameter + $rowGap)) + $sectionSpacing;
+        $choicesHeight = $rows * ($bubbleDiameter + $rowGap + 2);
+        $consumedHeight = ($currentY - $startY) + $choicesHeight + $sectionSpacing;
         
         return $consumedHeight;
     }

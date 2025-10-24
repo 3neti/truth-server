@@ -65,7 +65,7 @@ class RatingScaleRenderer implements SectionRenderer
         }
         
         $sectionSpacing = $this->config['section_spacing'] ?? 10;
-        $consumedHeight = ($pdf->GetY() - $startY) + $bubbleDiameter + $sectionSpacing;
+        $consumedHeight = ($currentY - $startY) + $bubbleDiameter + 5 + $sectionSpacing;
         
         return $consumedHeight;
     }

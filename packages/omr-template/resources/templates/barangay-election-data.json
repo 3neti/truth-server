@@ -1,0 +1,58 @@
+{
+  "election": {
+    "title": "2026 Barangay Elections",
+    "id": "BAL-2026-BRGY-0001"
+  },
+  "barangay": {
+    "name": "Barangay Maligaya",
+    "municipality": "San Jose",
+    "province": "Nueva Ecija"
+  },
+  "layout": "2-col",
+  "positions": [
+    { "code": "PUNONG_BARANGAY", "name": "Punong Barangay", "maxVotes": 1 },
+    { "code": "KAGAWAD", "name": "Kagawad, Sangguniang Barangay", "maxVotes": 8 }
+  ],
+  "candidates": {
+    "PUNONG_BARANGAY": [
+      { "code": "PB_001", "number": 1 },
+      { "code": "PB_002", "number": 2 },
+      { "code": "PB_003", "number": 3 },
+      { "code": "PB_004", "number": 4 },
+      { "code": "PB_005", "number": 5 },
+      { "code": "PB_006", "number": 6 }
+    ],
+    "KAGAWAD": [
+      { "code": "KG_001", "number": 1 },
+      { "code": "KG_002", "number": 2 },
+      { "code": "KG_003", "number": 3 },
+      { "code": "KG_004", "number": 4 },
+      { "code": "KG_005", "number": 5 },
+      { "code": "KG_006", "number": 6 },
+      { "code": "KG_007", "number": 7 },
+      { "code": "KG_008", "number": 8 },
+      { "code": "KG_009", "number": 9 },
+      { "code": "KG_010", "number": 10 },
+      { "code": "KG_011", "number": 11 },
+      { "code": "KG_012", "number": 12 },
+      { "code": "KG_013", "number": 13 },
+      { "code": "KG_014", "number": 14 },
+      { "code": "KG_015", "number": 15 },
+      { "code": "KG_016", "number": 16 },
+      { "code": "KG_017", "number": 17 },
+      { "code": "KG_018", "number": 18 },
+      { "code": "KG_019", "number": 19 },
+      { "code": "KG_020", "number": 20 },
+      { "code": "KG_021", "number": 21 },
+      { "code": "KG_022", "number": 22 },
+      { "code": "KG_023", "number": 23 },
+      { "code": "KG_024", "number": 24 },
+      { "code": "KG_025", "number": 25 },
+      { "code": "KG_026", "number": 26 },
+      { "code": "KG_027", "number": 27 },
+      { "code": "KG_028", "number": 28 },
+      { "code": "KG_029", "number": 29 },
+      { "code": "KG_030", "number": 30 }
+    ]
+  }
+}

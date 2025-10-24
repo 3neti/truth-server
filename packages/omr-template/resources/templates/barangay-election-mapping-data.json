@@ -1,0 +1,61 @@
+{
+  "election": {
+    "title": "2026 Barangay Elections - Candidate Reference",
+    "id": "MAP-2026-BRGY-0001"
+  },
+  "barangay": {
+    "name": "Barangay Maligaya",
+    "municipality": "San Jose",
+    "province": "Nueva Ecija"
+  },
+  "positions": [
+    {
+      "code": "PUNONG_BARANGAY",
+      "name": "Punong Barangay",
+      "candidates": [
+        { "number": 1, "name": "Juan Dela Cruz" },
+        { "number": 2, "name": "Maria Santos" },
+        { "number": 3, "name": "Pedro Reyes" },
+        { "number": 4, "name": "Ana Garcia" },
+        { "number": 5, "name": "Carlos Mendoza" },
+        { "number": 6, "name": "Rosa Fernandez" }
+      ]
+    },
+    {
+      "code": "KAGAWAD",
+      "name": "Kagawad, Sangguniang Barangay",
+      "candidates": [
+        { "number": 1, "name": "Antonio Ramos" },
+        { "number": 2, "name": "Beatriz Cruz" },
+        { "number": 3, "name": "Carlos Bautista" },
+        { "number": 4, "name": "Diana Lopez" },
+        { "number": 5, "name": "Eduardo Santos" },
+        { "number": 6, "name": "Fe Gutierrez" },
+        { "number": 7, "name": "Gabriel Torres" },
+        { "number": 8, "name": "Helena Domingo" },
+        { "number": 9, "name": "Ignacio Alvarez" },
+        { "number": 10, "name": "Julia Mercado" },
+        { "number": 11, "name": "Kevin Morales" },
+        { "number": 12, "name": "Linda Castillo" },
+        { "number": 13, "name": "Manuel Rivera" },
+        { "number": 14, "name": "Nora Villaruz" },
+        { "number": 15, "name": "Oscar Rojas" },
+        { "number": 16, "name": "Patricia Salazar" },
+        { "number": 17, "name": "Quintin Flores" },
+        { "number": 18, "name": "Rosario Aguilar" },
+        { "number": 19, "name": "Samuel Herrera" },
+        { "number": 20, "name": "Teresa Navarro" },
+        { "number": 21, "name": "Ulysses Ocampo" },
+        { "number": 22, "name": "Victoria Pascual" },
+        { "number": 23, "name": "William Santiago" },
+        { "number": 24, "name": "Xandra Velasco" },
+        { "number": 25, "name": "Yolanda Zamora" },
+        { "number": 26, "name": "Zachary Aquino" },
+        { "number": 27, "name": "Alice Navarro" },
+        { "number": 28, "name": "Benjamin Cortez" },
+        { "number": 29, "name": "Carmen Dela Rosa" },
+        { "number": 30, "name": "Daniel Evangelista" }
+      ]
+    }
+  ]
+}

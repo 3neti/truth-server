@@ -156,6 +156,10 @@ async function handleUpdateTemplate() {
 async function loadSampleTemplate(sampleName = 'simple') {
   if (sampleName === 'philippines') {
     await loadPhilippinesSample()
+  } else if (sampleName === 'barangay') {
+    await loadBarangaySample()
+  } else if (sampleName === 'barangay-mapping') {
+    await loadBarangayMappingSample()
   } else {
     loadSimpleSample()
   }
@@ -225,6 +229,40 @@ async function loadPhilippinesSample() {
     templateData.value = data
   } catch (e) {
     console.error('Failed to load Philippine election sample:', e)
+    alert('Failed to load sample. Using default instead.')
+    loadSimpleSample()
+  }
+}
+
+async function loadBarangaySample() {
+  try {
+    const templateResponse = await fetch('/packages/omr-template/resources/templates/barangay-election-template.hbs')
+    const template = await templateResponse.text()
+    
+    const dataResponse = await fetch('/packages/omr-template/resources/templates/barangay-election-data.json')
+    const data = await dataResponse.json()
+    
+    handlebarsTemplate.value = template
+    templateData.value = data
+  } catch (e) {
+    console.error('Failed to load Barangay election sample:', e)
+    alert('Failed to load sample. Using default instead.')
+    loadSimpleSample()
+  }
+}
+
+async function loadBarangayMappingSample() {
+  try {
+    const templateResponse = await fetch('/packages/omr-template/resources/templates/barangay-election-mapping-template.hbs')
+    const template = await templateResponse.text()
+    
+    const dataResponse = await fetch('/packages/omr-template/resources/templates/barangay-election-mapping-data.json')
+    const data = await dataResponse.json()
+    
+    handlebarsTemplate.value = template
+    templateData.value = data
+  } catch (e) {
+    console.error('Failed to load Barangay mapping sample:', e)
     alert('Failed to load sample. Using default instead.')
     loadSimpleSample()
   }
@@ -404,9 +442,21 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
             </button>
             <button
               @click="loadSampleTemplate('philippines'); showSampleMenu = false"
-              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 last:rounded-b-md"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               🇵🇭 Philippine General Election
+            </button>
+            <button
+              @click="loadSampleTemplate('barangay'); showSampleMenu = false"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              🗳️ 2026 Barangay Elections (Ballot)
+            </button>
+            <button
+              @click="loadSampleTemplate('barangay-mapping'); showSampleMenu = false"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 last:rounded-b-md"
+            >
+              📋 Barangay Candidate Mapping
             </button>
           </div>
         </div>

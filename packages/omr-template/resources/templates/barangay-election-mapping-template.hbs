@@ -1,0 +1,23 @@
+{
+  "document": {
+    "title": "{{barangay.name}}, {{barangay.municipality}}, {{barangay.province}}\n{{election.title}}",
+    "unique_id": "{{election.id}}",
+    "layout": "1-col"
+  },
+  "sections": [
+    {{#each positions}}
+    {
+      "type": "free_text",
+      "code": "{{code}}_HEADER",
+      "title": "{{name}}",
+      "content": "Vote for the candidate by shading the corresponding number on the ballot."
+    },
+    {
+      "type": "free_text",
+      "code": "{{code}}_LIST",
+      "title": "",
+      "content": "{{#each candidates}}{{number}}. {{name}}\n{{/each}}"
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}
