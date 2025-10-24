@@ -12,7 +12,7 @@ return [
     'page' => [
         'size' => 'A4',
         'orientation' => 'P',
-        'margins' => ['l' => 18, 't' => 18, 'r' => 18, 'b' => 18],
+        'margins' => ['l' => 18, 't' => 22, 'r' => 18, 'b' => 18],
         'dpi' => 300,
     ],
 

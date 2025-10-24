@@ -20,11 +20,6 @@
         "code": "SENATOR",
         "name": "Senator of the Philippines",
         "count": 12
-      },
-      {
-        "code": "REPRESENTATIVE-PARTY-LIST",
-        "name": "Party-list Representative",
-        "count": 1
       }
     ]
   },
@@ -43,6 +38,11 @@
       {
         "code": "MAYOR-ILN-CURRIMAO",
         "name": "Municipal Mayor — Currimao, Ilocos Norte",
+        "count": 1
+      },
+      {
+        "code": "REPRESENTATIVE-PARTY-LIST",
+        "name": "Party-list Representative",
         "count": 1
       }
     ]

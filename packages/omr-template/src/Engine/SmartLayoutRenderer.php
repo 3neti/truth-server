@@ -156,9 +156,8 @@ class SmartLayoutRenderer
             'contentHeight' => $this->context->getContentHeight(),
         ];
         
-        // Check if page break needed (estimate)
-        $estimatedHeight = 40; // Basic estimate
-        $this->paginator->checkAndAddPage($estimatedHeight);
+        // Note: Automatic page break checking disabled to support manual page_break sections
+        // If you need automatic pagination, remove manual page_break sections from your spec
         
         // Render section
         $consumedHeight = $renderer->render($this->pdf, $section, $contextArray);
