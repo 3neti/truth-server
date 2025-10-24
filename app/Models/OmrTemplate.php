@@ -20,6 +20,9 @@ class OmrTemplate extends Model
         'schema',
         'is_public',
         'user_id',
+        'family_id',
+        'layout_variant',
+        'version',
     ];
 
     protected $casts = [
@@ -34,6 +37,14 @@ class OmrTemplate extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the template family this template belongs to.
+     */
+    public function family(): BelongsTo
+    {
+        return $this->belongsTo(TemplateFamily::class);
     }
 
     /**
@@ -71,5 +82,27 @@ class OmrTemplate extends Model
                 $q->orWhere('user_id', $userId);
             }
         });
+    }
+
+    /**
+     * Check if this is the default layout variant.
+     */
+    public function isDefaultLayout(): bool
+    {
+        return $this->layout_variant === 'default';
+    }
+
+    /**
+     * Get other layout variants in the same family.
+     */
+    public function siblingVariants()
+    {
+        if (!$this->family_id) {
+            return collect([]);
+        }
+
+        return static::where('family_id', $this->family_id)
+            ->where('id', '!=', $this->id)
+            ->get();
     }
 }

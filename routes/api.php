@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\TemplateFamilyController;
 use App\Http\Controllers\TemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,14 @@ Route::prefix('templates')->name('templates.')->group(function () {
     Route::post('/library', [TemplateController::class, 'saveTemplate'])->name('library.store');
     Route::put('/library/{id}', [TemplateController::class, 'updateTemplate'])->name('library.update');
     Route::delete('/library/{id}', [TemplateController::class, 'deleteTemplate'])->name('library.delete');
+});
+
+// Template Families API
+Route::prefix('template-families')->name('template-families.')->group(function () {
+    Route::get('/', [TemplateFamilyController::class, 'index'])->name('index');
+    Route::post('/', [TemplateFamilyController::class, 'store'])->name('store');
+    Route::get('/{id}', [TemplateFamilyController::class, 'show'])->name('show');
+    Route::put('/{id}', [TemplateFamilyController::class, 'update'])->name('update');
+    Route::delete('/{id}', [TemplateFamilyController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/variants', [TemplateFamilyController::class, 'variants'])->name('variants');
 });
