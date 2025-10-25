@@ -23,5 +23,13 @@ Route::get('/templates/advanced', function () {
     return Inertia::render('Templates/AdvancedEditor');
 })->name('templates.advanced');
 
+Route::get('/data-editor-demo', function () {
+    return Inertia::render('DataEditorDemo');
+})->name('data-editor.demo');
+
+Route::get('/data/editor', function () {
+    return Inertia::render('DataFileEditor');
+})->name('data.editor');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -33,6 +33,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.1.0",
+        "@lbhurtado/vue-data-editor": "file:packages/vue-data-editor",
         "@lbhurtado/vue-tally-marks": "file:packages/vue-tally-marks",
         "@vueuse/core": "^12.8.2",
         "@zxing/browser": "^0.1.5",

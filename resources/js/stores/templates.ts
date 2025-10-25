@@ -383,6 +383,31 @@ export const useTemplatesStore = defineStore('templates', () => {
     }
   }
 
+  async function exportTemplateFamily(id: string) {
+    try {
+      const response = await axios.get(`/api/template-families/${id}/export`)
+      return response.data
+    } catch (err: any) {
+      error.value = err.message || 'Failed to export family'
+      throw err
+    }
+  }
+
+  async function importTemplateFamily(familyData: any) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await axios.post('/api/template-families/import', { family_data: familyData })
+      return response.data
+    } catch (err: any) {
+      error.value = err.response?.data?.error || err.message || 'Failed to import family'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   function setMode(newMode: 'simple' | 'advanced') {
     mode.value = newMode
   }
@@ -480,6 +505,8 @@ export const useTemplatesStore = defineStore('templates', () => {
     getFamilyVariants,
     createTemplateFamily,
     deleteTemplateFamily,
+    exportTemplateFamily,
+    importTemplateFamily,
     // Actions - Common
     saveToLocalStorage,
     loadFromLocalStorage,

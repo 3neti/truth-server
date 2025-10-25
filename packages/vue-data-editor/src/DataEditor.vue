@@ -19,6 +19,13 @@ const formData = ref<Record<string, any>>({ ...props.modelValue })
 const jsonString = ref(JSON.stringify(props.modelValue, null, 2))
 const jsonError = ref<string | null>(null)
 
+// Watch for external changes to modelValue prop
+watch(() => props.modelValue, (newVal) => {
+  console.log('DataEditor: modelValue changed', newVal)
+  formData.value = { ...newVal }
+  jsonString.value = JSON.stringify(newVal, null, 2)
+}, { deep: true, immediate: false })
+
 // Watch JSON string changes - only when in JSON view
 watch(jsonString, (newVal) => {
   if (viewMode.value === 'json') {
@@ -267,12 +274,12 @@ function resetFontSize() {
     </div>
 
     <!-- JSON View -->
-    <div v-else class="flex-1 flex flex-col">
+    <div v-else class="flex-1 flex flex-col min-h-0">
       <textarea
         v-model="jsonString"
-        class="flex-1 w-full p-4 font-mono border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+        class="flex-1 w-full p-4 font-mono border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-auto"
         :class="{ 'border-red-300': !isJsonValid, 'border-green-300': isJsonValid }"
-        :style="{ fontSize: `${fontSize}px` }"
+        :style="{ fontSize: `${fontSize}px`, minHeight: '400px' }"
         placeholder="Enter JSON data here..."
         spellcheck="false"
       />

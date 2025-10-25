@@ -173,4 +173,103 @@ class TemplateFamilyController extends Controller
             'variants' => $family->templates,
         ]);
     }
+
+    /**
+     * Export a template family as JSON.
+     */
+    public function export(string $id)
+    {
+        $family = TemplateFamily::with('templates')->findOrFail($id);
+
+        // Check access
+        if (!$family->is_public && $family->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $export = [
+            'format_version' => '1.0',
+            'exported_at' => now()->toIso8601String(),
+            'family' => [
+                'slug' => $family->slug,
+                'name' => $family->name,
+                'description' => $family->description,
+                'category' => $family->category,
+                'version' => $family->version,
+                'repo_url' => $family->repo_url,
+            ],
+            'variants' => $family->templates->map(function ($template) {
+                return [
+                    'layout_variant' => $template->layout_variant,
+                    'name' => $template->name,
+                    'description' => $template->description,
+                    'handlebars_template' => $template->handlebars_template,
+                    'sample_data' => $template->sample_data,
+                    'version' => $template->version,
+                ];
+            })->toArray(),
+        ];
+
+        $filename = Str::slug($family->name) . '-family.json';
+        
+        return response()->json($export)
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Import a template family from JSON.
+     */
+    public function import(Request $request)
+    {
+        $validated = $request->validate([
+            'family_data' => 'required|array',
+            'family_data.format_version' => 'required|string',
+            'family_data.family' => 'required|array',
+            'family_data.variants' => 'required|array',
+        ]);
+
+        $data = $validated['family_data'];
+
+        try {
+            // Create the family
+            $familyData = $data['family'];
+            $familyData['user_id'] = Auth::id();
+            $familyData['is_public'] = false; // Default to private on import
+
+            // Ensure unique slug
+            $originalSlug = $familyData['slug'];
+            $counter = 1;
+            while (TemplateFamily::where('slug', $familyData['slug'])->exists()) {
+                $familyData['slug'] = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+
+            $family = TemplateFamily::create($familyData);
+
+            // Create variant templates
+            foreach ($data['variants'] as $variantData) {
+                OmrTemplate::create([
+                    'name' => $variantData['name'],
+                    'description' => $variantData['description'],
+                    'category' => $familyData['category'],
+                    'handlebars_template' => $variantData['handlebars_template'],
+                    'sample_data' => $variantData['sample_data'],
+                    'is_public' => false,
+                    'user_id' => Auth::id(),
+                    'family_id' => $family->id,
+                    'layout_variant' => $variantData['layout_variant'],
+                    'version' => $variantData['version'] ?? '1.0.0',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'family' => $family->load('templates'),
+                'message' => 'Family imported successfully',
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Import failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

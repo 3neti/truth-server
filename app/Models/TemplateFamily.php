@@ -17,6 +17,9 @@ class TemplateFamily extends Model
         'description',
         'category',
         'repo_url',
+        'repo_provider',
+        'repo_path',
+        'storage_type',
         'version',
         'is_public',
         'user_id',
@@ -100,5 +103,45 @@ class TemplateFamily extends Model
                 $q->orWhere('user_id', $userId);
             }
         });
+    }
+
+    /**
+     * Check if family is stored remotely.
+     */
+    public function isRemote(): bool
+    {
+        return in_array($this->storage_type, ['remote', 'hybrid']);
+    }
+
+    /**
+     * Check if family is fully local.
+     */
+    public function isLocal(): bool
+    {
+        return $this->storage_type === 'local' || !$this->storage_type;
+    }
+
+    /**
+     * Check if family has mixed storage (local + remote variants).
+     */
+    public function isHybrid(): bool
+    {
+        return $this->storage_type === 'hybrid';
+    }
+
+    /**
+     * Get the count of remote templates in this family.
+     */
+    public function getRemoteTemplatesCount(): int
+    {
+        return $this->templates()->where('storage_type', 'remote')->count();
+    }
+
+    /**
+     * Get the count of local templates in this family.
+     */
+    public function getLocalTemplatesCount(): int
+    {
+        return $this->templates()->where('storage_type', 'local')->count();
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use LBHurtado\OMRTemplate\Engine\SmartLayoutRenderer;
 use LBHurtado\OMRTemplate\Services\HandlebarsCompiler;
+use Illuminate\Support\Facades\Auth;
 
 class TemplateController extends Controller
 {
@@ -206,14 +207,86 @@ class TemplateController extends Controller
         }
 
         try {
-            $spec = $compiler->compile(
-                $request->input('template'),
-                $request->input('data')
-            );
+            $template = $request->input('template');
+            $rawData = $request->input('data');
+            
+            // Extract data payload same way as validation endpoint
+            // Merge data.data with root-level fields (excluding document and data wrapper)
+            $data = $this->extractDataPayload($rawData);
+            
+            \Log::info('Compiling template', [
+                'template_length' => strlen($template),
+                'raw_data_keys' => array_keys($rawData),
+                'extracted_data_keys' => array_keys($data),
+                'extracted_data' => json_encode($data, JSON_PRETTY_PRINT),
+            ]);
+            
+            $spec = $compiler->compile($template, $data);
 
             return response()->json([
                 'success' => true,
                 'spec' => $spec,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Compilation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : null,
+            ], 500);
+        }
+    }
+
+    /**
+     * Compile from standalone JSON with template reference.
+     * Supports portable data files with template_ref pointers.
+     */
+    public function compileStandalone(Request $request, HandlebarsCompiler $compiler): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'document' => 'required|array',
+            'document.template_ref' => 'required|string',
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $templateRef = $request->input('document.template_ref');
+            $data = $request->input('data');
+            $checksum = $request->input('document.template_checksum');
+
+            // Resolve template from reference
+            $resolver = app(\App\Services\Templates\TemplateResolver::class);
+            $templateContent = $resolver->resolve($templateRef);
+
+            // Verify checksum if provided
+            if ($checksum) {
+                $actualChecksum = hash('sha256', $templateContent);
+                if ($actualChecksum !== str_replace('sha256:', '', $checksum)) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Template checksum verification failed',
+                    ], 400);
+                }
+            }
+
+            // Compile template with data
+            $spec = $compiler->compile($templateContent, $data);
+
+            return response()->json([
+                'success' => true,
+                'spec' => $spec,
+                'template_ref' => $templateRef,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -230,9 +303,23 @@ class TemplateController extends Controller
     {
         $query = OmrTemplate::query();
 
+        // Include family relationships if requested
+        if ($request->has('with_families') && $request->input('with_families')) {
+            $query->with('family');
+        }
+
         // Filter by category if provided
         if ($request->has('category')) {
             $query->category($request->input('category'));
+        }
+
+        // Search by name or description
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
         // Get templates accessible by user (public + owned)
@@ -495,5 +582,135 @@ class TemplateController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Validate template data against JSON schema.
+     */
+    public function validateData(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $data = $request->input('data');
+        $result = $template->validateData($data);
+
+        return response()->json([
+            'success' => true,
+            'valid' => $result['valid'],
+            'errors' => $result['errors'],
+            'has_schema' => !empty($template->json_schema),
+        ]);
+    }
+
+    /**
+     * Sign a template (generate SHA256 checksum).
+     */
+    public function signTemplate(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        // Check if user owns the template
+        if ($template->user_id !== $request->user()?->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+            ], 403);
+        }
+
+        try {
+            $template->sign($request->user()?->id);
+
+            return response()->json([
+                'success' => true,
+                'checksum' => $template->checksum_sha256,
+                'verified_at' => $template->verified_at,
+                'message' => 'Template signed successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify template signature.
+     */
+    public function verifyTemplate(Request $request, string $id): JsonResponse
+    {
+        $template = OmrTemplate::find($id);
+
+        if (!$template) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Template not found',
+            ], 404);
+        }
+
+        $isValid = $template->verifyChecksum();
+        $isSigned = $template->isSigned();
+        $isModified = $template->isModified();
+
+        return response()->json([
+            'success' => true,
+            'is_signed' => $isSigned,
+            'is_valid' => $isValid,
+            'is_modified' => $isModified,
+            'checksum' => $template->checksum_sha256,
+            'verified_at' => $template->verified_at,
+            'verified_by' => $template->verified_by,
+        ]);
+    }
+
+    /**
+     * Extract the actual data payload from the portable data structure.
+     * Handles both old format (flat) and new format (with data.data nesting).
+     * Same logic as DataValidationController.
+     */
+    private function extractDataPayload(array $data): array
+    {
+        // New format: {document: {...}, data: {...}, positions: [...]}
+        // We need to merge data.data with root-level fields (excluding document)
+        $payload = [];
+        
+        // Add fields from data.data if it exists
+        if (isset($data['data']) && is_array($data['data'])) {
+            $payload = array_merge($payload, $data['data']);
+        }
+        
+        // Add root-level fields (except 'document' and 'data')
+        foreach ($data as $key => $value) {
+            if (!in_array($key, ['document', 'data'])) {
+                $payload[$key] = $value;
+            }
+        }
+        
+        return $payload;
     }
 }

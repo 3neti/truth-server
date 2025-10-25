@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { TemplateSpec } from '@/stores/templates'
 
 const props = defineProps<{
@@ -7,11 +7,28 @@ const props = defineProps<{
   pdfUrl: string | null
   loading: boolean
   compilationError: string | null
+  currentTemplate?: {
+    id?: number
+    storage_type?: 'local' | 'remote' | 'hybrid'
+    template_uri?: string
+    family?: {
+      slug: string
+      variant?: string
+    }
+  }
+  originalData?: Record<string, any>
+  usePortableFormat?: boolean
 }>()
 
 const activeTab = ref<'spec' | 'pdf'>('spec')
 const fontSize = ref(13)
 const pdfTimestamp = ref(Date.now())
+const portableFormat = ref(false)
+
+// Debug: Log currentTemplate prop
+watch(() => props.currentTemplate, (newVal) => {
+  console.log('PreviewPane currentTemplate:', newVal)
+}, { immediate: true })
 
 const mergedSpecJson = computed(() => {
   return props.mergedSpec ? JSON.stringify(props.mergedSpec, null, 2) : ''
@@ -36,13 +53,68 @@ function refreshPdf() {
 function downloadSpec() {
   if (!props.mergedSpec) return
 
-  const blob = new Blob([JSON.stringify(props.mergedSpec, null, 2)], {
+  let dataToExport: any
+  const documentId = props.mergedSpec.document?.unique_id || 'template'
+
+  // If portable format is requested and template info is available
+  if ((props.usePortableFormat || portableFormat.value) && props.currentTemplate) {
+    const template = props.currentTemplate
+    
+    // Build template_ref based on storage type (prefer family/variant over ID)
+    let templateRef: string | undefined
+    
+    if (template.template_uri) {
+      // Remote or hybrid template with explicit URI
+      templateRef = template.template_uri
+    } else if (template.family?.slug && template.family?.variant) {
+      // Local template with family/variant reference (PREFERRED)
+      templateRef = `local:${template.family.slug}/${template.family.variant}`
+    } else if (template.id) {
+      // Fallback to template ID only if no family info
+      templateRef = `local:${template.id}`
+    }
+
+    // Create portable data format
+    if (templateRef) {
+      dataToExport = {
+        document: {
+          template_ref: templateRef,
+          // Add checksum for verification (optional but recommended)
+          // template_checksum: 'sha256:...' // Would need template content to compute
+        },
+        // Use original input data, not compiled output
+        data: props.originalData || extractDataFromSpec(props.mergedSpec)
+      }
+    } else {
+      // Fallback to full spec if no reference available
+      dataToExport = props.mergedSpec
+    }
+  } else {
+    // Standard format with embedded spec
+    dataToExport = props.mergedSpec
+  }
+
+  const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
     type: 'application/json',
   })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  link.download = `${props.mergedSpec.document?.unique_id || 'template'}.json`
+  const usePortable = props.usePortableFormat || portableFormat.value
+  const filename = usePortable ? `${documentId}-data.json` : `${documentId}.json`
+  link.download = filename
   link.click()
+}
+
+// Extract data portion from compiled spec (inverse of template compilation)
+function extractDataFromSpec(spec: TemplateSpec): Record<string, any> {
+  // This extracts the 'data' that was originally used to compile the template
+  // For now, we'll return the whole spec as the data source
+  // In a real implementation, this would extract only the variable data
+  return {
+    document: spec.document,
+    sections: spec.sections,
+    // Include any other relevant data fields
+  }
 }
 </script>
 
@@ -79,11 +151,23 @@ function downloadSpec() {
 
       <!-- Tab-specific controls -->
       <div v-if="activeTab === 'spec'" class="flex items-center gap-2">
+        <label
+          v-if="currentTemplate"
+          class="flex items-center gap-1 text-xs text-gray-600"
+          title="Export as portable data file with template reference"
+        >
+          <input
+            type="checkbox"
+            v-model="portableFormat"
+            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span>Portable</span>
+        </label>
         <button
           v-if="mergedSpec"
           @click="downloadSpec"
           class="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
-          title="Download JSON"
+          :title="portableFormat ? 'Download portable data file (~2KB)' : 'Download full JSON spec'"
         >
           Download
         </button>

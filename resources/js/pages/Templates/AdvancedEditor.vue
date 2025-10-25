@@ -4,10 +4,11 @@ import { useTemplatesStore } from '@/stores/templates'
 import { storeToRefs } from 'pinia'
 import { useDebounceFn } from '@vueuse/core'
 import TemplatePane from './Components/TemplatePane.vue'
-import DataPane from './Components/DataPane.vue'
+import DataPane from './Components/DataPaneNew.vue'
 import PreviewPane from './Components/PreviewPane.vue'
 import TemplateLibrary from './Components/TemplateLibrary.vue'
 import FamilyBrowser from './Components/FamilyBrowser.vue'
+import DataFileBrowser from '@/components/DataFileBrowser.vue'
 
 const store = useTemplatesStore()
 const {
@@ -25,6 +26,7 @@ const showSaveDialog = ref(false)
 const showUpdateDialog = ref(false)
 const showLibraryDrawer = ref(false)
 const showFamilyBrowser = ref(false)
+const showDataFileBrowser = ref(false)
 const showShortcutsHelp = ref(false)
 const showSampleMenu = ref(false)
 const libraryKey = ref(0)
@@ -37,6 +39,21 @@ const updateTemplateName = ref('')
 const updateTemplateDescription = ref('')
 const updateTemplateCategory = ref('ballot')
 const updateTemplateIsPublic = ref(true)
+
+// Track currently loaded template for portable data export and updates
+const currentTemplate = ref<{
+  id?: number
+  name?: string
+  description?: string
+  category?: string
+  is_public?: boolean
+  storage_type?: 'local' | 'remote' | 'hybrid'
+  template_uri?: string
+  family?: {
+    slug: string
+    variant?: string
+  }
+} | null>(null)
 
 // Auto-compile with debounce
 const debouncedCompile = useDebounceFn(async () => {
@@ -79,10 +96,25 @@ onUnmounted(() => {
 })
 
 async function handleCompile() {
+  console.log('=== Starting Compilation ===')
+  console.log('Template:', handlebarsTemplate.value?.substring(0, 200))
+  console.log('Data:', templateData.value)
+  
+  if (!handlebarsTemplate.value) {
+    alert('No template loaded! Please load a template first.')
+    return
+  }
+  
+  if (!templateData.value || Object.keys(templateData.value).length === 0) {
+    alert('No data loaded! Please load sample data or a data file first.')
+    return
+  }
+  
   try {
     await store.compileTemplate()
   } catch (e) {
     console.error('Compilation failed:', e)
+    alert('Compilation failed: ' + (e as any).message)
   }
 }
 
@@ -90,8 +122,17 @@ async function handleRenderPdf() {
   try {
     // First compile if needed
     if (!mergedSpec.value) {
+      console.log('No merged spec, compiling first...')
       await store.compileTemplate()
     }
+
+    console.log('=== Rendering PDF ===')
+    console.log('Merged spec:', JSON.stringify(mergedSpec.value, null, 2))
+    console.log('Has document?', !!mergedSpec.value?.document)
+    console.log('Has sections?', !!mergedSpec.value?.sections)
+    console.log('Document title:', mergedSpec.value?.document?.title)
+    console.log('Document unique_id:', mergedSpec.value?.document?.unique_id)
+    console.log('Sections count:', mergedSpec.value?.sections?.length)
 
     // Then render the merged spec
     if (mergedSpec.value) {
@@ -100,28 +141,48 @@ async function handleRenderPdf() {
       store.updateSpec(mergedSpec.value)
       await store.renderTemplate()
       store.updateSpec(originalSpec)
+    } else {
+      alert('No spec to render. Please compile first.')
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Render failed:', e)
+    console.error('Error response:', e.response?.data)
+    alert('Render failed: ' + (e.response?.data?.error || e.message))
   }
 }
 
 async function handleSaveTemplate() {
   try {
-    const savedTemplate = await store.saveTemplateToLibrary(
+    const newTemplate = await store.saveTemplateToLibrary(
       saveTemplateName.value,
       saveTemplateDescription.value,
       saveTemplateCategory.value,
       saveTemplateIsPublic.value
     )
+    
     showSaveDialog.value = false
+    
+    // If saving as new (not a copy), track as current template
+    if (!currentTemplate.value?.id || currentTemplate.value?.name !== saveTemplateName.value) {
+      currentTemplate.value = {
+        id: newTemplate.id,
+        name: newTemplate.name,
+        description: newTemplate.description,
+        category: newTemplate.category,
+        is_public: newTemplate.is_public,
+        storage_type: 'local',
+      }
+    }
     
     // Reset form
     saveTemplateName.value = ''
     saveTemplateDescription.value = ''
     saveTemplateCategory.value = 'ballot'
     
-    alert('Template saved successfully! You can now find it in the Browse Library.')
+    // Refresh library
+    libraryKey.value++
+    
+    alert('✓ Template saved successfully! You can now find it in the Browse Library.')
   } catch (e) {
     console.error('Save failed:', e)
     alert('Failed to save template. Please try again.')
@@ -139,6 +200,15 @@ async function handleUpdateTemplate() {
       updateTemplateCategory.value,
       updateTemplateIsPublic.value
     )
+    
+    // Update currentTemplate metadata
+    if (currentTemplate.value) {
+      currentTemplate.value.name = updateTemplateName.value
+      currentTemplate.value.description = updateTemplateDescription.value
+      currentTemplate.value.category = updateTemplateCategory.value
+      currentTemplate.value.is_public = updateTemplateIsPublic.value
+    }
+    
     showUpdateDialog.value = false
     
     // Reset form
@@ -147,7 +217,10 @@ async function handleUpdateTemplate() {
     updateTemplateDescription.value = ''
     updateTemplateCategory.value = 'ballot'
     
-    alert('Template updated successfully!')
+    // Refresh library if open
+    libraryKey.value++
+    
+    alert('✓ Template updated successfully!')
   } catch (e: any) {
     console.error('Update failed:', e)
     const errorMsg = e.response?.data?.error || e.message || 'Failed to update template'
@@ -170,9 +243,11 @@ async function loadSampleTemplate(sampleName = 'simple') {
 function loadSimpleSample() {
   handlebarsTemplate.value = `{
   "document": {
-    "title": "{{election.title}}",
-    "unique_id": "{{election.id}}",
-    "layout": "{{layout}}"
+    "title": "{{election_name}}",
+    "unique_id": "{{precinct}}-{{date}}",
+    "date": "{{date}}",
+    "precinct": "{{precinct}}",
+    "layout": "2-column"
   },
   "sections": [
     {{#each positions}}
@@ -180,14 +255,15 @@ function loadSimpleSample() {
       "type": "multiple_choice",
       "code": "{{code}}",
       "title": "{{title}}",
-      "question": "{{question}}",
-      "maxSelections": {{maxSelections}},
-      "layout": "{{../layout}}",
+      "question": "Vote for {{max_selections}}",
+      "maxSelections": {{max_selections}},
+      "layout": "2-column",
       "choices": [
         {{#each candidates}}
         {
-          "code": "{{code}}",
-          "label": "{{name}}"
+          "code": "{{position}}",
+          "label": "{{name}}",
+          "description": "{{party}}"
         }{{#unless @last}},{{/unless}}
         {{/each}}
       ]
@@ -196,25 +272,55 @@ function loadSimpleSample() {
   ]
 }`
 
-  templateData.value = {
-    election: {
-      title: '2025 General Election',
-      id: 'BAL-2025-001',
-    },
-    layout: '2-col',
+  const sampleData = {
+    election_name: '2025 National Elections',
+    precinct: '001-A',
+    date: '2025-05-15',
     positions: [
       {
-        code: 'PRESIDENT',
+        code: 'PRES',
         title: 'President',
-        question: 'Vote for one',
-        maxSelections: 1,
+        max_selections: 1,
         candidates: [
-          { code: 'P-A', name: 'Alice Johnson' },
-          { code: 'P-B', name: 'Bob Williams' },
+          { position: 1, name: 'Alice Martinez', party: 'Progressive Party' },
+          { position: 2, name: 'Robert Chen', party: 'Democratic Alliance' },
+          { position: 3, name: 'Maria Santos', party: 'Independent' },
+        ],
+      },
+      {
+        code: 'VP',
+        title: 'Vice President',
+        max_selections: 1,
+        candidates: [
+          { position: 1, name: 'John Williams', party: 'Progressive Party' },
+          { position: 2, name: 'Sarah Lee', party: 'Democratic Alliance' },
+        ],
+      },
+      {
+        code: 'SEN',
+        title: 'Senator',
+        max_selections: 6,
+        candidates: [
+          { position: 1, name: 'David Johnson', party: 'Progressive Party' },
+          { position: 2, name: 'Emma Wilson', party: 'Democratic Alliance' },
+          { position: 3, name: 'James Rodriguez', party: 'Independent' },
+          { position: 4, name: 'Lisa Anderson', party: 'Progressive Party' },
+          { position: 5, name: 'Michael Brown', party: 'Democratic Alliance' },
+          { position: 6, name: 'Jennifer Garcia', party: 'Independent' },
+          { position: 7, name: 'Daniel Kim', party: 'Progressive Party' },
+          { position: 8, name: 'Amanda Taylor', party: 'Democratic Alliance' },
         ],
       },
     ],
   }
+  
+  // Update store
+  store.updateTemplateData(sampleData)
+  console.log('Sample data loaded:', sampleData)
+  console.log('templateData.value:', templateData.value)
+
+  // Clear current template tracking since this is a sample
+  currentTemplate.value = null
 }
 
 async function loadPhilippinesSample() {
@@ -276,6 +382,55 @@ function clearTemplate() {
     templateData.value = {}
     store.updateHandlebarsTemplate('')
     store.updateTemplateData({})
+    currentTemplate.value = null // Clear template tracking
+  }
+}
+
+function handleTemplateSelection(template: any) {
+  // Load the selected template
+  handlebarsTemplate.value = template.handlebars_template || ''
+  templateData.value = template.sample_data || {}
+  
+  // Track template info for portable export
+  let familyInfo: { slug: string; variant?: string } | undefined
+  if (template.family_id && template.family) {
+    familyInfo = {
+      slug: template.family.slug || template.family_slug,
+      variant: template.layout_variant
+    }
+  } else if (template.family_id && template.family_slug) {
+    familyInfo = {
+      slug: template.family_slug,
+      variant: template.layout_variant
+    }
+  }
+
+  // Build template_ref
+  let templateRef: string
+  if (template.template_uri) {
+    templateRef = template.template_uri
+  } else if (familyInfo) {
+    templateRef = `local:${familyInfo.slug}/${familyInfo.variant}`
+  } else {
+    templateRef = `local:${template.id}`
+  }
+
+  currentTemplate.value = {
+    id: template.id,
+    name: template.name,
+    storage_type: template.storage_type || 'local',
+    template_uri: template.template_uri,
+    template_ref: templateRef,
+    family: familyInfo
+  }
+
+  console.log('Template selected:', currentTemplate.value)
+
+  // Trigger compilation
+  if (autoCompileEnabled.value) {
+    setTimeout(() => {
+      debouncedCompile()
+    }, 100)
   }
 }
 
@@ -291,6 +446,36 @@ function handleLoadFromLibrary(template: any) {
   templateData.value = template.sample_data || {}
   showLibraryDrawer.value = false
 
+  // Track loaded template for portable export and updates
+  // Extract family info if the template belongs to a family
+  let familyInfo: { slug: string; variant?: string } | undefined
+  if (template.family_id && template.family) {
+    // If template.family is an object with slug
+    familyInfo = {
+      slug: template.family.slug || template.family_slug,
+      variant: template.layout_variant
+    }
+  } else if (template.family_id && template.family_slug) {
+    // If family info is flattened (from JOIN)
+    familyInfo = {
+      slug: template.family_slug,
+      variant: template.layout_variant
+    }
+  }
+
+  currentTemplate.value = {
+    id: template.id,
+    name: template.name,
+    description: template.description,
+    category: template.category,
+    is_public: template.is_public,
+    storage_type: template.storage_type || 'local',
+    template_uri: template.template_uri,
+    family: familyInfo
+  }
+
+  console.log('Loaded template tracking:', currentTemplate.value)
+
   // Trigger compilation
   if (autoCompileEnabled.value) {
     setTimeout(() => {
@@ -303,6 +488,31 @@ function handleUpdateFromLibrary(template: any) {
   // Load template data into editor
   handlebarsTemplate.value = template.handlebars_template
   templateData.value = template.sample_data || {}
+  
+  // Track as current template
+  let familyInfo: { slug: string; variant?: string } | undefined
+  if (template.family_id && template.family) {
+    familyInfo = {
+      slug: template.family.slug || template.family_slug,
+      variant: template.layout_variant
+    }
+  } else if (template.family_id && template.family_slug) {
+    familyInfo = {
+      slug: template.family_slug,
+      variant: template.layout_variant
+    }
+  }
+  
+  currentTemplate.value = {
+    id: template.id,
+    name: template.name,
+    description: template.description,
+    category: template.category,
+    is_public: template.is_public,
+    storage_type: template.storage_type || 'local',
+    template_uri: template.template_uri,
+    family: familyInfo
+  }
   
   // Populate update form
   updateTemplateId.value = template.id
@@ -333,6 +543,78 @@ function openFamilyBrowser() {
   showFamilyBrowser.value = true
 }
 
+function openDataFileBrowser() {
+  showDataFileBrowser.value = true
+}
+
+async function handleLoadDataFile(dataFile: any) {
+  // Extract the data from the data file
+  const fileData = dataFile.data || {}
+  
+  console.log('Loading data file:', dataFile.name, fileData)
+  
+  // Check if data file has a template reference
+  const templateRef = fileData.document?.template_ref || dataFile.template_ref
+  
+  if (templateRef && templateRef.startsWith('local:')) {
+    console.log('Data file references template:', templateRef)
+    
+    // Try to load the template
+    try {
+      const ref = templateRef.substring(6) // Remove "local:"
+      let templateId: number | null = null
+      
+      // Check if it's family/variant format or direct ID
+      if (ref.includes('/')) {
+        // Family/variant format - need to resolve to ID
+        // For now, just log and let user load manually
+        console.log('Template family/variant format detected:', ref)
+        alert(`This data file references template: ${templateRef}\n\nPlease load the matching template from Browse Library or Template Families.`)
+      } else {
+        // Direct ID
+        templateId = parseInt(ref)
+        
+        if (!isNaN(templateId)) {
+          console.log('Loading template ID:', templateId)
+          const template = await store.loadTemplateFromLibrary(templateId.toString())
+          
+          if (template) {
+            console.log('Template loaded successfully:', template.name)
+            // Template is now in handlebarsTemplate and store
+            currentTemplate.value = {
+              id: template.id,
+              name: template.name,
+              description: template.description,
+              category: template.category,
+              is_public: template.is_public,
+              storage_type: 'local',
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to auto-load template:', e)
+      alert(`Could not auto-load template ${templateRef}. Please load it manually from Browse Library.`)
+    }
+  }
+  
+  // Send the FULL data structure to the backend
+  // The compile endpoint will extract the payload using extractDataPayload()
+  // just like the validation endpoint does
+  store.updateTemplateData(fileData)
+  
+  showDataFileBrowser.value = false
+  
+  console.log('Loaded full data structure (backend will extract payload):', fileData)
+  
+  // Trigger compilation if auto-compile is enabled
+  if (autoCompileEnabled.value && handlebarsTemplate.value) {
+    setTimeout(() => {
+      debouncedCompile()
+    }, 100)
+  }
+}
+
 async function handleLoadFromFamily(family: any, variant: string) {
   try {
     // Get the specific variant template
@@ -343,6 +625,17 @@ async function handleLoadFromFamily(family: any, variant: string) {
       handlebarsTemplate.value = template.handlebars_template
       templateData.value = template.sample_data || {}
       showFamilyBrowser.value = false
+
+      // Track loaded template for portable export
+      currentTemplate.value = {
+        id: template.id,
+        storage_type: template.storage_type || family.storage_type || 'local',
+        template_uri: template.template_uri,
+        family: {
+          slug: family.slug,
+          variant: variant
+        }
+      }
 
       // Trigger compilation
       if (autoCompileEnabled.value) {
@@ -357,12 +650,28 @@ async function handleLoadFromFamily(family: any, variant: string) {
   }
 }
 
+function openUpdateDialog() {
+  if (!currentTemplate.value?.id) return
+  
+  updateTemplateId.value = currentTemplate.value.id
+  updateTemplateName.value = currentTemplate.value.name || ''
+  updateTemplateDescription.value = currentTemplate.value.description || ''
+  updateTemplateCategory.value = currentTemplate.value.category || 'ballot'
+  updateTemplateIsPublic.value = currentTemplate.value.is_public ?? true
+  
+  showUpdateDialog.value = true
+}
+
 function handleKeyboardShortcut(e: KeyboardEvent) {
-  // Cmd/Ctrl + S: Save template
+  // Cmd/Ctrl + S: Save or Update template
   if ((e.metaKey || e.ctrlKey) && e.key === 's') {
     e.preventDefault()
     if (handlebarsTemplate.value && templateData.value) {
-      showSaveDialog.value = true
+      if (currentTemplate.value?.id) {
+        openUpdateDialog()
+      } else {
+        showSaveDialog.value = true
+      }
     }
   }
   
@@ -394,6 +703,7 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
     showUpdateDialog.value = false
     showLibraryDrawer.value = false
     showFamilyBrowser.value = false
+    showDataFileBrowser.value = false
     showShortcutsHelp.value = false
   }
   
@@ -417,9 +727,18 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
               <span class="ml-3 px-3 py-1 text-sm font-medium bg-purple-100 text-purple-700 rounded">
                 Advanced Mode
               </span>
+              <span v-if="currentTemplate?.name" class="ml-3 px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded">
+                📝 {{ currentTemplate.name }}
+              </span>
             </h1>
             <p class="text-gray-600">
-              Separate Handlebars template from data for reusable OMR documents
+              <template v-if="currentTemplate?.name">
+                Editing loaded template
+                <span v-if="currentTemplate.description" class="text-gray-500">• {{ currentTemplate.description }}</span>
+              </template>
+              <template v-else>
+                Separate Handlebars template from data for reusable OMR documents
+              </template>
             </p>
           </div>
 
@@ -455,6 +774,13 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
           class="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100"
         >
           👨‍👩‍👧‍👦 Template Families
+        </button>
+
+        <button
+          @click="openDataFileBrowser"
+          class="px-4 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100"
+        >
+          📁 Load Data File
         </button>
 
         <div class="relative">
@@ -507,11 +833,30 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
         </button>
 
         <button
+          v-if="!currentTemplate?.id"
           @click="showSaveDialog = true"
           :disabled="!handlebarsTemplate || !templateData"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
         >
-          Save Template
+          💾 Save as New
+        </button>
+        
+        <button
+          v-else
+          @click="openUpdateDialog"
+          :disabled="!handlebarsTemplate || !templateData"
+          class="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100 disabled:opacity-50"
+        >
+          ✏️ Update Template
+        </button>
+        
+        <button
+          v-if="currentTemplate?.id"
+          @click="showSaveDialog = true"
+          :disabled="!handlebarsTemplate || !templateData"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+        >
+          💾 Save as Copy
         </button>
 
         <div class="w-px h-8 bg-gray-300" />
@@ -553,12 +898,19 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
       <div class="grid grid-cols-12 gap-6" style="height: calc(100vh - 320px);">
         <!-- Left: Handlebars Template (25%) -->
         <div class="col-span-3 bg-white rounded-lg shadow-sm p-6 overflow-hidden">
-          <TemplatePane v-model="handlebarsTemplate" />
+          <TemplatePane 
+            v-model="handlebarsTemplate" 
+            :selected-template="currentTemplate"
+            @template-selected="handleTemplateSelection"
+          />
         </div>
 
         <!-- Middle: JSON Data (25%) -->
         <div class="col-span-3 bg-white rounded-lg shadow-sm p-6 overflow-hidden">
-          <DataPane v-model="templateData" />
+          <DataPane 
+            :model-value="templateData" 
+            @update:model-value="(data) => store.updateTemplateData(data)" 
+          />
         </div>
 
         <!-- Right: Preview (50%) -->
@@ -568,6 +920,8 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
             :pdf-url="pdfUrl"
             :loading="loading"
             :compilation-error="compilationError"
+            :current-template="currentTemplate"
+            :original-data="templateData"
           />
         </div>
       </div>
@@ -822,6 +1176,35 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
           >
             Update
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data File Browser Drawer -->
+    <div
+      v-if="showDataFileBrowser"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center"
+      @click.self="showDataFileBrowser = false"
+    >
+      <div
+        class="bg-white w-full h-[90vh] sm:max-w-4xl sm:rounded-lg shadow-xl overflow-hidden"
+      >
+        <div class="h-full p-6 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Load Data File</h2>
+            <button
+              @click="showDataFileBrowser = false"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <DataFileBrowser
+              @select="handleLoadDataFile"
+              @close="showDataFileBrowser = false"
+            />
+          </div>
         </div>
       </div>
     </div>

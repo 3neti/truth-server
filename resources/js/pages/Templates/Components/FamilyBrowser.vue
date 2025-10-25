@@ -112,6 +112,43 @@ async function handleDeleteFamily(family: TemplateFamily) {
   }
 }
 
+async function handleExportFamily(family: TemplateFamily) {
+  try {
+    const data = await store.exportTemplateFamily(family.id.toString())
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${family.slug}-family.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    alert('Failed to export family')
+  }
+}
+
+function handleImportClick() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json'
+  input.onchange = async (e: any) => {
+    const file = e.target?.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      
+      await store.importTemplateFamily(data)
+      await loadFamilies()
+      alert('Family imported successfully!')
+    } catch (error: any) {
+      alert('Failed to import family: ' + (error.message || 'Invalid file'))
+    }
+  }
+  input.click()
+}
+
 function handleViewDetails(family: TemplateFamily) {
   // For now, just show variant selector
   selectedFamily.value = family
@@ -129,14 +166,23 @@ onMounted(() => {
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-2xl font-bold text-gray-900">Template Families</h2>
-      <button
-        @click="emit('close')"
-        class="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
-      >
-        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          @click="handleImportClick"
+          class="px-3 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100"
+          title="Import family"
+        >
+          ⬆️ Import
+        </button>
+        <button
+          @click="emit('close')"
+          class="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+        >
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Search & Filters -->
@@ -206,6 +252,7 @@ onMounted(() => {
           @load="handleLoadFamily"
           @delete="handleDeleteFamily"
           @view-details="handleViewDetails"
+          @export="handleExportFamily"
         />
       </div>
     </div>

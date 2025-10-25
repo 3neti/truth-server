@@ -11,6 +11,9 @@ interface TemplateFamily {
   is_public: boolean
   variants_count: number
   layout_variants: string[]
+  storage_type?: string
+  repo_url?: string
+  repo_provider?: string
   created_at: string
   user?: {
     id: number
@@ -27,6 +30,7 @@ const emit = defineEmits<{
   load: [family: TemplateFamily]
   delete: [family: TemplateFamily]
   viewDetails: [family: TemplateFamily]
+  export: [family: TemplateFamily]
 }>()
 
 const categoryColor = computed(() => {
@@ -57,6 +61,28 @@ const formattedDate = computed(() => {
 const variantsList = computed(() => {
   return props.family.layout_variants.join(', ')
 })
+
+const storageTypeBadge = computed(() => {
+  const type = props.family.storage_type
+  if (!type || type === 'local') return null
+  
+  const badges: Record<string, { icon: string, color: string, label: string, tooltip: string }> = {
+    remote: {
+      icon: '☁️',
+      color: 'bg-sky-100 text-sky-700 border-sky-200',
+      label: 'Remote',
+      tooltip: `Remote templates from ${props.family.repo_provider || 'external source'}`
+    },
+    hybrid: {
+      icon: '🔗',
+      color: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      label: 'Hybrid',
+      tooltip: 'Mix of local and remote templates'
+    }
+  }
+  
+  return badges[type] || null
+})
 </script>
 
 <template>
@@ -69,12 +95,25 @@ const variantsList = computed(() => {
       <h3 class="text-lg font-semibold text-gray-900 flex-1 mr-2">
         {{ family.name }}
       </h3>
-      <span
-        :class="categoryColor"
-        class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap"
-      >
-        {{ family.category }}
-      </span>
+      <div class="flex gap-2">
+        <!-- Storage Type Badge -->
+        <span
+          v-if="storageTypeBadge"
+          :class="storageTypeBadge.color"
+          :title="storageTypeBadge.tooltip"
+          class="px-2 py-1 text-xs font-medium rounded border flex items-center gap-1 whitespace-nowrap"
+        >
+          <span>{{ storageTypeBadge.icon }}</span>
+          <span>{{ storageTypeBadge.label }}</span>
+        </span>
+        <!-- Category Badge -->
+        <span
+          :class="categoryColor"
+          class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap"
+        >
+          {{ family.category }}
+        </span>
+      </div>
     </div>
 
     <!-- Description -->
@@ -116,6 +155,13 @@ const variantsList = computed(() => {
         class="flex-1 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100"
       >
         Load
+      </button>
+      <button
+        @click="emit('export', family)"
+        class="px-3 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100"
+        title="Export family"
+      >
+        ⬇️
       </button>
       <button
         v-if="showDelete"
