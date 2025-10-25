@@ -1,0 +1,48 @@
+{
+  "name": "@lbhurtado/vue-data-editor",
+  "version": "1.0.0",
+  "description": "A Vue 3 component for editing JSON data with dual Form and JSON views",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "data-editor",
+    "json-editor",
+    "form",
+    "json",
+    "editor",
+    "component"
+  ],
+  "author": "rli",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "lucide-vue-next": "^0.468.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.0.4",
+    "vue-tsc": "^2.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lbhurtado/vue-data-editor"
+  },
+  "bugs": {
+    "url": "https://github.com/lbhurtado/vue-data-editor/issues"
+  },
+  "homepage": "https://github.com/lbhurtado/vue-data-editor#readme"
+}
