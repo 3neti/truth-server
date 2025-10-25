@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('repo_path')->nullable()->after('repo_provider'); // path within repo
         });
 
-        // OMR templates
-        Schema::table('omr_templates', function (Blueprint $table) {
+        // Templates
+        Schema::table('templates', function (Blueprint $table) {
             $table->enum('storage_type', ['local', 'remote'])->default('local')->after('family_id');
             $table->string('template_uri')->nullable()->after('storage_type'); // Full URI reference
             $table->json('remote_metadata')->nullable()->after('template_uri'); // Cache metadata
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->dropColumn(['storage_type', 'repo_provider', 'repo_path']);
         });
 
-        Schema::table('omr_templates', function (Blueprint $table) {
+        Schema::table('templates', function (Blueprint $table) {
             $table->dropColumn(['storage_type', 'template_uri', 'remote_metadata', 'cached_template', 'last_fetched_at']);
         });
     }

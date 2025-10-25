@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Models\TemplateInstance;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -301,7 +301,7 @@ class TemplateController extends Controller
      */
     public function listTemplates(Request $request): JsonResponse
     {
-        $query = OmrTemplate::query();
+        $query = Template::query();
 
         // Include family relationships if requested
         if ($request->has('with_families') && $request->input('with_families')) {
@@ -339,7 +339,7 @@ class TemplateController extends Controller
      */
     public function getTemplate(string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -377,7 +377,7 @@ class TemplateController extends Controller
         }
 
         try {
-            $template = OmrTemplate::create([
+            $template = Template::create([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
                 'category' => $request->input('category'),
@@ -409,7 +409,7 @@ class TemplateController extends Controller
      */
     public function updateTemplate(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -485,7 +485,7 @@ class TemplateController extends Controller
      */
     public function deleteTemplate(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -522,7 +522,7 @@ class TemplateController extends Controller
      */
     public function getVersionHistory(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -544,7 +544,7 @@ class TemplateController extends Controller
      */
     public function rollbackToVersion(Request $request, string $templateId, string $versionId): JsonResponse
     {
-        $template = OmrTemplate::find($templateId);
+        $template = Template::find($templateId);
 
         if (!$template) {
             return response()->json([
@@ -589,7 +589,7 @@ class TemplateController extends Controller
      */
     public function validateData(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -625,7 +625,7 @@ class TemplateController extends Controller
      */
     public function signTemplate(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([
@@ -664,7 +664,7 @@ class TemplateController extends Controller
      */
     public function verifyTemplate(Request $request, string $id): JsonResponse
     {
-        $template = OmrTemplate::find($id);
+        $template = Template::find($id);
 
         if (!$template) {
             return response()->json([

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Models\TemplateFamily;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -64,7 +64,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Single Column Variant
-        $template1 = OmrTemplate::create([
+        $template1 = Template::create([
             'name' => 'National Elections 2025 (Single Column)',
             'description' => 'Single column layout for narrow ballots',
             'category' => 'ballot',
@@ -80,7 +80,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Two Column Variant
-        OmrTemplate::create([
+        Template::create([
             'name' => 'National Elections 2025 (Two Column)',
             'description' => 'Two column layout for standard 8.5x11 paper',
             'category' => 'ballot',
@@ -96,7 +96,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Three Column Variant
-        OmrTemplate::create([
+        Template::create([
             'name' => 'National Elections 2025 (Three Column)',
             'description' => 'Three column layout for wide format ballots',
             'category' => 'ballot',
@@ -129,7 +129,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Standard Variant
-        OmrTemplate::create([
+        Template::create([
             'name' => 'Customer Survey 2025 (Standard)',
             'description' => 'Standard survey layout',
             'category' => 'survey',
@@ -145,7 +145,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Compact Variant
-        OmrTemplate::create([
+        Template::create([
             'name' => 'Customer Survey 2025 (Compact)',
             'description' => 'Space-saving compact layout',
             'category' => 'survey',
@@ -178,7 +178,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Remote template example (note: these won't work without actual GitHub repo)
-        OmrTemplate::create([
+        Template::create([
             'name' => 'COMELEC Ballot (Single Column)',
             'description' => 'Official single column ballot from COMELEC',
             'category' => 'ballot',
@@ -192,7 +192,7 @@ class SampleTemplatesSeeder extends Seeder
             'version' => '1.0.0',
         ]);
 
-        OmrTemplate::create([
+        Template::create([
             'name' => 'COMELEC Ballot (Two Column)',
             'description' => 'Official two column ballot from COMELEC',
             'category' => 'ballot',
@@ -223,7 +223,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Remote variant
-        OmrTemplate::create([
+        Template::create([
             'name' => 'Regional Ballot (Official)',
             'description' => 'Official template from central repository',
             'category' => 'ballot',
@@ -238,7 +238,7 @@ class SampleTemplatesSeeder extends Seeder
         ]);
 
         // Local custom variants
-        OmrTemplate::create([
+        Template::create([
             'name' => 'Regional Ballot (Custom Single)',
             'description' => 'Customized single column for special precincts',
             'category' => 'ballot',
@@ -252,7 +252,7 @@ class SampleTemplatesSeeder extends Seeder
             'version' => '1.0.0',
         ]);
 
-        OmrTemplate::create([
+        Template::create([
             'name' => 'Regional Ballot (High Density)',
             'description' => 'Custom high-density layout for urban areas',
             'category' => 'ballot',

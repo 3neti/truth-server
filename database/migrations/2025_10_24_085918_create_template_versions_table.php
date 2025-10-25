@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('template_versions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('template_id')->constrained('omr_templates')->onDelete('cascade');
+            $table->foreignId('template_id')->constrained('templates')->onDelete('cascade');
             $table->string('version'); // e.g., 1.0.0, 1.0.1, 1.1.0
             $table->longText('handlebars_template');
             $table->json('sample_data')->nullable();

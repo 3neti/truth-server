@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DataFile extends Model
+class TemplateData extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'template_data';
 
     protected $fillable = [
         'name',

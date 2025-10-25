@@ -16,7 +16,7 @@ Validate template data against a JSON schema before rendering to ensure data int
 
 ### Database Schema
 
-Added to `omr_templates` table:
+Added to `templates` table:
 ```php
 $table->json('json_schema')->nullable();
 ```
@@ -60,7 +60,7 @@ Templates can define a JSON schema following the JSON Schema specification:
 
 **`validateData(array $data): array`**
 ```php
-$template = OmrTemplate::find(1);
+$template = Template::find(1);
 $result = $template->validateData([
     'title' => 'Election 2025',
     'year' => 2025,
@@ -122,7 +122,7 @@ Generate cryptographic checksums to verify template integrity and detect unautho
 
 ### Database Schema
 
-Added to `omr_templates` table:
+Added to `templates` table:
 ```php
 $table->string('checksum_sha256', 64)->nullable();
 $table->timestamp('verified_at')->nullable();
@@ -242,7 +242,7 @@ CREATE TABLE template_partials (
 
 CREATE TABLE template_dependencies (
   id BIGINT PRIMARY KEY,
-  template_id BIGINT REFERENCES omr_templates(id),
+  template_id BIGINT REFERENCES templates(id),
   partial_id BIGINT REFERENCES template_partials(id),
   alias VARCHAR(255),
   created_at TIMESTAMP
@@ -306,7 +306,7 @@ php artisan test --filter=TemplateValidationSigningTest
 ### Adding Schema to Existing Template
 
 ```php
-$template = OmrTemplate::find(1);
+$template = Template::find(1);
 $template->json_schema = [
     'type' => 'object',
     'required' => ['title'],
@@ -351,7 +351,7 @@ if ($request->input('auto_sign')) {
 
 ```php
 // When loading template
-$template = OmrTemplate::find($id);
+$template = Template::find($id);
 
 if ($template->isSigned() && $template->isModified()) {
     // Warn user that template was modified

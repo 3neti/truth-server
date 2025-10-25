@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,7 +15,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'json_schema' => [
                 'type' => 'object',
@@ -38,7 +38,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'json_schema' => [
                 'type' => 'object',
@@ -63,7 +63,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'handlebars_template' => '<div>Test</div>',
         ]);
@@ -82,7 +82,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'handlebars_template' => '<div>Test</div>',
         ]);
@@ -100,7 +100,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'json_schema' => [
                 'type' => 'object',
@@ -127,7 +127,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'handlebars_template' => '<div>Test</div>',
         ]);
@@ -153,7 +153,7 @@ class TemplateValidationSigningTest extends TestCase
     {
         $user = User::factory()->create();
         
-        $template = OmrTemplate::factory()->create([
+        $template = Template::factory()->create([
             'user_id' => $user->id,
             'handlebars_template' => '<div>Test</div>',
         ]);

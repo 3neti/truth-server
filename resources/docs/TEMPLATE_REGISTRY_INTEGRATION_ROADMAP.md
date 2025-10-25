@@ -11,7 +11,7 @@
 | Component | Status | Location |
 |-----------|--------|----------|
 | **Template Library UI** | ✅ Implemented | `resources/js/pages/Templates/Components/TemplateLibrary.vue` |
-| **Template Storage** | ✅ Working | `OmrTemplate` model, `omr_templates` table |
+| **Template Storage** | ✅ Working | `Template` model, `templates` table |
 | **Template Instances** | ✅ Working | `TemplateInstance` model tracks rendered documents |
 | **Handlebars Compilation** | ✅ Working | Advanced Editor with data separation |
 | **Sample Templates** | ✅ Working | Philippine Elections, Barangay Elections |
@@ -52,7 +52,7 @@ Schema::create('template_families', function (Blueprint $table) {
 });
 ```
 
-**Update Migration**: Add to `omr_templates` table
+**Update Migration**: Add to `templates` table
 
 ```php
 $table->foreignId('family_id')->nullable()->constrained('template_families');
@@ -74,12 +74,12 @@ class TemplateFamily extends Model
     
     public function templates()
     {
-        return $this->hasMany(OmrTemplate::class, 'family_id');
+        return $this->hasMany(Template::class, 'family_id');
     }
     
     public function defaultTemplate()
     {
-        return $this->hasOne(OmrTemplate::class, 'family_id')
+        return $this->hasOne(Template::class, 'family_id')
             ->where('layout_variant', 'default');
     }
     
@@ -93,7 +93,7 @@ class TemplateFamily extends Model
 }
 ```
 
-**Update Model**: `app/Models/OmrTemplate.php`
+**Update Model**: `app/Models/Template.php`
 
 ```php
 public function family()
@@ -163,7 +163,7 @@ flowchart TD
 ```php
 Schema::create('template_versions', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('template_id')->constrained('omr_templates');
+    $table->foreignId('template_id')->constrained('templates');
     $table->string('version'); // 1.0.0, 1.0.1, etc.
     $table->longText('handlebars_template');
     $table->json('sample_data')->nullable();
@@ -259,7 +259,7 @@ https://github.com/lbhurtado/omr-template-registry
 ### 5.1 Template Validation
 
 **JSON Schema Support**:
-- Store schema in `omr_templates.schema`
+- Store schema in `templates.schema`
 - Validate data before rendering
 - Show validation errors in UI
 - Auto-generate sample data from schema
@@ -286,7 +286,7 @@ https://github.com/lbhurtado/omr-template-registry
 
 ### Sprint 1 (Foundation) - 2 weeks
 - ✅ Create `template_families` table
-- ✅ Add `family_id` to `omr_templates`
+- ✅ Add `family_id` to `templates`
 - ✅ Create `TemplateFamily` model
 - ✅ Seed existing templates into families
 - ✅ Basic family CRUD API
@@ -327,7 +327,7 @@ https://github.com/lbhurtado/omr-template-registry
 public function run()
 {
     // Group existing templates by category and name similarity
-    $templates = OmrTemplate::all();
+    $templates = Template::all();
     
     foreach ($templates as $template) {
         // Create family for each unique template

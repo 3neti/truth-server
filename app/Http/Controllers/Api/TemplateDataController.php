@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataFile;
+use App\Models\TemplateData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class DataFileController extends Controller
+class TemplateDataController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = DataFile::with('user')
+        $query = TemplateData::with('user')
             ->orderBy('created_at', 'desc');
 
         // Filter by template_ref if provided
@@ -65,7 +65,7 @@ class DataFileController extends Controller
 
         $validated['user_id'] = Auth::id();
 
-        $dataFile = DataFile::create($validated);
+        $dataFile = TemplateData::create($validated);
 
         return response()->json($dataFile->load('user'), 201);
     }
@@ -73,7 +73,7 @@ class DataFileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DataFile $dataFile)
+    public function show(TemplateData $dataFile)
     {
         // Check permissions
         if (!$dataFile->is_public && $dataFile->user_id !== Auth::id()) {
@@ -86,7 +86,7 @@ class DataFileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, DataFile $dataFile)
+    public function update(Request $request, TemplateData $dataFile)
     {
         // Check permissions
         if ($dataFile->user_id !== Auth::id()) {
@@ -110,7 +110,7 @@ class DataFileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(DataFile $dataFile)
+    public function destroy(TemplateData $dataFile)
     {
         // Check permissions
         if ($dataFile->user_id !== Auth::id()) {

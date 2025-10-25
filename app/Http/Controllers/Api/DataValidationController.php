@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataFile;
-use App\Models\OmrTemplate;
+use App\Models\TemplateData;
+use App\Models\Template;
 use App\Models\TemplateFamily;
 use Illuminate\Http\Request;
 use LightnCandy\LightnCandy;
@@ -14,7 +14,7 @@ class DataValidationController extends Controller
     /**
      * Validate a data file against its template reference.
      */
-    public function validateDataFile(Request $request, DataFile $dataFile)
+    public function validateDataFile(Request $request, TemplateData $dataFile)
     {
         // Extract template_ref from data JSON
         $data = $dataFile->data;
@@ -151,7 +151,7 @@ class DataValidationController extends Controller
                     return null;
                 }
                 
-                $template = OmrTemplate::where('family_id', $family->id)
+                $template = Template::where('family_id', $family->id)
                     ->where('layout_variant', $variant)
                     ->first();
                 
@@ -168,7 +168,7 @@ class DataValidationController extends Controller
             }
             
             // Direct ID reference
-            $template = OmrTemplate::find((int) $ref);
+            $template = Template::find((int) $ref);
             if (!$template) {
                 return null;
             }

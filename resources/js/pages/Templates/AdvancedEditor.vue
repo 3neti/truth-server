@@ -8,7 +8,7 @@ import DataPane from './Components/DataPaneNew.vue'
 import PreviewPane from './Components/PreviewPane.vue'
 import TemplateLibrary from './Components/TemplateLibrary.vue'
 import FamilyBrowser from './Components/FamilyBrowser.vue'
-import DataFileBrowser from '@/components/DataFileBrowser.vue'
+import TemplateDataBrowser from '@/components/TemplateDataBrowser.vue'
 
 const store = useTemplatesStore()
 const {
@@ -26,7 +26,7 @@ const showSaveDialog = ref(false)
 const showUpdateDialog = ref(false)
 const showLibraryDrawer = ref(false)
 const showFamilyBrowser = ref(false)
-const showDataFileBrowser = ref(false)
+const showTemplateDataBrowser = ref(false)
 const showShortcutsHelp = ref(false)
 const showSampleMenu = ref(false)
 const libraryKey = ref(0)
@@ -543,8 +543,8 @@ function openFamilyBrowser() {
   showFamilyBrowser.value = true
 }
 
-function openDataFileBrowser() {
-  showDataFileBrowser.value = true
+function openTemplateDataBrowser() {
+  showTemplateDataBrowser.value = true
 }
 
 async function handleLoadDataFile(dataFile: any) {
@@ -603,7 +603,7 @@ async function handleLoadDataFile(dataFile: any) {
   // just like the validation endpoint does
   store.updateTemplateData(fileData)
   
-  showDataFileBrowser.value = false
+  showTemplateDataBrowser.value = false
   
   console.log('Loaded full data structure (backend will extract payload):', fileData)
   
@@ -703,7 +703,7 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
     showUpdateDialog.value = false
     showLibraryDrawer.value = false
     showFamilyBrowser.value = false
-    showDataFileBrowser.value = false
+    showTemplateDataBrowser.value = false
     showShortcutsHelp.value = false
   }
   
@@ -777,7 +777,7 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
         </button>
 
         <button
-          @click="openDataFileBrowser"
+          @click="openTemplateDataBrowser"
           class="px-4 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100"
         >
           📁 Load Data File
@@ -1182,9 +1182,9 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
 
     <!-- Data File Browser Drawer -->
     <div
-      v-if="showDataFileBrowser"
+      v-if="showTemplateDataBrowser"
       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center"
-      @click.self="showDataFileBrowser = false"
+      @click.self="showTemplateDataBrowser = false"
     >
       <div
         class="bg-white w-full h-[90vh] sm:max-w-4xl sm:rounded-lg shadow-xl overflow-hidden"
@@ -1193,16 +1193,16 @@ function handleKeyboardShortcut(e: KeyboardEvent) {
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold">Load Data File</h2>
             <button
-              @click="showDataFileBrowser = false"
+              @click="showTemplateDataBrowser = false"
               class="text-gray-400 hover:text-gray-600"
             >
               ✕
             </button>
           </div>
           <div class="flex-1 overflow-hidden">
-            <DataFileBrowser
+            <TemplateDataBrowser
               @select="handleLoadDataFile"
-              @close="showDataFileBrowser = false"
+              @close="showTemplateDataBrowser = false"
             />
           </div>
         </div>

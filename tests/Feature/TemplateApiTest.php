@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -46,12 +46,12 @@ test('compile endpoint validates required fields', function () {
 
 test('can list public templates', function () {
     // Create some templates
-    OmrTemplate::factory()->create([
+    Template::factory()->create([
         'name' => 'Public Template',
         'is_public' => true,
     ]);
 
-    OmrTemplate::factory()->create([
+    Template::factory()->create([
         'name' => 'Private Template',
         'is_public' => false,
     ]);
@@ -66,7 +66,7 @@ test('can list public templates', function () {
 });
 
 test('can get specific template by id', function () {
-    $template = OmrTemplate::factory()->create([
+    $template = Template::factory()->create([
         'name' => 'Test Template',
         'category' => 'ballot',
     ]);
@@ -130,12 +130,12 @@ test('save template validates required fields', function () {
 });
 
 test('can filter templates by category', function () {
-    OmrTemplate::factory()->create([
+    Template::factory()->create([
         'category' => 'ballot',
         'is_public' => true,
     ]);
 
-    OmrTemplate::factory()->create([
+    Template::factory()->create([
         'category' => 'survey',
         'is_public' => true,
     ]);

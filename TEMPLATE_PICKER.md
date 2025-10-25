@@ -134,7 +134,7 @@ Click "Manual input" to expand the text field for:
 
 ## Integration Points
 
-### DataFileEditor.vue
+### TemplateDataEditor.vue
 
 **Before**:
 ```vue
@@ -291,7 +291,7 @@ The picker generates standardized template references:
 - [ ] Responsive on mobile
 
 ### Integration
-- [ ] Works in DataFileEditor save dialog
+- [ ] Works in TemplateDataEditor save dialog
 - [ ] template_ref syncs with data JSON
 - [ ] Validation uses correct template
 - [ ] Template families display correctly
@@ -314,7 +314,7 @@ The picker generates standardized template references:
 - `resources/js/components/TemplatePicker.vue` - Main picker component
 
 ### Modified Files
-- `resources/js/pages/DataFileEditor.vue` - Integration point
+- `resources/js/pages/TemplateDataEditor.vue` - Integration point
 - `app/Http/Controllers/TemplateController.php` - API enhancement
   - Added `with_families` parameter
   - Added search functionality

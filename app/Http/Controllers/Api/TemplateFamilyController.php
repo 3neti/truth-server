@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Template;
 use App\Models\TemplateFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -247,7 +248,7 @@ class TemplateFamilyController extends Controller
 
             // Create variant templates
             foreach ($data['variants'] as $variantData) {
-                OmrTemplate::create([
+                Template::create([
                     'name' => $variantData['name'],
                     'description' => $variantData['description'],
                     'category' => $familyData['category'],

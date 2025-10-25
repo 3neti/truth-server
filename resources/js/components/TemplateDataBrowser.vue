@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useDataFilesStore, type DataFile } from '@/stores/dataFiles'
+import { useTemplateDataStore, type TemplateData } from '@/stores/templateData'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, FileText, Trash2, Eye } from 'lucide-vue-next'
 
 const emit = defineEmits<{
-  'select': [dataFile: DataFile]
+  'select': [dataFile: TemplateData]
   'close': []
 }>()
 
-const store = useDataFilesStore()
+const store = useTemplateDataStore()
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 
 onMounted(() => {
-  store.fetchDataFiles()
+  store.fetchTemplateDatas()
 })
 
 const filteredDataFiles = computed(() => {
-  let files = store.dataFiles
+  let files = store.templateData
 
   // Filter by category
   if (selectedCategory.value !== 'all') {
@@ -40,15 +40,15 @@ const filteredDataFiles = computed(() => {
 })
 
 const categories = computed(() => {
-  const cats = new Set(store.dataFiles.map(df => df.category))
+  const cats = new Set(store.templateData.map(df => df.category))
   return ['all', ...Array.from(cats)]
 })
 
-function selectDataFile(dataFile: DataFile) {
+function selectDataFile(dataFile: TemplateData) {
   emit('select', dataFile)
 }
 
-async function deleteDataFile(dataFile: DataFile, event: Event) {
+async function deleteDataFile(dataFile: TemplateData, event: Event) {
   event.stopPropagation()
   
   if (!confirm(`Delete "${dataFile.name}"?`)) {
@@ -56,7 +56,7 @@ async function deleteDataFile(dataFile: DataFile, event: Event) {
   }
 
   try {
-    await store.deleteDataFile(dataFile.id)
+    await store.deleteTemplateData(dataFile.id)
   } catch (e) {
     alert('Failed to delete data file')
   }

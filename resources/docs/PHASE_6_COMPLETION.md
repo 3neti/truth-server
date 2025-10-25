@@ -16,7 +16,7 @@ Phase 6 implements remote template storage and references, enabling portable dat
 ### Phase 6A: Template References ✅
 
 **Database Schema**:
-- `storage_type` enum (local, remote, hybrid) in both template_families and omr_templates
+- `storage_type` enum (local, remote, hybrid) in both template_families and templates
 - `template_uri` for storing template references
 - `remote_metadata` for caching provider metadata
 - `cached_template` for storing fetched template content
@@ -307,7 +307,7 @@ Content-Type: application/json
 
 ### Model Methods
 
-**OmrTemplate**:
+**Template**:
 ```php
 $template->isRemote()                    // Check if remote
 $template->isCacheStale()                // Check cache age
@@ -361,7 +361,7 @@ $content = $resolver->resolve('https://example.com/template.hbs');
 
 **4. Test Caching**:
 ```php
-$template = OmrTemplate::where('storage_type', 'remote')->first();
+$template = Template::where('storage_type', 'remote')->first();
 $template->getTemplateContent();  // Fetches and caches
 $template->last_fetched_at;       // Should be recent
 $template->cached_template;       // Should have content
@@ -398,7 +398,7 @@ curl -X POST http://truth.test/api/templates/compile-standalone \
 - `app/Services/Templates/Providers/GitHubTemplateProvider.php`
 - `app/Services/Templates/Providers/HttpTemplateProvider.php`
 - `app/Services/Templates/Providers/LocalTemplateProvider.php`
-- `app/Models/OmrTemplate.php` (remote support methods)
+- `app/Models/Template.php` (remote support methods)
 - `app/Models/TemplateFamily.php` (storage type methods)
 - `app/Http/Controllers/TemplateController.php` (compileStandalone)
 - `routes/api.php` (compile-standalone route)

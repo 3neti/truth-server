@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class OmrTemplate extends Model
+class Template extends Model
 {
     use HasFactory;
+
+    protected $table = 'templates';
 
     protected $fillable = [
         'name',

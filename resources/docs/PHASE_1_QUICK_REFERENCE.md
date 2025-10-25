@@ -17,14 +17,14 @@ packages/omr-template/src/Services/
 ### Models
 ```
 app/Models/
-├── OmrTemplate.php                 # Template storage model
+├── Template.php                 # Template storage model
 └── TemplateInstance.php            # Compiled instance model
 ```
 
 ### Migrations
 ```
 database/migrations/
-├── 2025_10_23_150641_create_omr_templates_table.php
+├── 2025_10_23_150641_create_templates_table.php
 └── 2025_10_23_150647_create_template_instances_table.php
 ```
 
@@ -42,7 +42,7 @@ routes/
 tests/
 ├── Unit/HandlebarsCompilerTest.php     # 7 unit tests
 ├── Feature/TemplateApiTest.php         # 8 feature tests
-└── database/factories/OmrTemplateFactory.php
+└── database/factories/TemplateFactory.php
 ```
 
 ### Sample Templates
@@ -126,9 +126,9 @@ $spec = $compiler->compileWithHelpers($template, $data);
 
 ## 🗄️ Database Schema
 
-### omr_templates
+### templates
 ```php
-OmrTemplate::create([
+Template::create([
     'name' => 'General Election Ballot',
     'description' => 'Standard ballot template',
     'category' => 'ballot',
@@ -142,13 +142,13 @@ OmrTemplate::create([
 ### Query Examples
 ```php
 // Get all public templates
-$templates = OmrTemplate::public()->get();
+$templates = Template::public()->get();
 
 // Get ballot templates
-$ballots = OmrTemplate::category('ballot')->get();
+$ballots = Template::category('ballot')->get();
 
 // Get user's accessible templates
-$templates = OmrTemplate::accessibleBy(auth()->id())->get();
+$templates = Template::accessibleBy(auth()->id())->get();
 ```
 
 ---

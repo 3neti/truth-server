@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from '@/lib/axios'
 
-export interface DataFile {
+export interface TemplateData {
   id: number
   name: string
   description: string | null
@@ -20,14 +20,14 @@ export interface DataFile {
   }
 }
 
-export const useDataFilesStore = defineStore('dataFiles', () => {
-  const dataFiles = ref<DataFile[]>([])
-  const currentDataFile = ref<DataFile | null>(null)
+export const useTemplateDataStore = defineStore('templateData', () => {
+  const templateData = ref<TemplateData[]>([])
+  const currentTemplateData = ref<TemplateData | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
   // Fetch all data files with optional filters
-  async function fetchDataFiles(filters?: {
+  async function fetchTemplateDatas(filters?: {
     template_ref?: string
     category?: string
     search?: string
@@ -35,8 +35,8 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.get('/api/data-files', { params: filters })
-      dataFiles.value = response.data
+      const response = await axios.get('/api/template-data', { params: filters })
+      templateData.value = response.data
       return response.data
     } catch (e: any) {
       error.value = e.response?.data?.message || 'Failed to fetch data files'
@@ -47,12 +47,12 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
   }
 
   // Fetch a single data file
-  async function fetchDataFile(id: number) {
+  async function fetchTemplateData(id: number) {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.get(`/api/data-files/${id}`)
-      currentDataFile.value = response.data
+      const response = await axios.get(`/api/template-data/${id}`)
+      currentTemplateData.value = response.data
       return response.data
     } catch (e: any) {
       error.value = e.response?.data?.message || 'Failed to fetch data file'
@@ -63,7 +63,7 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
   }
 
   // Create a new data file
-  async function createDataFile(data: {
+  async function createTemplateData(data: {
     name: string
     description?: string
     template_ref?: string
@@ -74,11 +74,11 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.post('/api/data-files', data)
-      const newDataFile = response.data
-      dataFiles.value.unshift(newDataFile)
-      currentDataFile.value = newDataFile
-      return newDataFile
+      const response = await axios.post('/api/template-data', data)
+      const newTemplateData = response.data
+      templateData.value.unshift(newTemplateData)
+      currentTemplateData.value = newTemplateData
+      return newTemplateData
     } catch (e: any) {
       error.value = e.response?.data?.message || 'Failed to create data file'
       throw e
@@ -88,7 +88,7 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
   }
 
   // Update an existing data file
-  async function updateDataFile(id: number, data: Partial<{
+  async function updateTemplateData(id: number, data: Partial<{
     name: string
     description: string
     template_ref: string
@@ -99,21 +99,21 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.put(`/api/data-files/${id}`, data)
-      const updatedDataFile = response.data
+      const response = await axios.put(`/api/template-data/${id}`, data)
+      const updatedTemplateData = response.data
       
       // Update in list
-      const index = dataFiles.value.findIndex(df => df.id === id)
+      const index = templateData.value.findIndex(df => df.id === id)
       if (index !== -1) {
-        dataFiles.value[index] = updatedDataFile
+        templateData.value[index] = updatedTemplateData
       }
       
       // Update current if it's the same
-      if (currentDataFile.value?.id === id) {
-        currentDataFile.value = updatedDataFile
+      if (currentTemplateData.value?.id === id) {
+        currentTemplateData.value = updatedTemplateData
       }
       
-      return updatedDataFile
+      return updatedTemplateData
     } catch (e: any) {
       error.value = e.response?.data?.message || 'Failed to update data file'
       throw e
@@ -123,18 +123,18 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
   }
 
   // Delete a data file
-  async function deleteDataFile(id: number) {
+  async function deleteTemplateData(id: number) {
     loading.value = true
     error.value = null
     try {
-      await axios.delete(`/api/data-files/${id}`)
+      await axios.delete(`/api/template-data/${id}`)
       
       // Remove from list
-      dataFiles.value = dataFiles.value.filter(df => df.id !== id)
+      templateData.value = templateData.value.filter(df => df.id !== id)
       
       // Clear current if it's the same
-      if (currentDataFile.value?.id === id) {
-        currentDataFile.value = null
+      if (currentTemplateData.value?.id === id) {
+        currentTemplateData.value = null
       }
     } catch (e: any) {
       error.value = e.response?.data?.message || 'Failed to delete data file'
@@ -146,27 +146,27 @@ export const useDataFilesStore = defineStore('dataFiles', () => {
 
   // Clear current data file
   function clearCurrent() {
-    currentDataFile.value = null
+    currentTemplateData.value = null
   }
 
   // Set current data file (for editing)
-  function setCurrent(dataFile: DataFile) {
-    currentDataFile.value = dataFile
+  function setCurrent(dataFile: TemplateData) {
+    currentTemplateData.value = dataFile
   }
 
   return {
     // State
-    dataFiles,
-    currentDataFile,
+    templateData,
+    currentTemplateData,
     loading,
     error,
     
     // Actions
-    fetchDataFiles,
-    fetchDataFile,
-    createDataFile,
-    updateDataFile,
-    deleteDataFile,
+    fetchTemplateDatas,
+    fetchTemplateData,
+    createTemplateData,
+    updateTemplateData,
+    deleteTemplateData,
     clearCurrent,
     setCurrent,
   }

@@ -315,7 +315,7 @@ POST /api/templates/library/1/rollback/2
 To increment major or minor version:
 
 ```php
-$template = OmrTemplate::find(1);
+$template = Template::find(1);
 $template->incrementVersion('minor'); // 1.0.2 → 1.1.0
 $template->save();
 
@@ -711,7 +711,7 @@ curl -X POST http://truth.test/api/templates/compile-standalone \
 
 **Cache status**:
 ```php
-$template = OmrTemplate::find(1);
+$template = Template::find(1);
 
 echo $template->last_fetched_at;  // When last fetched
 echo $template->isCacheStale();   // true/false

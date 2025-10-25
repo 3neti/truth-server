@@ -54,7 +54,7 @@ The `HandlebarsCompiler` is registered as a singleton and can be dependency-inje
 
 **Created Tables**:
 
-#### `omr_templates` Table
+#### `templates` Table
 ```sql
 - id (primary key)
 - name (string)
@@ -72,7 +72,7 @@ The `HandlebarsCompiler` is registered as a singleton and can be dependency-inje
 #### `template_instances` Table
 ```sql
 - id (primary key)
-- template_id (foreign key to omr_templates)
+- template_id (foreign key to templates)
 - document_id (string, unique)
 - data (json)
 - compiled_spec (json)
@@ -86,7 +86,7 @@ The `HandlebarsCompiler` is registered as a singleton and can be dependency-inje
 
 **Created Models**:
 
-#### `App\Models\OmrTemplate`
+#### `App\Models\Template`
 - Relationships: `user()`, `instances()`
 - Scopes: `public()`, `category($category)`, `accessibleBy($userId)`
 - Casts: `sample_data`, `schema`, `is_public`
@@ -148,9 +148,9 @@ Tests:
 
 ### 9. ✅ Model Factory
 
-**File**: `database/factories/OmrTemplateFactory.php`
+**File**: `database/factories/TemplateFactory.php`
 
-Factory for generating test data for `OmrTemplate` model with realistic fake data.
+Factory for generating test data for `Template` model with realistic fake data.
 
 ### 10. ✅ Sample Templates
 

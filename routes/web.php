@@ -28,7 +28,7 @@ Route::get('/data-editor-demo', function () {
 })->name('data-editor.demo');
 
 Route::get('/data/editor', function () {
-    return Inertia::render('DataFileEditor');
+    return Inertia::render('TemplateDataEditor');
 })->name('data.editor');
 
 require __DIR__.'/settings.php';

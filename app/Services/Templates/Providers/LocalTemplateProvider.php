@@ -2,7 +2,7 @@
 
 namespace App\Services\Templates\Providers;
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Services\Templates\Contracts\TemplateProviderInterface;
 
 class LocalTemplateProvider implements TemplateProviderInterface
@@ -14,7 +14,7 @@ class LocalTemplateProvider implements TemplateProviderInterface
         
         if (isset($parts['id'])) {
             // Fetch by ID
-            $template = OmrTemplate::find($parts['id']);
+            $template = Template::find($parts['id']);
             if (!$template) {
                 throw new \Exception("Template with ID {$parts['id']} not found");
             }
@@ -23,7 +23,7 @@ class LocalTemplateProvider implements TemplateProviderInterface
         
         if (isset($parts['family'], $parts['variant'])) {
             // Fetch by family/variant
-            $template = OmrTemplate::whereHas('family', function ($q) use ($parts) {
+            $template = Template::whereHas('family', function ($q) use ($parts) {
                 $q->where('slug', $parts['family']);
             })
             ->where('layout_variant', $parts['variant'])

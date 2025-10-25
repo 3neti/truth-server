@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('omr_templates', function (Blueprint $table) {
+        Schema::table('templates', function (Blueprint $table) {
             $table->longText('handlebars_template')->nullable()->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('omr_templates', function (Blueprint $table) {
+        Schema::table('templates', function (Blueprint $table) {
             $table->longText('handlebars_template')->nullable(false)->change();
         });
     }

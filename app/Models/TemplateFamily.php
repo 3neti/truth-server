@@ -42,7 +42,7 @@ class TemplateFamily extends Model
      */
     public function templates(): HasMany
     {
-        return $this->hasMany(OmrTemplate::class, 'family_id');
+        return $this->hasMany(Template::class, 'family_id');
     }
 
     /**

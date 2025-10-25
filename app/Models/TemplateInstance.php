@@ -29,7 +29,7 @@ class TemplateInstance extends Model
      */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(OmrTemplate::class);
+        return $this->belongsTo(Template::class);
     }
 
     /**

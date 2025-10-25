@@ -406,7 +406,7 @@ The `TemplateResolver` service handles all URI formats:
 
 Templates are automatically cached:
 - **TTL**: 24 hours
-- **Storage**: `cached_template` column in `omr_templates` table
+- **Storage**: `cached_template` column in `templates` table
 - **Refresh**: Automatic if stale, or manual force refresh
 - **Fallback**: Use stale cache if network fails
 

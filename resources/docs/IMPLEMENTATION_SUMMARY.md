@@ -27,9 +27,9 @@ Successfully implemented a comprehensive **Template Registry & Composition Syste
 
 **Completed:**
 - ✅ `template_families` table migration
-- ✅ Added `family_id` and `layout_variant` to `omr_templates`
+- ✅ Added `family_id` and `layout_variant` to `templates`
 - ✅ `TemplateFamily` model with relationships
-- ✅ Updated `OmrTemplate` model with family support
+- ✅ Updated `Template` model with family support
 - ✅ `TemplateFamilyController` with full CRUD
 - ✅ API routes for family management
 - ✅ Seeder to convert existing templates into families
@@ -42,9 +42,9 @@ Successfully implemented a comprehensive **Template Registry & Composition Syste
 
 **Files Created/Modified:**
 - `database/migrations/*_create_template_families_table.php`
-- `database/migrations/*_add_family_fields_to_omr_templates.php`
+- `database/migrations/*_add_family_fields_to_templates.php`
 - `app/Models/TemplateFamily.php`
-- `app/Models/OmrTemplate.php` (updated)
+- `app/Models/Template.php` (updated)
 - `app/Http/Controllers/Api/TemplateFamilyController.php`
 - `routes/api.php` (family routes)
 - `database/seeders/ConvertTemplatesToFamiliesSeeder.php`
@@ -87,7 +87,7 @@ Successfully implemented a comprehensive **Template Registry & Composition Syste
 **Completed:**
 - ✅ `template_versions` table migration
 - ✅ `TemplateVersion` model
-- ✅ Version tracking methods in `OmrTemplate`
+- ✅ Version tracking methods in `Template`
 - ✅ Automatic version creation on save
 - ✅ Version history API endpoints
 - ✅ Rollback functionality
@@ -103,7 +103,7 @@ Successfully implemented a comprehensive **Template Registry & Composition Syste
 **Files Created/Modified:**
 - `database/migrations/*_create_template_versions_table.php`
 - `app/Models/TemplateVersion.php`
-- `app/Models/OmrTemplate.php` (versioning methods)
+- `app/Models/Template.php` (versioning methods)
 - `app/Http/Controllers/TemplateController.php` (version endpoints)
 - `routes/api.php` (version routes)
 
@@ -199,8 +199,8 @@ Successfully implemented a comprehensive **Template Registry & Composition Syste
   - `GET /api/templates/library/{id}/verify`
 
 **Files Created/Modified:**
-- `database/migrations/*_add_schema_and_signature_to_omr_templates.php`
-- `app/Models/OmrTemplate.php` (validation/signing methods)
+- `database/migrations/*_add_schema_and_signature_to_templates.php`
+- `app/Models/Template.php` (validation/signing methods)
 - `app/Http/Controllers/TemplateController.php` (validation/signing endpoints)
 - `routes/api.php` (validation/signing routes)
 - `tests/Feature/TemplateValidationSigningTest.php`
@@ -231,7 +231,7 @@ template_families
 ├─ created_by
 └─ timestamps
 
-omr_templates
+templates
 ├─ id
 ├─ name
 ├─ category
@@ -411,7 +411,7 @@ importTemplateFamily(data)
 
 **Database Tables:**
 - template_families (new)
-- omr_templates (7 new fields)
+- templates (7 new fields)
 - template_versions (new)
 
 **API Endpoints:**

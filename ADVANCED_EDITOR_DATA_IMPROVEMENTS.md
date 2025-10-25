@@ -37,12 +37,12 @@ watch(() => props.modelValue, (newVal) => {
 
 **📁 Load Data File Button**
 - Added green button in toolbar: "📁 Load Data File"
-- Opens a drawer with the `DataFileBrowser` component
+- Opens a drawer with the `TemplateDataBrowser` component
 - Allows browsing and selecting data files from the database
 
 **Handler Function**:
 ```typescript
-function handleLoadDataFile(dataFile: any) {
+function handleLoadTemplateData(dataFile: any) {
   // Extract the data from the data file
   const data = dataFile.data || {}
   
@@ -53,7 +53,7 @@ function handleLoadDataFile(dataFile: any) {
     templateData.value = data
   }
   
-  showDataFileBrowser.value = false
+  showTemplateDataBrowser.value = false
   
   // Trigger compilation if auto-compile is enabled
   if (autoCompileEnabled.value) {
@@ -131,10 +131,10 @@ function handleLoadDataFile(dataFile: any) {
 
 ### 2. Advanced Editor
 - `resources/js/pages/Templates/AdvancedEditor.vue`
-  - Imported `DataFileBrowser` component
-  - Added `showDataFileBrowser` state
-  - Added `openDataFileBrowser()` function
-  - Added `handleLoadDataFile()` function
+  - Imported `TemplateDataBrowser` component
+  - Added `showTemplateDataBrowser` state
+  - Added `openTemplateDataBrowser()` function
+  - Added `handleLoadTemplateData()` function
   - Added "📁 Load Data File" button in toolbar
   - Added Data File Browser drawer in template
   - Updated ESC key handler
@@ -152,7 +152,7 @@ function handleLoadDataFile(dataFile: any) {
 
 ### For Developers
 - ✅ Reactive DataEditor component
-- ✅ Reusable DataFileBrowser integration
+- ✅ Reusable TemplateDataBrowser integration
 - ✅ Consistent data loading patterns
 - ✅ Better debugging (console logs)
 

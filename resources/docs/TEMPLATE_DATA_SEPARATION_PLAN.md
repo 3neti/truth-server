@@ -246,8 +246,8 @@ public function getTemplate(string $id): JsonResponse
 ### 5. Database Schema
 
 ```php
-// New migration: create_omr_templates_table
-Schema::create('omr_templates', function (Blueprint $table) {
+// New migration: create_templates_table
+Schema::create('templates', function (Blueprint $table) {
     $table->id();
     $table->string('name');
     $table->text('description')->nullable();
@@ -263,7 +263,7 @@ Schema::create('omr_templates', function (Blueprint $table) {
 // New migration: create_template_instances_table
 Schema::create('template_instances', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('template_id')->constrained('omr_templates')->onDelete('cascade');
+    $table->foreignId('template_id')->constrained('templates')->onDelete('cascade');
     $table->string('document_id')->unique();
     $table->json('data');
     $table->json('compiled_spec');

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\DataFile;
-use App\Models\OmrTemplate;
+use App\Models\TemplateData;
+use App\Models\Template;
 use App\Models\TemplateFamily;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -27,7 +27,7 @@ class TemplateDataSeeder extends Seeder
         );
         
         // Delete existing test data created by this seeder
-        DataFile::where('user_id', $user->id)
+        TemplateData::where('user_id', $user->id)
             ->whereIn('name', [
                 'Precinct 001-A Election Data',
                 'Precinct 002-B Election Data',
@@ -38,10 +38,10 @@ class TemplateDataSeeder extends Seeder
         
         $ballotFamily = TemplateFamily::where('slug', 'ballot-2025')->first();
         if ($ballotFamily) {
-            OmrTemplate::where('family_id', $ballotFamily->id)->delete();
+            Template::where('family_id', $ballotFamily->id)->delete();
         }
         
-        OmrTemplate::where('user_id', $user->id)
+        Template::where('user_id', $user->id)
             ->where('name', 'Customer Satisfaction Survey')
             ->delete();
         
@@ -63,7 +63,7 @@ class TemplateDataSeeder extends Seeder
         );
 
         // 2. Create Template Variants in the Family
-        $verticalTemplate = OmrTemplate::create([
+        $verticalTemplate = Template::create([
             'name' => 'Vertical Ballot',
             'description' => 'Single column vertical ballot layout',
             'category' => 'ballot',
@@ -76,7 +76,7 @@ class TemplateDataSeeder extends Seeder
             'storage_type' => 'local',
         ]);
 
-        $horizontalTemplate = OmrTemplate::create([
+        $horizontalTemplate = Template::create([
             'name' => 'Horizontal Ballot',
             'description' => 'Two column horizontal ballot layout',
             'category' => 'ballot',
@@ -92,7 +92,7 @@ class TemplateDataSeeder extends Seeder
         // 3. Create Data Files referencing these templates
         
         // Data file 1: References vertical template (embedded in JSON)
-        DataFile::create([
+        TemplateData::create([
             'name' => 'Precinct 001-A Election Data',
             'description' => 'Election data for Precinct 001-A using vertical ballot',
             'template_ref' => 'local:ballot-2025/vertical', // Also synced to column for indexing
@@ -133,7 +133,7 @@ class TemplateDataSeeder extends Seeder
         ]);
 
         // Data file 2: References horizontal template (embedded in JSON)
-        DataFile::create([
+        TemplateData::create([
             'name' => 'Precinct 002-B Election Data',
             'description' => 'Election data for Precinct 002-B using horizontal ballot',
             'template_ref' => 'local:ballot-2025/horizontal', // Also synced to column
@@ -164,7 +164,7 @@ class TemplateDataSeeder extends Seeder
         ]);
 
         // 4. Create standalone template (not in a family)
-        $surveyTemplate = OmrTemplate::create([
+        $surveyTemplate = Template::create([
             'name' => 'Customer Satisfaction Survey',
             'description' => 'Generic customer satisfaction survey template',
             'category' => 'survey',
@@ -176,7 +176,7 @@ class TemplateDataSeeder extends Seeder
         ]);
 
         // Data file 3: References standalone template by ID (embedded in JSON)
-        DataFile::create([
+        TemplateData::create([
             'name' => 'Q4 2024 Customer Survey Data',
             'description' => 'Customer feedback collected in Q4 2024',
             'template_ref' => "local:{$surveyTemplate->id}", // Also synced to column
@@ -208,7 +208,7 @@ class TemplateDataSeeder extends Seeder
         ]);
 
         // 5. Create a data file WITHOUT template reference (standalone data)
-        DataFile::create([
+        TemplateData::create([
             'name' => 'General Configuration Data',
             'description' => 'Miscellaneous configuration settings',
             'template_ref' => null, // No template

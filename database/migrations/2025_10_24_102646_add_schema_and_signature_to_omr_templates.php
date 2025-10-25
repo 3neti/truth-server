@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('omr_templates', function (Blueprint $table) {
+        Schema::table('templates', function (Blueprint $table) {
             $table->json('json_schema')->nullable()->after('schema');
             $table->string('checksum_sha256', 64)->nullable()->after('version');
             $table->timestamp('verified_at')->nullable()->after('checksum_sha256');
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('omr_templates', function (Blueprint $table) {
+        Schema::table('templates', function (Blueprint $table) {
             $table->dropForeign(['verified_by']);
             $table->dropColumn(['json_schema', 'checksum_sha256', 'verified_at', 'verified_by']);
         });

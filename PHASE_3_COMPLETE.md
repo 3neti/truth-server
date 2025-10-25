@@ -68,7 +68,7 @@ The Truth OMR System now has **complete CRUD operations** for both templates and
 | Operation | Status | How |
 |-----------|--------|-----|
 | **New** | ✅ | "New" button |
-| **Open** | ✅ | "Open" button → DataFileBrowser |
+| **Open** | ✅ | "Open" button → TemplateDataBrowser |
 | **Edit** | ✅ | Form view (guided) + JSON view (raw) |
 | **Save** | ✅ | "Save" button → Updates DB + syncs template_ref |
 | **Delete** | ✅ | Delete button in browser |
@@ -108,14 +108,14 @@ The Truth OMR System now has **complete CRUD operations** for both templates and
 
 ### Data Storage
 
-**Database** (`data_files` table):
+**Database** (`template_data` table):
 ```
 id, name, description, template_ref (indexed), 
 data (JSON), category, is_public, user_id, 
 created_at, updated_at, deleted_at
 ```
 
-**Model** (`App\Models\DataFile`):
+**Model** (`App\Models\TemplateData`):
 - Syncs `template_ref` between column and `data.document.template_ref`
 - Array casting for `data` field
 - Soft deletes
@@ -146,13 +146,13 @@ created_at, updated_at, deleted_at
 - `@lbhurtado/vue-tally-marks` - Tally marks component (existing)
 
 **Pages**:
-- `/data/editor` - DataFileEditor
+- `/data/editor` - TemplateDataEditor
 - `/templates/advanced` - AdvancedEditor (Handlebars)
 - `/templates/editor` - Simple Editor (JSON)
 
 **Components**:
 - `DataEditor` - Form/JSON dual-mode editor
-- `DataFileBrowser` - Browse/search/filter data files
+- `TemplateDataBrowser` - Browse/search/filter data files
 - `TemplateLibrary` - Browse/search templates
 - `FamilyBrowser` - Browse template families
 
@@ -275,15 +275,15 @@ Full implementation of GitHub/HTTP template fetching with caching.
 ## Files Changed/Created
 
 ### Backend
-- `app/Models/DataFile.php` - Added boot() hook for template_ref syncing
-- `app/Http/Controllers/Api/DataFileController.php` - CRUD operations
+- `app/Models/TemplateData.php` - Added boot() hook for template_ref syncing
+- `app/Http/Controllers/Api/TemplateDataController.php` - CRUD operations
 - `app/Http/Controllers/Api/DataValidationController.php` - Validation logic
 - `routes/api.php` - Added data-files and validation routes
 - `database/seeders/TemplateDataSeeder.php` - Sample data with admin user
 
 ### Frontend
-- `resources/js/pages/DataFileEditor.vue` - Complete data editor UI
-- `resources/js/components/DataFileBrowser.vue` - Browse/search component
+- `resources/js/pages/TemplateDataEditor.vue` - Complete data editor UI
+- `resources/js/components/TemplateDataBrowser.vue` - Browse/search component
 - `resources/js/stores/dataFiles.ts` - Pinia store with CSRF-configured axios
 - `packages/vue-data-editor/` - Standalone DataEditor package (height fixes)
 

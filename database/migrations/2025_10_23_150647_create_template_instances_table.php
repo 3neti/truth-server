@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('template_instances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('template_id')->constrained('omr_templates')->onDelete('cascade');
+            $table->foreignId('template_id')->constrained('templates')->onDelete('cascade');
             $table->string('document_id')->unique();
             $table->json('data');
             $table->json('compiled_spec');

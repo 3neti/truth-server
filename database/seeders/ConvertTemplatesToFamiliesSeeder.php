@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\OmrTemplate;
+use App\Models\Template;
 use App\Models\TemplateFamily;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -17,7 +17,7 @@ class ConvertTemplatesToFamiliesSeeder extends Seeder
         $this->command->info('Converting existing templates to template families...');
 
         // Group templates by name to detect variants
-        $templates = OmrTemplate::all()->groupBy(function ($template) {
+        $templates = Template::all()->groupBy(function ($template) {
             // Extract base name (remove variant indicators)
             $name = $template->name;
             $name = preg_replace('/\s*\((ballot|mapping|reference|portrait|landscape)\)$/i', '', $name);

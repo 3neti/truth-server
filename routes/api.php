@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\DataFileController;
+use App\Http\Controllers\Api\TemplateDataController;
 use App\Http\Controllers\Api\TemplateFamilyController;
 use App\Http\Controllers\TemplateController;
 use Illuminate\Support\Facades\Route;
@@ -53,13 +53,13 @@ Route::prefix('template-families')->name('template-families.')->group(function (
     Route::post('/import', [TemplateFamilyController::class, 'import'])->name('import');
 });
 
-// Data Files API
-Route::prefix('data-files')->name('data-files.')->group(function () {
-    Route::get('/', [DataFileController::class, 'index'])->name('index');
-    Route::post('/', [DataFileController::class, 'store'])->name('store');
-    Route::get('/{dataFile}', [DataFileController::class, 'show'])->name('show');
-    Route::put('/{dataFile}', [DataFileController::class, 'update'])->name('update');
-    Route::delete('/{dataFile}', [DataFileController::class, 'destroy'])->name('destroy');
+// Template Data API
+Route::prefix('template-data')->name('template-data.')->group(function () {
+    Route::get('/', [TemplateDataController::class, 'index'])->name('index');
+    Route::post('/', [TemplateDataController::class, 'store'])->name('store');
+    Route::get('/{dataFile}', [TemplateDataController::class, 'show'])->name('show');
+    Route::put('/{dataFile}', [TemplateDataController::class, 'update'])->name('update');
+    Route::delete('/{dataFile}', [TemplateDataController::class, 'destroy'])->name('destroy');
     
     // Validation
     Route::post('/{dataFile}/validate', [\App\Http\Controllers\Api\DataValidationController::class, 'validateDataFile'])->name('validate');

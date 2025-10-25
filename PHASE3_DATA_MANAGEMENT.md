@@ -8,17 +8,17 @@ We've successfully built a complete **Data File Management System** that allows 
 
 ### 🗄️ Backend (Laravel)
 
-1. **Database Table**: `data_files`
+1. **Database Table**: `template_data`
    - Fields: `name`, `description`, `template_ref`, `data` (JSON), `user_id`, `is_public`, `category`
    - Soft deletes, indexes on key fields
    - User ownership and permissions
 
-2. **Model**: `App\Models\DataFile`
+2. **Model**: `App\Models\TemplateData`
    - JSON casting for data field
    - User relationship
    - Formatted date attribute
 
-3. **Controller**: `App\Http\Controllers\Api\DataFileController`
+3. **Controller**: `App\Http\Controllers\Api\TemplateDataController`
    - `index()` - List with filters (template_ref, category, search)
    - `store()` - Create new data file
    - `show()` - Get single data file
@@ -38,7 +38,7 @@ We've successfully built a complete **Data File Management System** that allows 
    - Loading and error states
    - Current file tracking
 
-2. **DataFileEditor Page**: `/data/editor`
+2. **TemplateDataEditor Page**: `/data/editor`
    - **New/Open/Save workflow**
    - **DataEditor component** integration (uses our vue-data-editor package!)
    - Form and JSON view modes
@@ -46,7 +46,7 @@ We've successfully built a complete **Data File Management System** that allows 
    - URL-based file loading (?id=123)
    - Unsaved changes warning
 
-3. **DataFileBrowser Component**
+3. **TemplateDataBrowser Component**
    - Browse saved data files
    - Search by name, description, or template
    - Filter by category
@@ -84,15 +84,15 @@ We've successfully built a complete **Data File Management System** that allows 
 
 ```
 Backend:
-├── app/Models/DataFile.php
-├── app/Http/Controllers/Api/DataFileController.php
-├── database/migrations/2025_10_25_095901_create_data_files_table.php
+├── app/Models/TemplateData.php
+├── app/Http/Controllers/Api/TemplateDataController.php
+├── database/migrations/2025_10_25_095901_create_template_data_table.php
 └── routes/api.php (data-files routes)
 
 Frontend:
 ├── resources/js/stores/dataFiles.ts
-├── resources/js/pages/DataFileEditor.vue
-├── resources/js/components/DataFileBrowser.vue
+├── resources/js/pages/TemplateDataEditor.vue
+├── resources/js/components/TemplateDataBrowser.vue
 └── routes/web.php (/data/editor route)
 ```
 
@@ -189,7 +189,7 @@ Delete data file (owner only)
 
 ### With DataEditor Package
 
-The `DataFileEditor` page uses our **@lbhurtado/vue-data-editor** package:
+The `TemplateDataEditor` page uses our **@lbhurtado/vue-data-editor** package:
 
 ```vue
 <DataEditor :model-value="dataObject" @update:model-value="handleDataChange" />

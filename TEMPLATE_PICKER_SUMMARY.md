@@ -21,7 +21,7 @@ A searchable template picker component that replaces manual text input for templ
 - `TEMPLATE_PICKER.md` - Full documentation
 
 ### Modified
-- `resources/js/pages/DataFileEditor.vue` - Integrated picker in save dialog
+- `resources/js/pages/TemplateDataEditor.vue` - Integrated picker in save dialog
 - `app/Http/Controllers/TemplateController.php` - Enhanced API with `with_families` and `search` params
 
 ## How It Works

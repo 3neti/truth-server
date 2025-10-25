@@ -141,7 +141,7 @@ Import automatically appended `-imported` to avoid conflict with existing family
    - Testing via cURL requires cookie-based auth
    - UI handles this automatically
 
-2. **Nullable Parameter Warnings**: Deprecation warnings in `OmrTemplate::createVersion()`
+2. **Nullable Parameter Warnings**: Deprecation warnings in `Template::createVersion()`
    - Does not affect functionality
    - Should be fixed with explicit nullable types
 
@@ -174,7 +174,7 @@ Import automatically appended `-imported` to avoid conflict with existing family
 
 Phase 4 complete. Possible future enhancements:
 
-1. **Fix Deprecation Warnings**: Update `OmrTemplate::createVersion()` with explicit nullable types
+1. **Fix Deprecation Warnings**: Update `Template::createVersion()` with explicit nullable types
 2. **Batch Import/Export**: Support multiple families at once
 3. **Template Marketplace**: Browse and install from central repository
 4. **Validation**: JSON schema validation on import

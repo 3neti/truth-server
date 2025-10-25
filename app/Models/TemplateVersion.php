@@ -28,7 +28,7 @@ class TemplateVersion extends Model
      */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(OmrTemplate::class, 'template_id');
+        return $this->belongsTo(Template::class, 'template_id');
     }
 
     /**

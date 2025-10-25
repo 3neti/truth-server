@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useDataFilesStore } from '@/stores/dataFiles'
+import { useTemplateDataStore } from '@/stores/templateData'
 import { DataEditor } from '@lbhurtado/vue-data-editor'
-import DataFileBrowser from '@/components/DataFileBrowser.vue'
+import TemplateDataBrowser from '@/components/TemplateDataBrowser.vue'
 import TemplatePicker from '@/components/TemplatePicker.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { Save, FolderOpen, FileText, FilePlus } from 'lucide-vue-next'
 
-const store = useDataFilesStore()
+const store = useTemplateDataStore()
 
 // Editor state
 const dataObject = ref<Record<string, any>>({})
@@ -46,7 +46,7 @@ onMounted(() => {
   const dataFileId = urlParams.get('id')
   
   if (dataFileId) {
-    loadDataFile(parseInt(dataFileId))
+    loadTemplateData(parseInt(dataFileId))
   } else {
     resetEditor()
   }
@@ -65,9 +65,9 @@ function handleDataChange(newData: Record<string, any>) {
   isModified.value = true
 }
 
-async function loadDataFile(id: number) {
+async function loadTemplateData(id: number) {
   try {
-    const dataFile = await store.fetchDataFile(id)
+    const dataFile = await store.fetchTemplateData(id)
     console.log('Loading data file:', dataFile)
     dataObject.value = { ...dataFile.data }
     currentFileName.value = dataFile.name
@@ -85,14 +85,14 @@ async function loadDataFile(id: number) {
 }
 
 function openSaveDialog() {
-  if (store.currentDataFile) {
+  if (store.currentTemplateData) {
     // Editing existing file
     saveForm.value = {
-      name: store.currentDataFile.name,
-      description: store.currentDataFile.description || '',
-      template_ref: store.currentDataFile.template_ref || '',
-      category: store.currentDataFile.category,
-      is_public: store.currentDataFile.is_public,
+      name: store.currentTemplateData.name,
+      description: store.currentTemplateData.description || '',
+      template_ref: store.currentTemplateData.template_ref || '',
+      category: store.currentTemplateData.category,
+      is_public: store.currentTemplateData.is_public,
     }
   } else {
     // New file
@@ -107,23 +107,23 @@ function openSaveDialog() {
   showSaveDialog.value = true
 }
 
-async function saveDataFile() {
+async function saveTemplateData() {
   if (!saveForm.value.name) {
     alert('Please enter a name')
     return
   }
 
   try {
-    if (store.currentDataFile) {
+    if (store.currentTemplateData) {
       // Update existing
-      await store.updateDataFile(store.currentDataFile.id, {
+      await store.updateTemplateData(store.currentTemplateData.id, {
         ...saveForm.value,
         data: dataObject.value,
       })
       currentFileName.value = saveForm.value.name
     } else {
       // Create new
-      const newFile = await store.createDataFile({
+      const newFile = await store.createTemplateData({
         ...saveForm.value,
         data: dataObject.value,
       })
@@ -147,8 +147,8 @@ function openBrowser() {
   showBrowserDrawer.value = true
 }
 
-function handleSelectDataFile(dataFile: any) {
-  loadDataFile(dataFile.id)
+function handleSelectTemplateData(dataFile: any) {
+  loadTemplateData(dataFile.id)
   showBrowserDrawer.value = false
 }
 
@@ -173,13 +173,13 @@ const pageTitle = computed(() => {
 })
 
 async function validateData() {
-  if (!store.currentDataFile) return
+  if (!store.currentTemplateData) return
   
   validating.value = true
   validationResult.value = null
   
   try {
-    const response = await fetch(`/api/data-files/${store.currentDataFile.id}/validate`, {
+    const response = await fetch(`/api/template-data/${store.currentTemplateData.id}/validate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ async function validateData() {
             Save
           </Button>
           <Button 
-            v-if="store.currentDataFile" 
+            v-if="store.currentTemplateData" 
             variant="outline" 
             @click="validateData"
             :disabled="validating"
@@ -264,29 +264,29 @@ async function validateData() {
       </div>
 
       <!-- Metadata Panel (when file is loaded) -->
-      <div v-if="store.currentDataFile" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+      <div v-if="store.currentTemplateData" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <h3 class="text-sm font-semibold text-blue-900 mb-2">File Metadata</h3>
             <div class="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span class="text-gray-600">Category:</span>
-                <span class="ml-2 font-medium text-gray-900">{{ store.currentDataFile.category }}</span>
+                <span class="ml-2 font-medium text-gray-900">{{ store.currentTemplateData.category }}</span>
               </div>
               <div>
                 <span class="text-gray-600">Visibility:</span>
-                <span class="ml-2 font-medium text-gray-900">{{ store.currentDataFile.is_public ? 'Public' : 'Private' }}</span>
+                <span class="ml-2 font-medium text-gray-900">{{ store.currentTemplateData.is_public ? 'Public' : 'Private' }}</span>
               </div>
               <div class="col-span-2">
                 <span class="text-gray-600">Template Reference:</span>
-                <span v-if="store.currentDataFile.template_ref" class="ml-2 font-mono text-sm bg-white px-2 py-1 rounded border border-blue-300 text-blue-900">
-                  {{ store.currentDataFile.template_ref }}
+                <span v-if="store.currentTemplateData.template_ref" class="ml-2 font-mono text-sm bg-white px-2 py-1 rounded border border-blue-300 text-blue-900">
+                  {{ store.currentTemplateData.template_ref }}
                 </span>
                 <span v-else class="ml-2 text-gray-400 italic">None</span>
               </div>
-              <div v-if="store.currentDataFile.description" class="col-span-2">
+              <div v-if="store.currentTemplateData.description" class="col-span-2">
                 <span class="text-gray-600">Description:</span>
-                <p class="mt-1 text-gray-900">{{ store.currentDataFile.description }}</p>
+                <p class="mt-1 text-gray-900">{{ store.currentTemplateData.description }}</p>
               </div>
             </div>
           </div>
@@ -313,10 +313,10 @@ async function validateData() {
       <DialogContent class="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {{ store.currentDataFile ? 'Update' : 'Save' }} Data File
+            {{ store.currentTemplateData ? 'Update' : 'Save' }} Data File
           </DialogTitle>
           <DialogDescription>
-            {{ store.currentDataFile ? 'Update the details of this data file' : 'Save this data as a new file' }}
+            {{ store.currentTemplateData ? 'Update the details of this data file' : 'Save this data as a new file' }}
           </DialogDescription>
         </DialogHeader>
 
@@ -377,8 +377,8 @@ async function validateData() {
           <Button variant="outline" @click="showSaveDialog = false">
             Cancel
           </Button>
-          <Button @click="saveDataFile">
-            {{ store.currentDataFile ? 'Update' : 'Save' }}
+          <Button @click="saveTemplateData">
+            {{ store.currentTemplateData ? 'Update' : 'Save' }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -391,8 +391,8 @@ async function validateData() {
           <DialogTitle>Open Data File</DialogTitle>
         </DialogHeader>
         <div class="flex-1 overflow-hidden">
-          <DataFileBrowser
-            @select="handleSelectDataFile"
+          <TemplateDataBrowser
+            @select="handleSelectTemplateData"
             @close="showBrowserDrawer = false"
           />
         </div>
