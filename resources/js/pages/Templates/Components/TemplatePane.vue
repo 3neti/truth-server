@@ -100,7 +100,7 @@ onMounted(async () => {
 async function loadTemplates() {
   loadingTemplates.value = true
   try {
-    const response = await axios.get('/api/templates/library')
+    const response = await axios.get('/api/truth-templates/templates')
     templates.value = response.data.templates || []
   } catch (e) {
     console.error('Failed to load templates:', e)

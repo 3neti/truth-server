@@ -9,7 +9,17 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
+|
+| Note: Truth Templates API routes are now unified under /api/truth-templates
+| See routes/truth-templates.php for the canonical definitions.
+| The routes below are legacy aliases for backwards compatibility.
+|
 */
+
+// ===========================================================================
+// LEGACY API ROUTES (Deprecated)
+// These routes redirect to the new unified /api/truth-templates endpoints
+// ===========================================================================
 
 Route::prefix('templates')->name('templates.')->group(function () {
     // Existing routes

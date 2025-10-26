@@ -437,7 +437,7 @@ function handleTemplateSelection(template: any) {
 function switchToSimpleMode() {
   if (confirm('Switch to simple mode? Your current template will be saved.')) {
     store.setMode('simple')
-    window.location.href = '/templates/editor'
+    window.location.href = '/truth-templates/editor'
   }
 }
 

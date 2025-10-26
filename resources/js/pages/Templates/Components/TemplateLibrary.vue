@@ -141,7 +141,7 @@ async function handleDelete(template: Template) {
   }
 
   try {
-    await axios.delete(`/api/templates/library/${template.id}`)
+    await axios.delete(`/api/truth-templates/templates/${template.id}`)
     
     // Reload templates
     await loadTemplates()

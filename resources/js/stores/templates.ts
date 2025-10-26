@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from '@/lib/axios'
+import axios from 'axios'
 
 export interface DocumentSpec {
   title: string
@@ -71,7 +71,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/templates/render', {
+      const response = await axios.post('/api/truth-templates/render', {
         spec: spec.value,
       })
 
@@ -95,7 +95,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     validationErrors.value = null
 
     try {
-      const response = await axios.post('/api/templates/validate', {
+      const response = await axios.post('/api/truth-templates/validate', {
         spec: spec.value,
       })
 
@@ -116,7 +116,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.get('/api/templates/samples')
+      const response = await axios.get('/api/truth-templates/samples')
       const sample = response.data.samples.find((s: any) => s.name === sampleName)
 
       if (sample) {
@@ -131,7 +131,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function getSamples() {
     try {
-      const response = await axios.get('/api/templates/samples')
+      const response = await axios.get('/api/truth-templates/samples')
       return response.data.samples
     } catch (err: any) {
       error.value = err.message || 'Failed to get samples'
@@ -141,7 +141,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function getLayouts() {
     try {
-      const response = await axios.get('/api/templates/layouts')
+      const response = await axios.get('/api/truth-templates/layouts')
       return response.data.layouts
     } catch (err: any) {
       error.value = err.message || 'Failed to get layouts'
@@ -209,7 +209,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     compilationError.value = null
 
     try {
-      const response = await axios.post('/api/templates/compile', {
+      const response = await axios.post('/api/truth-templates/compile', {
         template: handlebarsTemplate.value,
         data: templateData.value,
       })
@@ -231,7 +231,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/templates/library', {
+      const response = await axios.post('/api/truth-templates/templates', {
         name,
         description,
         category,
@@ -256,7 +256,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.put(`/api/templates/library/${id}`, {
+      const response = await axios.put(`/api/truth-templates/templates/${id}`, {
         name,
         description,
         category,
@@ -281,7 +281,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.get(`/api/templates/library/${id}`)
+      const response = await axios.get(`/api/truth-templates/templates/${id}`)
 
       if (response.data.success) {
         const template = response.data.template
@@ -299,9 +299,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function getTemplateLibrary(category?: string) {
     try {
-      const url = category
-        ? `/api/templates/library?category=${category}`
-        : '/api/templates/library'
+      const url = category ? `/api/truth-templates/templates?category=${category}` : '/api/truth-templates/templates'
       const response = await axios.get(url)
       return response.data.templates || []
     } catch (err: any) {
@@ -317,7 +315,7 @@ export const useTemplatesStore = defineStore('templates', () => {
       if (params?.category) queryParams.append('category', params.category)
       if (params?.search) queryParams.append('search', params.search)
       
-      const url = `/api/template-families${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `/api/truth-templates/families${queryParams.toString() ? '?' + queryParams.toString() : ''}`
       const response = await axios.get(url)
       return response.data || []
     } catch (err: any) {
@@ -328,7 +326,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function getTemplateFamily(id: string) {
     try {
-      const response = await axios.get(`/api/template-families/${id}`)
+      const response = await axios.get(`/api/truth-templates/families/${id}`)
       return response.data
     } catch (err: any) {
       error.value = err.message || 'Failed to get template family'
@@ -338,7 +336,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function getFamilyVariants(id: string) {
     try {
-      const response = await axios.get(`/api/template-families/${id}/variants`)
+      const response = await axios.get(`/api/truth-templates/families/${id}/templates`)
       return response.data
     } catch (err: any) {
       error.value = err.message || 'Failed to get family variants'
@@ -358,7 +356,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/template-families', data)
+      const response = await axios.post('/api/truth-templates/families', data)
       return response.data
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Failed to create family'
@@ -373,7 +371,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      await axios.delete(`/api/template-families/${id}`)
+      await axios.delete(`/api/truth-templates/families/${id}`)
       return true
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Failed to delete family'
@@ -385,7 +383,7 @@ export const useTemplatesStore = defineStore('templates', () => {
 
   async function exportTemplateFamily(id: string) {
     try {
-      const response = await axios.get(`/api/template-families/${id}/export`)
+      const response = await axios.get(`/api/truth-templates/families/${id}/export`)
       return response.data
     } catch (err: any) {
       error.value = err.message || 'Failed to export family'
@@ -398,7 +396,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/template-families/import', { family_data: familyData })
+      const response = await axios.post('/api/truth-templates/families/import', { family_data: familyData })
       return response.data
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Failed to import family'
