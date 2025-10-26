@@ -17,7 +17,13 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    resolve: (name) => {
+        // If name already starts with a module path, use it directly
+        const path = name.startsWith('TruthTemplatesUi/') || name.startsWith('TruthElectionUi/') || name.startsWith('TruthQrUi/') 
+            ? `./${name}.vue` 
+            : `./pages/${name}.vue`
+        return resolvePageComponent(path, import.meta.glob<DefineComponent>(['./pages/**/*.vue', './TruthTemplatesUi/**/*.vue', './TruthElectionUi/**/*.vue', './TruthQrUi/**/*.vue']))
+    },
     setup({ el, App, props, plugin }) {
         const pinia = createPinia();
         

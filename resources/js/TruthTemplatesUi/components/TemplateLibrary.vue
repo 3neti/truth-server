@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useTemplatesStore } from '@/stores/templates'
+import { useTemplatesStore } from '@/TruthTemplatesUi/stores/templates'
 import TemplateCard from './TemplateCard.vue'
 import axios from '@/lib/axios'
 

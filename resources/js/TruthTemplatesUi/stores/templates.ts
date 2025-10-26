@@ -1,34 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
-
-export interface DocumentSpec {
-  title: string
-  unique_id: string
-  layout?: string
-  locale?: string
-}
-
-export interface ChoiceSpec {
-  code: string
-  label: string
-}
-
-export interface SectionSpec {
-  type: string
-  code: string
-  title: string
-  layout?: string
-  maxSelections?: number
-  question?: string
-  scale?: number[]
-  choices?: ChoiceSpec[]
-}
-
-export interface TemplateSpec {
-  document: DocumentSpec
-  sections: SectionSpec[]
-}
+import type { DocumentSpec, ChoiceSpec, SectionSpec, TemplateSpec } from '../types/templates'
 
 export const useTemplatesStore = defineStore('templates', () => {
   // State - Simple Mode

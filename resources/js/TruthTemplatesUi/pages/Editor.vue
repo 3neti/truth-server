@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { useTemplatesStore } from '@/stores/templates'
+import { useTemplatesStore } from '@/TruthTemplatesUi/stores/templates'
 import { storeToRefs } from 'pinia'
 
 const store = useTemplatesStore()

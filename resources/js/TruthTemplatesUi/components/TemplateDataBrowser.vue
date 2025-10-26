@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useTemplateDataStore, type TemplateData } from '@/stores/templateData'
+import { useTemplateDataStore, type TemplateData } from '@/TruthTemplatesUi/stores/templateData'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, FileText, Trash2, Eye } from 'lucide-vue-next'

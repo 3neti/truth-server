@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useTemplateDataStore } from '@/stores/templateData'
+import { useTemplateDataStore } from '@/TruthTemplatesUi/stores/templateData'
 import { DataEditor } from '@lbhurtado/vue-data-editor'
-import TemplateDataBrowser from '@/components/TemplateDataBrowser.vue'
-import TemplatePicker from '@/components/TemplatePicker.vue'
+import TemplateDataBrowser from '@/TruthTemplatesUi/components/TemplateDataBrowser.vue'
+import TemplatePicker from '@/TruthTemplatesUi/components/TemplatePicker.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

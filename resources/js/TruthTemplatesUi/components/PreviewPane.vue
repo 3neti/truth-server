@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { TemplateSpec } from '@/stores/templates'
+import type { TemplateSpec } from '@/TruthTemplatesUi/stores/templates'
 
 const props = defineProps<{
   mergedSpec: TemplateSpec | null

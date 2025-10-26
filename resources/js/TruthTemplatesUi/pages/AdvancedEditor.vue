@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useTemplatesStore } from '@/stores/templates'
+import { useTemplatesStore } from '@/TruthTemplatesUi/stores/templates'
 import { storeToRefs } from 'pinia'
 import { useDebounceFn } from '@vueuse/core'
-import TemplatePane from './Components/TemplatePane.vue'
-import DataPane from './Components/DataPaneNew.vue'
-import PreviewPane from './Components/PreviewPane.vue'
-import TemplateLibrary from './Components/TemplateLibrary.vue'
-import FamilyBrowser from './Components/FamilyBrowser.vue'
-import TemplateDataBrowser from '@/components/TemplateDataBrowser.vue'
+import TemplatePane from '@/TruthTemplatesUi/components/TemplatePane.vue'
+import DataPane from '@/TruthTemplatesUi/components/DataPaneNew.vue'
+import PreviewPane from '@/TruthTemplatesUi/components/PreviewPane.vue'
+import TemplateLibrary from '@/TruthTemplatesUi/components/TemplateLibrary.vue'
+import FamilyBrowser from '@/TruthTemplatesUi/components/FamilyBrowser.vue'
+import TemplateDataBrowser from '@/TruthTemplatesUi/components/TemplateDataBrowser.vue'
 
 const store = useTemplatesStore()
 const {

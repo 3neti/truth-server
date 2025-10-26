@@ -41,7 +41,15 @@
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
         @routes
-        @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
+        @php
+            $component = $page['component'];
+            $componentPath = str_starts_with($component, 'TruthTemplatesUi/') || 
+                            str_starts_with($component, 'TruthElectionUi/') || 
+                            str_starts_with($component, 'TruthQrUi/') 
+                ? "resources/js/{$component}.vue" 
+                : "resources/js/pages/{$component}.vue";
+        @endphp
+        @vite(['resources/js/app.ts', $componentPath])
         @inertiaHead
     </head>
     <body class="font-sans antialiased">

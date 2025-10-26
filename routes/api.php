@@ -77,3 +77,8 @@ Route::prefix('template-data')->name('template-data.')->group(function () {
 
 // Data Validation API
 Route::post('/data/validate', [\App\Http\Controllers\Api\DataValidationController::class, 'validateData'])->name('data.validate');
+
+// ===========================================================================
+// Truth Templates API Routes
+// ===========================================================================
+require __DIR__.'/truth-templates_api.php';

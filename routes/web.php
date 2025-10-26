@@ -3,6 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Favicon fallback
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('favicon.ico'));
+});
+
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
@@ -39,5 +44,6 @@ Route::get('/data/editor', function () {
     return redirect()->route('truth-templates.data.editor');
 })->name('data.editor');
 
+require __DIR__.'/truth-templates_web.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
