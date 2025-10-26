@@ -16,10 +16,13 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('category'); // ballot, survey, test, questionnaire
+            $table->string('category'); // election, survey, test, etc.
             $table->string('repo_url')->nullable();
             $table->string('version')->default('1.0.0');
             $table->boolean('is_public')->default(true);
+            $table->enum('storage_type', ['local', 'remote', 'hybrid'])->default('local');
+            $table->string('repo_provider')->nullable(); // github, gitlab, http
+            $table->string('repo_path')->nullable(); // path within repo
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
             
