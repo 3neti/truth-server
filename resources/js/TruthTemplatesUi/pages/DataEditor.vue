@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useTemplateDataStore } from '@/TruthTemplatesUi/stores/templateData'
+import { useTemplatesStore } from '@/TruthTemplatesUi/stores/templates'
+import { storeToRefs } from 'pinia'
+import { useDebounceFn } from '@vueuse/core'
 import { DataEditor } from '@lbhurtado/vue-data-editor'
 import TemplateDataBrowser from '@/TruthTemplatesUi/components/TemplateDataBrowser.vue'
 import TemplatePicker from '@/TruthTemplatesUi/components/TemplatePicker.vue'
+import PreviewPane from '@/TruthTemplatesUi/components/PreviewPane.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,19 +19,24 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Save, FolderOpen, FileText, FilePlus } from 'lucide-vue-next'
+import { Save, FolderOpen, FileText, FilePlus, Eye, FileDown } from 'lucide-vue-next'
 
 const store = useTemplateDataStore()
+const templatesStore = useTemplatesStore()
+const { mergedSpec, pdfUrl, loading, error: compileError } = storeToRefs(templatesStore)
 
 // Editor state
 const dataObject = ref<Record<string, any>>({})
 const currentFileName = ref('')
 const isModified = ref(false)
 const editorKey = ref(0) // Force DataEditor re-render
+const loadedTemplate = ref<any>(null)
+const autoCompileEnabled = ref(true)
 
 // UI state
 const showSaveDialog = ref(false)
 const showBrowserDrawer = ref(false)
+const showPreview = ref(false)
 const validating = ref(false)
 const validationResult = ref<any>(null)
 
@@ -65,6 +74,24 @@ function handleDataChange(newData: Record<string, any>) {
   isModified.value = true
 }
 
+// Auto-compile with debounce
+const debouncedCompile = useDebounceFn(async () => {
+  if (autoCompileEnabled.value && loadedTemplate.value && dataObject.value && Object.keys(dataObject.value).length > 0) {
+    try {
+      await handleCompile()
+    } catch (e) {
+      console.error('Auto-compilation failed:', e)
+    }
+  }
+}, 1000)
+
+// Watch for data changes and auto-compile
+watch(dataObject, () => {
+  if (autoCompileEnabled.value && showPreview.value) {
+    debouncedCompile()
+  }
+}, { deep: true })
+
 async function loadTemplateData(id: number) {
   try {
     const dataFile = await store.fetchTemplateData(id)
@@ -73,6 +100,9 @@ async function loadTemplateData(id: number) {
     currentFileName.value = dataFile.name
     isModified.value = false
     editorKey.value++ // Force re-render
+    
+    // Load associated template if template_ref exists
+    await loadTemplateFromRef(dataFile.template_ref)
     
     // Update URL
     const url = new URL(window.location.href)
@@ -222,6 +252,109 @@ async function validateData() {
     validating.value = false
   }
 }
+
+async function loadTemplateFromRef(templateRef: string | null | undefined) {
+  if (!templateRef) {
+    console.log('No template reference')
+    loadedTemplate.value = null
+    return
+  }
+  
+  if (!templateRef.startsWith('local:')) {
+    console.warn('Only local templates supported for now')
+    return
+  }
+  
+  try {
+    const ref = templateRef.substring(6) // Remove "local:"
+    
+    // Check if it's family/variant format or direct ID
+    if (ref.includes('/')) {
+      const [familySlug, variant] = ref.split('/')
+      console.log('Loading template from family:', familySlug, 'variant:', variant)
+      
+      const families = await templatesStore.getTemplateFamilies()
+      const family = families.find((f: any) => f.slug === familySlug)
+      
+      if (family) {
+        const variantData = await templatesStore.getFamilyVariants(family.id.toString())
+        const template = variantData.variants.find((v: any) => v.layout_variant === variant)
+        
+        if (template) {
+          loadedTemplate.value = template
+          templatesStore.updateHandlebarsTemplate(template.handlebars_template)
+          console.log('✅ Template loaded:', template.name)
+        }
+      }
+    } else {
+      // Direct ID
+      const templateId = parseInt(ref)
+      if (!isNaN(templateId)) {
+        const template = await templatesStore.loadTemplateFromLibrary(templateId.toString())
+        if (template) {
+          loadedTemplate.value = template
+          console.log('✅ Template loaded:', template.name)
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load template:', e)
+  }
+}
+
+async function handleCompile() {
+  if (!loadedTemplate.value) {
+    alert('No template loaded. Please ensure the data file has a valid template_ref.')
+    return
+  }
+  
+  if (!dataObject.value || Object.keys(dataObject.value).length === 0) {
+    alert('No data to compile.')
+    return
+  }
+  
+  try {
+    // Update the templates store with current data
+    templatesStore.updateTemplateData(dataObject.value)
+    
+    // Compile
+    await templatesStore.compileTemplate()
+    console.log('✅ Compilation successful')
+  } catch (e) {
+    console.error('Compilation failed:', e)
+    throw e
+  }
+}
+
+async function handleRender() {
+  try {
+    // Compile first if not already compiled
+    if (!mergedSpec.value) {
+      await handleCompile()
+    }
+    
+    if (mergedSpec.value) {
+      // Temporarily set spec for rendering
+      const originalSpec = templatesStore.spec
+      templatesStore.updateSpec(mergedSpec.value)
+      await templatesStore.renderTemplate()
+      templatesStore.updateSpec(originalSpec)
+      console.log('✅ PDF rendered')
+    }
+  } catch (e: any) {
+    console.error('Render failed:', e)
+    alert('Render failed: ' + (e.response?.data?.error || e.message))
+  }
+}
+
+function togglePreview() {
+  showPreview.value = !showPreview.value
+  
+  // Compile when opening preview if template and data are loaded
+  if (showPreview.value && loadedTemplate.value && dataObject.value && Object.keys(dataObject.value).length > 0) {
+    handleCompile().catch(console.error)
+  }
+}
 </script>
 
 <template>
@@ -260,6 +393,14 @@ async function validateData() {
           >
             {{ validating ? 'Validating...' : 'Validate' }}
           </Button>
+          <Button 
+            v-if="loadedTemplate" 
+            variant="outline" 
+            @click="togglePreview"
+            :class="{ 'bg-blue-100 text-blue-700': showPreview }"
+          >
+            {{ showPreview ? 'Hide Preview' : 'Show Preview' }}
+          </Button>
         </div>
       </div>
 
@@ -296,9 +437,44 @@ async function validateData() {
         </div>
       </div>
 
-      <!-- Editor -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" style="height: calc(100vh - 350px);">
+      <!-- Editor Layout -->
+      <div v-if="!showPreview" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" style="height: calc(100vh - 350px);">
         <DataEditor :key="editorKey" :model-value="dataObject" @update:model-value="handleDataChange" />
+      </div>
+      
+      <!-- Split Layout: Editor + Preview -->
+      <div v-else class="grid grid-cols-2 gap-4" style="height: calc(100vh - 350px);">
+        <!-- Left: Data Editor -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 overflow-auto">
+          <DataEditor :key="editorKey" :model-value="dataObject" @update:model-value="handleDataChange" />
+        </div>
+        
+        <!-- Right: Preview + Render -->
+        <div class="flex flex-col gap-4">
+          <!-- Render Button -->
+          <div class="flex justify-end">
+            <Button 
+              @click="handleRender" 
+              :disabled="!mergedSpec"
+              class="w-full"
+            >
+              Render PDF
+            </Button>
+          </div>
+          
+          <!-- Preview Pane -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-auto flex-1">
+            <PreviewPane 
+              :merged-spec="mergedSpec"
+              :pdf-url="templatesStore.pdfUrl"
+              :loading="templatesStore.compiling || templatesStore.rendering"
+              :compilation-error="templatesStore.compilationError"
+              :current-template="loadedTemplate"
+              :original-data="dataObject"
+              :use-portable-format="true"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Info -->

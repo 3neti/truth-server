@@ -566,10 +566,53 @@ async function handleLoadDataFile(dataFile: any) {
       
       // Check if it's family/variant format or direct ID
       if (ref.includes('/')) {
-        // Family/variant format - need to resolve to ID
-        // For now, just log and let user load manually
-        console.log('Template family/variant format detected:', ref)
-        alert(`This data file references template: ${templateRef}\n\nPlease load the matching template from Browse Library or Template Families.`)
+        // Family/variant format: family-slug/variant
+        const [familySlug, variant] = ref.split('/')
+        console.log('Loading template from family:', familySlug, 'variant:', variant)
+        
+        try {
+          // Find family by slug - fetch all and filter locally
+          const families = await store.getTemplateFamilies()
+          const family = families.find((f: any) => f.slug === familySlug)
+          
+          console.log('Available families:', families.map((f: any) => f.slug))
+          console.log('Looking for family:', familySlug)
+          console.log('Found family:', family)
+          
+          if (family) {
+            // Get variants and find the matching one
+            const variantData = await store.getFamilyVariants(family.id.toString())
+            const template = variantData.variants.find((v: any) => v.layout_variant === variant)
+            
+            if (template) {
+              console.log('✅ Template loaded from family:', template.name)
+              handlebarsTemplate.value = template.handlebars_template
+              
+              currentTemplate.value = {
+                id: template.id,
+                name: template.name,
+                description: template.description,
+                category: template.category,
+                is_public: template.is_public,
+                storage_type: template.storage_type || family.storage_type || 'local',
+                template_uri: template.template_uri,
+                family: {
+                  slug: family.slug,
+                  variant: variant
+                }
+              }
+            } else {
+              console.warn('Template variant not found:', variant)
+              alert(`Template variant "${variant}" not found in family "${familySlug}".\nPlease load it manually.`)
+            }
+          } else {
+            console.warn('Template family not found:', familySlug)
+            alert(`Template family "${familySlug}" not found.\nPlease load the template manually.`)
+          }
+        } catch (e) {
+          console.error('Failed to load template from family:', e)
+          alert(`Could not load template from family: ${familySlug}/${variant}\nPlease load it manually.`)
+        }
       } else {
         // Direct ID
         templateId = parseInt(ref)
