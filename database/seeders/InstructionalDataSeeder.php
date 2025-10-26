@@ -1,0 +1,282 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\TemplateData;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class InstructionalDataSeeder extends Seeder
+{
+    /**
+     * Seed instructional template data examples.
+     */
+    public function run(): void
+    {
+        $this->command->info('Creating instructional template data examples...');
+
+        $user = User::where('email', 'admin@disburse.cash')->first();
+
+        if (!$user) {
+            $this->command->error('Admin user not found. Run UserSeeder first.');
+            return;
+        }
+
+        // Election examples
+        $this->createElectionExamples($user);
+
+        // Survey examples
+        $this->createSurveyExamples($user);
+
+        // Test examples
+        $this->createTestExamples($user);
+
+        $this->command->info('✅ Instructional template data created successfully!');
+    }
+
+    private function createElectionExamples(User $user): void
+    {
+        // Getting Started: Simple Election
+        TemplateData::create([
+            'name' => 'Getting Started: Simple Election',
+            'description' => 'A minimal election example with 2 positions to help you understand the data structure',
+            'template_ref' => 'local:election-ballot/standard',
+            'category' => 'election',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:election-ballot/standard',
+                ],
+                'election_name' => 'My First Election',
+                'precinct' => '001-A',
+                'date' => '2025-05-15',
+                'positions' => [
+                    [
+                        'code' => 'PRES',
+                        'title' => 'President',
+                        'max_selections' => 1,
+                        'candidates' => [
+                            ['code' => 'P01', 'name' => 'Candidate A', 'party' => 'Party 1'],
+                            ['code' => 'P02', 'name' => 'Candidate B', 'party' => 'Party 2'],
+                        ]
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+
+        // Example: School Council Election
+        TemplateData::create([
+            'name' => 'Example: School Council Election',
+            'description' => 'Complete school council election with multiple positions showing practical usage',
+            'template_ref' => 'local:election-ballot/compact',
+            'category' => 'election',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:election-ballot/compact',
+                ],
+                'election_name' => 'School Council Elections 2025',
+                'precinct' => 'Grade-10',
+                'date' => '2025-03-15',
+                'positions' => [
+                    [
+                        'code' => 'PRES',
+                        'title' => 'President',
+                        'max_selections' => 1,
+                        'candidates' => [
+                            ['code' => 'P01', 'name' => 'Sarah Johnson', 'party' => 'Leadership Party'],
+                            ['code' => 'P02', 'name' => 'Michael Chen', 'party' => 'Unity Party'],
+                            ['code' => 'P03', 'name' => 'Emma Rodriguez', 'party' => 'Independent'],
+                        ]
+                    ],
+                    [
+                        'code' => 'VP',
+                        'title' => 'Vice President',
+                        'max_selections' => 1,
+                        'candidates' => [
+                            ['code' => 'VP01', 'name' => 'David Kim', 'party' => 'Leadership Party'],
+                            ['code' => 'VP02', 'name' => 'Lisa Martinez', 'party' => 'Unity Party'],
+                        ]
+                    ],
+                    [
+                        'code' => 'SEC',
+                        'title' => 'Secretary',
+                        'max_selections' => 1,
+                        'candidates' => [
+                            ['code' => 'S01', 'name' => 'Alex Thompson', 'party' => 'Leadership Party'],
+                            ['code' => 'S02', 'name' => 'Maya Patel', 'party' => 'Independent'],
+                        ]
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+    }
+
+    private function createSurveyExamples(User $user): void
+    {
+        // Getting Started: Basic Survey
+        TemplateData::create([
+            'name' => 'Getting Started: Basic Survey',
+            'description' => 'A simple 2-question survey to demonstrate the basic structure',
+            'template_ref' => 'local:survey-form/standard',
+            'category' => 'survey',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:survey-form/standard',
+                ],
+                'survey_title' => 'My First Survey',
+                'description' => 'A simple example survey',
+                'date' => '2025-10-24',
+                'questions' => [
+                    [
+                        'number' => 1,
+                        'type' => 'multiple_choice',
+                        'text' => 'How do you rate this?',
+                        'options' => ['Excellent', 'Good', 'Fair', 'Poor']
+                    ],
+                    [
+                        'number' => 2,
+                        'type' => 'multiple_choice',
+                        'text' => 'Would you recommend it?',
+                        'options' => ['Yes', 'Maybe', 'No']
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+
+        // Example: Customer Satisfaction Survey
+        TemplateData::create([
+            'name' => 'Example: Customer Satisfaction Survey',
+            'description' => 'Comprehensive customer feedback survey with rating scales and recommendations',
+            'template_ref' => 'local:survey-form/grid',
+            'category' => 'survey',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:survey-form/grid',
+                ],
+                'survey_title' => 'Customer Satisfaction Survey Q4 2024',
+                'description' => 'Help us improve our services by sharing your feedback',
+                'date' => '2024-12-15',
+                'questions' => [
+                    [
+                        'number' => 1,
+                        'type' => 'multiple_choice',
+                        'text' => 'How satisfied are you with our service?',
+                        'options' => ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
+                    ],
+                    [
+                        'number' => 2,
+                        'type' => 'multiple_choice',
+                        'text' => 'How would you rate our product quality?',
+                        'options' => ['Excellent', 'Good', 'Average', 'Below Average', 'Poor']
+                    ],
+                    [
+                        'number' => 3,
+                        'type' => 'multiple_choice',
+                        'text' => 'How responsive was our customer support?',
+                        'options' => ['Very Responsive', 'Responsive', 'Somewhat Responsive', 'Not Responsive']
+                    ],
+                    [
+                        'number' => 4,
+                        'type' => 'multiple_choice',
+                        'text' => 'Would you recommend us to friends or colleagues?',
+                        'options' => ['Definitely', 'Probably', 'Not Sure', 'Probably Not', 'Definitely Not']
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+    }
+
+    private function createTestExamples(User $user): void
+    {
+        // Getting Started: Simple Quiz
+        TemplateData::create([
+            'name' => 'Getting Started: Simple Quiz',
+            'description' => 'A basic 3-question quiz to understand the test data format',
+            'template_ref' => 'local:test-exam/standard',
+            'category' => 'test',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:test-exam/standard',
+                ],
+                'test_title' => 'My First Quiz',
+                'subject' => 'General Knowledge',
+                'date' => '2025-10-24',
+                'duration' => '15 minutes',
+                'questions' => [
+                    [
+                        'number' => 1,
+                        'text' => 'What is 5 + 3?',
+                        'points' => 1,
+                        'options' => ['6', '7', '8', '9']
+                    ],
+                    [
+                        'number' => 2,
+                        'text' => 'What color is the sky?',
+                        'points' => 1,
+                        'options' => ['Red', 'Blue', 'Green', 'Yellow']
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+
+        // Example: Math Assessment
+        TemplateData::create([
+            'name' => 'Example: Math Assessment',
+            'description' => 'Grade 8 mathematics assessment covering basic algebra and geometry',
+            'template_ref' => 'local:test-exam/multiple-choice',
+            'category' => 'test',
+            'data' => [
+                'document' => [
+                    'template_ref' => 'local:test-exam/multiple-choice',
+                ],
+                'test_title' => 'Grade 8 Mathematics Assessment',
+                'subject' => 'Mathematics',
+                'date' => '2025-03-20',
+                'duration' => '60 minutes',
+                'questions' => [
+                    [
+                        'number' => 1,
+                        'text' => 'Solve for x: 2x + 5 = 13',
+                        'points' => 2,
+                        'options' => ['x = 3', 'x = 4', 'x = 5', 'x = 6']
+                    ],
+                    [
+                        'number' => 2,
+                        'text' => 'What is the area of a rectangle with length 8 cm and width 5 cm?',
+                        'points' => 2,
+                        'options' => ['13 cm²', '26 cm²', '40 cm²', '45 cm²']
+                    ],
+                    [
+                        'number' => 3,
+                        'text' => 'What is 15% of 200?',
+                        'points' => 2,
+                        'options' => ['20', '25', '30', '35']
+                    ],
+                    [
+                        'number' => 4,
+                        'text' => 'If a triangle has angles of 60° and 70°, what is the third angle?',
+                        'points' => 2,
+                        'options' => ['40°', '50°', '60°', '70°']
+                    ],
+                    [
+                        'number' => 5,
+                        'text' => 'What is the square root of 144?',
+                        'points' => 2,
+                        'options' => ['10', '11', '12', '13']
+                    ],
+                ],
+            ],
+            'user_id' => $user->id,
+            'is_public' => true,
+        ]);
+    }
+}
