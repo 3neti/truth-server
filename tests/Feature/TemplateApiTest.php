@@ -21,7 +21,7 @@ test('can compile handlebars template with data', function () {
         ],
     ];
 
-    $response = $this->postJson('/api/templates/compile', [
+    $response = $this->postJson('/api/truth-templates/compile', [
         'template' => $template,
         'data' => $data,
     ]);
@@ -35,12 +35,9 @@ test('can compile handlebars template with data', function () {
 });
 
 test('compile endpoint validates required fields', function () {
-    $response = $this->postJson('/api/templates/compile', []);
+    $response = $this->postJson('/api/truth-templates/compile', []);
 
     $response->assertStatus(422)
-        ->assertJson([
-            'success' => false,
-        ])
         ->assertJsonValidationErrors(['template', 'data']);
 });
 
@@ -56,7 +53,7 @@ test('can list public templates', function () {
         'is_public' => false,
     ]);
 
-    $response = $this->getJson('/api/templates/library');
+    $response = $this->getJson('/api/truth-templates/templates');
 
     $response->assertStatus(200)
         ->assertJson([
@@ -71,7 +68,7 @@ test('can get specific template by id', function () {
         'category' => 'ballot',
     ]);
 
-    $response = $this->getJson("/api/templates/library/{$template->id}");
+    $response = $this->getJson("/api/truth-templates/templates/{$template->id}");
 
     $response->assertStatus(200)
         ->assertJson([
@@ -85,7 +82,7 @@ test('can get specific template by id', function () {
 });
 
 test('returns 404 for non-existent template', function () {
-    $response = $this->getJson('/api/templates/library/99999');
+    $response = $this->getJson('/api/truth-templates/templates/99999');
 
     $response->assertStatus(404)
         ->assertJson([
@@ -95,7 +92,9 @@ test('returns 404 for non-existent template', function () {
 });
 
 test('can save new template', function () {
-    $response = $this->postJson('/api/templates/library', [
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson('/api/truth-templates/templates', [
         'name' => 'New Template',
         'description' => 'A test template',
         'category' => 'ballot',
@@ -113,14 +112,14 @@ test('can save new template', function () {
             ],
         ]);
 
-    $this->assertDatabaseHas('omr_templates', [
+    $this->assertDatabaseHas('templates', [
         'name' => 'New Template',
         'category' => 'ballot',
     ]);
 });
 
 test('save template validates required fields', function () {
-    $response = $this->postJson('/api/templates/library', []);
+    $response = $this->postJson('/api/truth-templates/templates', []);
 
     $response->assertStatus(422)
         ->assertJson([
@@ -140,7 +139,7 @@ test('can filter templates by category', function () {
         'is_public' => true,
     ]);
 
-    $response = $this->getJson('/api/templates/library?category=ballot');
+    $response = $this->getJson('/api/truth-templates/templates?category=ballot');
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'templates');

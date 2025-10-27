@@ -1,10 +1,14 @@
 <?php
 
-use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TemplateFamilyController;
 use App\Http\Controllers\Api\TemplateDataController;
 use App\Http\Controllers\Api\DataValidationController;
 use Illuminate\Support\Facades\Route;
+
+use App\Actions\TruthTemplates\Templates\{GetLayoutPresets, GetSampleTemplates};
+use App\Actions\TruthTemplates\Rendering\{GetCoordinatesMap, DownloadRenderedPdf, ValidateTemplateSpec, RenderTemplateSpec};
+use App\Actions\TruthTemplates\Compilation\{CompileHandlebarsTemplate, CompileStandaloneData};
 
 /*
 |--------------------------------------------------------------------------
@@ -18,126 +22,115 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('truth-templates')
     ->name('api.truth-templates.')
     ->group(function () {
-        
+
         // -----------------------------------------------------------------------
         // Core Template Operations
+        // Updated: 2025-01-27 Phase 3 - Migrated rendering action
         // -----------------------------------------------------------------------
-        
-        Route::post('/render', [TemplateController::class, 'render'])
+
+        Route::post('/render', RenderTemplateSpec::class)
             ->name('render');
-        
-        Route::post('/validate', [TemplateController::class, 'validate'])
+
+        Route::post('/validate', ValidateTemplateSpec::class)
             ->name('validate');
-        
-        Route::post('/compile', [TemplateController::class, 'compile'])
+
+        Route::post('/compile', CompileHandlebarsTemplate::class)
             ->name('compile');
-        
-        Route::post('/compile-standalone', [TemplateController::class, 'compileStandalone'])
+
+        Route::post('/compile-standalone', CompileStandaloneData::class)
             ->name('compile-standalone');
 
         // -----------------------------------------------------------------------
         // Template Library/Registry CRUD
         // -----------------------------------------------------------------------
-        
-        Route::get('/templates', [TemplateController::class, 'listTemplates'])
-            ->name('templates.index');
-        
-        Route::post('/templates', [TemplateController::class, 'saveTemplate'])
-            ->name('templates.store');
-        
-        Route::get('/templates/{id}', [TemplateController::class, 'getTemplate'])
-            ->name('templates.show');
-        
-        Route::put('/templates/{id}', [TemplateController::class, 'updateTemplate'])
-            ->name('templates.update');
-        
-        Route::delete('/templates/{id}', [TemplateController::class, 'deleteTemplate'])
-            ->name('templates.destroy');
+
+        Route::apiResource('templates', TemplateController::class);
 
         // Template versioning
         Route::get('/templates/{id}/versions', [TemplateController::class, 'getVersionHistory'])
             ->name('templates.versions');
-        
+
         Route::post('/templates/{templateId}/rollback/{versionId}', [TemplateController::class, 'rollbackToVersion'])
             ->name('templates.rollback');
 
         // Template validation and signing
         Route::post('/templates/{id}/validate-data', [TemplateController::class, 'validateData'])
             ->name('templates.validate-data');
-        
+
         Route::post('/templates/{id}/sign', [TemplateController::class, 'signTemplate'])
             ->name('templates.sign');
-        
+
         Route::get('/templates/{id}/verify', [TemplateController::class, 'verifyTemplate'])
             ->name('templates.verify');
 
         // Template utilities
-        Route::get('/layouts', [TemplateController::class, 'layouts'])
+        // Updated: 2025-01-27 - Migrated to Laravel Actions for direct route binding
+        Route::get('/layouts', GetLayoutPresets::class)
             ->name('layouts');
-        
-        Route::get('/samples', [TemplateController::class, 'samples'])
+
+        Route::get('/samples', GetSampleTemplates::class)
             ->name('samples');
-        
-        Route::get('/download/{documentId}', [TemplateController::class, 'download'])
+
+        Route::get('/download/{documentId}', DownloadRenderedPdf::class)
             ->name('download');
-        
-        Route::get('/coords/{documentId}', [TemplateController::class, 'coords'])
+
+        Route::get('/coords/{documentId}', GetCoordinatesMap::class)
             ->name('coords');
 
         // -----------------------------------------------------------------------
         // Template Families
         // -----------------------------------------------------------------------
-        
+
         Route::get('/families', [TemplateFamilyController::class, 'index'])
             ->name('families.index');
-        
+
         Route::post('/families', [TemplateFamilyController::class, 'store'])
             ->name('families.store');
-        
+
         Route::get('/families/{id}', [TemplateFamilyController::class, 'show'])
             ->name('families.show');
-        
+
         Route::put('/families/{id}', [TemplateFamilyController::class, 'update'])
             ->name('families.update');
-        
+
         Route::delete('/families/{id}', [TemplateFamilyController::class, 'destroy'])
             ->name('families.destroy');
-        
+
         Route::get('/families/{id}/templates', [TemplateFamilyController::class, 'variants'])
             ->name('families.templates');
-        
+
         Route::get('/families/{id}/export', [TemplateFamilyController::class, 'export'])
             ->name('families.export');
-        
+
         Route::post('/families/import', [TemplateFamilyController::class, 'import'])
             ->name('families.import');
 
         // -----------------------------------------------------------------------
         // Template Data
         // -----------------------------------------------------------------------
-        
+
         Route::get('/data', [TemplateDataController::class, 'index'])
             ->name('data.index');
-        
+
         Route::post('/data', [TemplateDataController::class, 'store'])
             ->name('data.store');
-        
+
         Route::get('/data/{dataFile}', [TemplateDataController::class, 'show'])
             ->name('data.show');
-        
+
         Route::put('/data/{dataFile}', [TemplateDataController::class, 'update'])
             ->name('data.update');
-        
+
         Route::delete('/data/{dataFile}', [TemplateDataController::class, 'destroy'])
             ->name('data.destroy');
-        
+
         Route::post('/data/{dataFile}/validate', [DataValidationController::class, 'validateDataFile'])
             ->name('data.validate-file');
 
         // -----------------------------------------------------------------------
         // Data Validation
         // -----------------------------------------------------------------------
-        
+
         Route::post('/validate-data', [DataValidationController::class, 'validateData'])
             ->name('validate-data');
     });

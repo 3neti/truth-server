@@ -111,7 +111,7 @@ class TemplateValidationSigningTest extends TestCase
             ]
         ]);
 
-        $response = $this->postJson("/api/templates/library/{$template->id}/validate-data", [
+        $response = $this->postJson("/api/truth-templates/templates/{$template->id}/validate-data", [
             'data' => ['title' => 'Valid Title']
         ]);
 
@@ -133,7 +133,7 @@ class TemplateValidationSigningTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->postJson("/api/templates/library/{$template->id}/sign");
+            ->postJson("/api/truth-templates/templates/{$template->id}/sign");
 
         $response->assertStatus(200)
             ->assertJson([
@@ -160,7 +160,7 @@ class TemplateValidationSigningTest extends TestCase
 
         $template->sign($user->id);
 
-        $response = $this->getJson("/api/templates/library/{$template->id}/verify");
+        $response = $this->getJson("/api/truth-templates/templates/{$template->id}/verify");
 
         $response->assertStatus(200)
             ->assertJson([

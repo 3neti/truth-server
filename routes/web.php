@@ -3,11 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Favicon fallback
-Route::get('/favicon.ico', function () {
-    return response()->file(public_path('favicon.ico'));
-});
-
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
@@ -23,7 +18,7 @@ Route::get('/truth', function () {
 // ===========================================================================
 // Truth Templates Routes (New Unified System)
 // ===========================================================================
-require __DIR__.'/truth-templates.php';
+//require __DIR__.'/truth-templates.php';
 
 // ===========================================================================
 // Legacy Template Routes (Deprecated - Redirects to new routes)

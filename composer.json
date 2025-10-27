@@ -31,7 +31,8 @@
         "lbhurtado/omr-appreciation": "dev-main",
         "lbhurtado/omr-template": "dev-main",
         "lbhurtado/truth-election-db": "dev-main",
-        "lbhurtado/truth-election-ui": "dev-main"
+        "lbhurtado/truth-election-ui": "dev-main",
+        "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
