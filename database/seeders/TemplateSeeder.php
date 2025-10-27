@@ -617,7 +617,8 @@ JSON;
       "maxSelections": {{max_selections}},
       "layout": "single-column",
       "metadata": {
-        "level": "{{level}}"
+        "level": "{{level}}",
+        "show_bubbles": false
       },
       "choices": [
         {{#each candidates}}
@@ -657,7 +658,8 @@ JSON;
       "maxSelections": {{max_selections}},
       "layout": "single-column",
       "metadata": {
-        "level": "{{level}}"
+        "level": "{{level}}",
+        "show_bubbles": true
       },
       "choices": [
         {{#each candidates}}

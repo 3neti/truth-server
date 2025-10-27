@@ -30,6 +30,12 @@ class MultipleChoiceRenderer implements SectionRenderer
         $choices = $section['choices'] ?? [];
         $layout = $section['layout'] ?? '2-col';
         
+        // Determine if this is a reference/questionnaire (no bubbles) vs actual ballot (with bubbles)
+        // Check section metadata for 'show_bubbles' flag, default to true for backward compatibility
+        $showBubbles = $section['metadata']['show_bubbles'] ?? true;
+        $metadata = $section['metadata'] ?? [];
+        $isQuestionnaire = ($metadata['type'] ?? '') === 'questionnaire';
+        
         // Get layout configuration
         $layoutConfig = $this->config['layouts'][$layout] ?? $this->config['layouts']['2-col'];
         $numCols = $layoutConfig['cols'];
@@ -49,8 +55,8 @@ class MultipleChoiceRenderer implements SectionRenderer
         
         // Calculate column width
         $colWidth = ($contentWidth - ($gutter * ($numCols - 1))) / $numCols;
-        $bubbleDiameter = Measure::mmToPoints($this->config['omr']['bubble']['diameter_mm'] ?? 4.0);
-        $labelGap = Measure::mmToPoints($this->config['omr']['bubble']['label_gap_mm'] ?? 2.0);
+        $bubbleDiameter = $showBubbles ? Measure::mmToPoints($this->config['omr']['bubble']['diameter_mm'] ?? 4.0) : 0;
+        $labelGap = $showBubbles ? Measure::mmToPoints($this->config['omr']['bubble']['label_gap_mm'] ?? 2.0) : 0;
         
         // Render choices in columns
         $choicesPerCol = ceil(count($choices) / $numCols);
@@ -63,16 +69,22 @@ class MultipleChoiceRenderer implements SectionRenderer
             $x = $marginLeft + ($col * ($colWidth + $gutter));
             $y = $currentY + ($row * ($bubbleDiameter + $rowGap + 2));
             
-            // Draw bubble
-            $bubbleId = "{$code}_{$choice['code']}";
-            $this->omrDrawer->drawBubble($x, $y, $bubbleId);
+            // Draw bubble only if enabled (for ballot/answer sheet, not for questionnaire)
+            if ($showBubbles) {
+                $bubbleId = "{$code}_{$choice['code']}";
+                $this->omrDrawer->drawBubble($x, $y, $bubbleId);
+            }
             
-            // Draw label with number (use hardcoded 'number' field if available, otherwise compute)
+            // Draw label with number
             $labelX = $x + $bubbleDiameter + $labelGap;
             $pdf->SetXY($labelX, $y);
             $number = $choice['number'] ?? ($index + 1);
             $displayLabel = empty($choice['label']) ? (string)$number : "{$number}. {$choice['label']}";
-            $pdf->Cell($colWidth - $bubbleDiameter - $labelGap, $bubbleDiameter, $displayLabel, 0, 0, 'L');
+            
+            // For questionnaire without bubbles, use full column width
+            $availableWidth = $showBubbles ? ($colWidth - $bubbleDiameter - $labelGap) : $colWidth;
+            $cellHeight = $showBubbles ? $bubbleDiameter : 6; // Use fixed height for text-only
+            $pdf->Cell($availableWidth, $cellHeight, $displayLabel, 0, 0, 'L');
             
             $choiceIndex++;
         }
