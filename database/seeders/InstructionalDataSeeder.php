@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\TemplateData;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Symfony\Component\Yaml\Yaml;
 
 class InstructionalDataSeeder extends Seeder
 {
@@ -24,6 +25,9 @@ class InstructionalDataSeeder extends Seeder
 
         // Election examples
         $this->createElectionExamples($user);
+
+        // Philippine National Election Ballot
+        $this->createPhilippineElectionBallot($user);
 
         // Survey examples
         $this->createSurveyExamples($user);
@@ -183,6 +187,87 @@ class InstructionalDataSeeder extends Seeder
             ],
             'user_id' => $user->id,
         ]);
+    }
+
+    private function createPhilippineElectionBallot(User $user): void
+    {
+        // Load election and precinct configuration
+        $electionConfig = json_decode(file_get_contents(config_path('election.json')), true);
+        $precinctConfig = Yaml::parseFile(config_path('precinct.yaml'));
+
+        // Build positions array from election config
+        $positions = [];
+        foreach ($electionConfig['positions'] as $position) {
+            $positionData = [
+                'code' => $position['code'],
+                'title' => $position['name'],
+                'level' => $position['level'],
+                'max_selections' => $position['count'],
+                'candidates' => [],
+            ];
+
+            // Add candidates for this position
+            if (isset($electionConfig['candidates'][$position['code']])) {
+                foreach ($electionConfig['candidates'][$position['code']] as $candidate) {
+                    $positionData['candidates'][] = [
+                        'code' => $candidate['code'],
+                        'name' => $candidate['name'],
+                        'party' => $candidate['alias'] ?? null,
+                    ];
+                }
+            }
+
+            $positions[] = $positionData;
+        }
+
+        // Create Questionnaire (Candidate List) - for reference/posting
+        TemplateData::create([
+            'document_id' => 'PH-2025-QUESTIONNAIRE-CURRIMAO-001',
+            'name' => 'Philippine Elections 2025 - Candidate List (Questionnaire)',
+            'template_ref' => 'local:election-ballot/questionnaire',
+            'json_data' => [
+                'document' => [
+                    'template_ref' => 'local:election-ballot/questionnaire',
+                    'type' => 'questionnaire',
+                ],
+                'election_name' => 'Philippine National and Local Elections 2025',
+                'precinct_code' => $precinctConfig['code'],
+                'precinct_location' => $precinctConfig['location_name'],
+                'latitude' => $precinctConfig['latitude'],
+                'longitude' => $precinctConfig['longitude'],
+                'date' => '2025-05-12',
+                'positions' => $positions,
+                'electoral_inspectors' => $precinctConfig['electoral_inspectors'],
+            ],
+            'user_id' => $user->id,
+        ]);
+
+        // Create Answer Sheet (Ballot) - for voter marking
+        TemplateData::create([
+            'document_id' => 'PH-2025-BALLOT-CURRIMAO-001',
+            'name' => 'Philippine Elections 2025 - Official Ballot (Answer Sheet)',
+            'template_ref' => 'local:election-ballot/answer-sheet',
+            'json_data' => [
+                'document' => [
+                    'template_ref' => 'local:election-ballot/answer-sheet',
+                    'type' => 'ballot',
+                ],
+                'election_name' => 'Philippine National and Local Elections 2025',
+                'precinct_code' => $precinctConfig['code'],
+                'precinct_location' => $precinctConfig['location_name'],
+                'date' => '2025-05-12',
+                'positions' => $positions,
+                'instructions' => [
+                    'Use a black or blue pen to shade the oval completely.',
+                    'Do not overvote. Overvoting will invalidate your choices for that position.',
+                    'To change your vote, ask for a new ballot from the poll worker.',
+                    'Do not make any stray marks on this ballot.',
+                ],
+            ],
+            'user_id' => $user->id,
+        ]);
+
+        $this->command->info('  ✓ Philippine election ballot created with ' . count($positions) . ' positions');
     }
 
     private function createTestExamples(User $user): void
