@@ -38,11 +38,10 @@ class InstructionalDataSeeder extends Seeder
     {
         // Getting Started: Simple Election
         TemplateData::create([
+            'document_id' => 'DEMO-ELECTION-001',
             'name' => 'Getting Started: Simple Election',
-            'description' => 'A minimal election example with 2 positions to help you understand the data structure',
             'template_ref' => 'local:election-ballot/standard',
-            'category' => 'election',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:election-ballot/standard',
                 ],
@@ -62,16 +61,14 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
 
-        // Example: School Council Election
+        // Example: School Counci        // Example: School Council Election
         TemplateData::create([
+            'document_id' => 'DEMO-ELECTION-002',
             'name' => 'Example: School Council Election',
-            'description' => 'Complete school council election with multiple positions showing practical usage',
             'template_ref' => 'local:election-ballot/compact',
-            'category' => 'election',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:election-ballot/compact',
                 ],
@@ -110,7 +107,6 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
     }
 
@@ -118,11 +114,10 @@ class InstructionalDataSeeder extends Seeder
     {
         // Getting Started: Basic Survey
         TemplateData::create([
+            'document_id' => 'DEMO-SURVEY-001',
             'name' => 'Getting Started: Basic Survey',
-            'description' => 'A simple 2-question survey to demonstrate the basic structure',
             'template_ref' => 'local:survey-form/standard',
-            'category' => 'survey',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:survey-form/standard',
                 ],
@@ -145,16 +140,14 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
 
-        // Example: Customer Satisfaction Survey
+        // Example: Customer Sati        // Example: Customer Satisfaction Survey
         TemplateData::create([
+            'document_id' => 'DEMO-SURVEY-002',
             'name' => 'Example: Customer Satisfaction Survey',
-            'description' => 'Comprehensive customer feedback survey with rating scales and recommendations',
             'template_ref' => 'local:survey-form/grid',
-            'category' => 'survey',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:survey-form/grid',
                 ],
@@ -189,7 +182,6 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
     }
 
@@ -197,11 +189,10 @@ class InstructionalDataSeeder extends Seeder
     {
         // Getting Started: Simple Quiz
         TemplateData::create([
+            'document_id' => 'DEMO-TEST-001',
             'name' => 'Getting Started: Simple Quiz',
-            'description' => 'A basic 3-question quiz to understand the test data format',
             'template_ref' => 'local:test-exam/standard',
-            'category' => 'test',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:test-exam/standard',
                 ],
@@ -225,16 +216,14 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
 
-        // Example: Math Assessment
+        // Example: Math Assessme        // Example: Math Assessment
         TemplateData::create([
+            'document_id' => 'DEMO-TEST-002',
             'name' => 'Example: Math Assessment',
-            'description' => 'Grade 8 mathematics assessment covering basic algebra and geometry',
             'template_ref' => 'local:test-exam/multiple-choice',
-            'category' => 'test',
-            'data' => [
+            'json_data' => [
                 'document' => [
                     'template_ref' => 'local:test-exam/multiple-choice',
                 ],
@@ -276,7 +265,6 @@ class InstructionalDataSeeder extends Seeder
                 ],
             ],
             'user_id' => $user->id,
-            'is_public' => true,
         ]);
     }
 }

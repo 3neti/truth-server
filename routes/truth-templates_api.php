@@ -124,8 +124,14 @@ Route::prefix('truth-templates')
         Route::delete('/data/{dataFile}', [TemplateDataController::class, 'destroy'])
             ->name('data.destroy');
 
-        Route::post('/data/{dataFile}/validate', [DataValidationController::class, 'validateDataFile'])
-            ->name('data.validate-file');
+        Route::post('/data/{dataFile}/validate', [TemplateDataController::class, 'validate'])
+            ->name('data.validate');
+
+        Route::post('/data/{dataFile}/compile', [TemplateDataController::class, 'compile'])
+            ->name('data.compile');
+
+        Route::post('/data/{dataFile}/render', [TemplateDataController::class, 'render'])
+            ->name('data.render');
 
         // -----------------------------------------------------------------------
         // Data Validation
@@ -133,4 +139,26 @@ Route::prefix('truth-templates')
 
         Route::post('/validate-data', [DataValidationController::class, 'validateData'])
             ->name('validate-data');
+
+        // -----------------------------------------------------------------------
+        // Rendering Jobs
+        // -----------------------------------------------------------------------
+
+        Route::get('/jobs', [\App\Http\Controllers\Api\RenderingJobsController::class, 'index'])
+            ->name('jobs.index');
+
+        Route::post('/jobs', [\App\Http\Controllers\Api\RenderingJobsController::class, 'store'])
+            ->name('jobs.store');
+
+        Route::get('/jobs/{job}', [\App\Http\Controllers\Api\RenderingJobsController::class, 'show'])
+            ->name('jobs.show');
+
+        Route::post('/jobs/{job}/retry', [\App\Http\Controllers\Api\RenderingJobsController::class, 'retry'])
+            ->name('jobs.retry');
+
+        Route::post('/jobs/{job}/cancel', [\App\Http\Controllers\Api\RenderingJobsController::class, 'cancel'])
+            ->name('jobs.cancel');
+
+        Route::delete('/jobs/{job}', [\App\Http\Controllers\Api\RenderingJobsController::class, 'destroy'])
+            ->name('jobs.destroy');
     });

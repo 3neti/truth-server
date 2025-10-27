@@ -2,6 +2,7 @@
 
 namespace App\Actions\TruthTemplates\Rendering;
 
+use App\Models\RenderingJob;
 use LBHurtado\OMRTemplate\Engine\SmartLayoutRenderer;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -63,9 +64,62 @@ class RenderTemplateSpec
         }
     }
 
-    public function asJob(array $spec): void
+    /**
+     * Execute as queued job with RenderingJob tracking.
+     * 
+     * @param array $spec The template spec to render
+     * @param int|null $jobId The RenderingJob ID to track
+     */
+    public function asJob(array $spec, ?int $jobId = null): void
     {
-        $this->handle($spec);
+        $job = null;
+        
+        // Load the job if ID provided
+        if ($jobId) {
+            $job = RenderingJob::find($jobId);
+            if ($job) {
+                $job->markAsProcessing();
+            }
+        }
+        
+        try {
+            // Update progress at start
+            if ($job) {
+                $job->updateProgress(10);
+            }
+            
+            // Render the template
+            $result = $this->handle($spec);
+            
+            // Update progress
+            if ($job) {
+                $job->updateProgress(80);
+            }
+            
+            // Generate public URL for the PDF
+            $documentId = $result['document_id'];
+            $pdfUrl = url("/api/truth-templates/download/{$documentId}");
+            
+            // Mark as completed
+            if ($job) {
+                $job->markAsCompleted($pdfUrl);
+                // Store additional metadata
+                $job->update([
+                    'metadata' => array_merge($job->metadata ?? [], [
+                        'document_id' => $documentId,
+                        'pdf_path' => $result['pdf'],
+                        'coords_path' => $result['coords'],
+                        'coords_url' => url("/api/truth-templates/coords/{$documentId}"),
+                    ]),
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Mark as failed
+            if ($job) {
+                $job->markAsFailed($e->getMessage());
+            }
+            throw $e;
+        }
     }
 
     public function asCommand(string $specPath, ?string $outputPath = null): int

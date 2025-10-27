@@ -13,18 +13,20 @@ return new class extends Migration
     {
         Schema::create('template_data', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('document_id')->unique();
+            $table->string('name')->nullable();
+            $table->foreignId('template_id')->nullable()->constrained('templates')->onDelete('set null');
             $table->string('template_ref')->nullable(); // URI to template (local:family/variant, github:org/repo, etc.)
-            $table->json('data'); // The actual data object
+            $table->boolean('portable_format')->default(false);
+            $table->json('json_data'); // The actual data object
+            $table->json('compiled_spec')->nullable(); // Compiled template spec
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->boolean('is_public')->default(false);
-            $table->string('category')->default('general');
             $table->timestamps();
             $table->softDeletes();
             
+            $table->index('document_id');
+            $table->index('template_id');
             $table->index('template_ref');
-            $table->index('category');
             $table->index('user_id');
         });
     }

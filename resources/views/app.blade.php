@@ -39,13 +39,15 @@
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         @routes
         @php
             $component = $page['component'];
             $componentPath = str_starts_with($component, 'TruthTemplatesUi/') || 
                             str_starts_with($component, 'TruthElectionUi/') || 
-                            str_starts_with($component, 'TruthQrUi/') 
+                            str_starts_with($component, 'TruthQrUi/') ||
+                            str_starts_with($component, 'Admin/')
                 ? "resources/js/{$component}.vue" 
                 : "resources/js/pages/{$component}.vue";
         @endphp

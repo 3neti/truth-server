@@ -40,5 +40,6 @@ Route::get('/data/editor', function () {
 })->name('data.editor');
 
 require __DIR__.'/truth-templates_web.php';
+require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

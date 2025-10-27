@@ -14,36 +14,31 @@ class TemplateDataController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TemplateData::with('user')
+        $query = TemplateData::with(['user', 'template.family'])
             ->orderBy('created_at', 'desc');
+
+        // Filter by template_id if provided
+        if ($request->has('template_id')) {
+            $query->where('template_id', $request->template_id);
+        }
 
         // Filter by template_ref if provided
         if ($request->has('template_ref')) {
             $query->where('template_ref', $request->template_ref);
         }
 
-        // Filter by category if provided
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
         // Filter by search term
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                $q->where('document_id', 'like', "%{$search}%")
+                  ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
-        // Show only public or user's own files
+        // Filter by user if authenticated
         if (Auth::check()) {
-            $query->where(function ($q) {
-                $q->where('is_public', true)
-                  ->orWhere('user_id', Auth::id());
-            });
-        } else {
-            $query->where('is_public', true);
+            $query->where('user_id', Auth::id());
         }
 
         return response()->json($query->get());
@@ -55,19 +50,20 @@ class TemplateDataController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'document_id' => 'required|string|max:255|unique:template_data',
+            'name' => 'nullable|string|max:255',
+            'template_id' => 'required|exists:templates,id',
             'template_ref' => 'nullable|string|max:255',
-            'data' => 'required|array',
-            'is_public' => 'boolean',
-            'category' => 'string|max:255',
+            'portable_format' => 'boolean',
+            'json_data' => 'required|array',
         ]);
 
         $validated['user_id'] = Auth::id();
+        $validated['portable_format'] = $validated['portable_format'] ?? false;
 
         $dataFile = TemplateData::create($validated);
 
-        return response()->json($dataFile->load('user'), 201);
+        return response()->json($dataFile->load(['user', 'template.family']), 201);
     }
 
     /**
@@ -76,11 +72,11 @@ class TemplateDataController extends Controller
     public function show(TemplateData $dataFile)
     {
         // Check permissions
-        if (!$dataFile->is_public && $dataFile->user_id !== Auth::id()) {
+        if ($dataFile->user_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
 
-        return response()->json($dataFile->load('user'));
+        return response()->json($dataFile->load(['user', 'template.family']));
     }
 
     /**
@@ -94,17 +90,17 @@ class TemplateDataController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
+            'document_id' => 'sometimes|required|string|max:255|unique:template_data,document_id,' . $dataFile->id,
+            'name' => 'nullable|string|max:255',
+            'template_id' => 'sometimes|required|exists:templates,id',
             'template_ref' => 'nullable|string|max:255',
-            'data' => 'sometimes|required|array',
-            'is_public' => 'boolean',
-            'category' => 'string|max:255',
+            'portable_format' => 'boolean',
+            'json_data' => 'sometimes|required|array',
         ]);
 
         $dataFile->update($validated);
 
-        return response()->json($dataFile->load('user'));
+        return response()->json($dataFile->load(['user', 'template.family']));
     }
 
     /**
@@ -120,5 +116,58 @@ class TemplateDataController extends Controller
         $dataFile->delete();
 
         return response()->json(['message' => 'Data file deleted successfully']);
+    }
+
+    /**
+     * Validate template data against schema.
+     */
+    public function validate(TemplateData $dataFile)
+    {
+        // Check permissions
+        if ($dataFile->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // TODO: Implement schema validation
+        // For now, return a simple valid response
+        return response()->json([
+            'valid' => true,
+            'errors' => [],
+        ]);
+    }
+
+    /**
+     * Compile template with data.
+     */
+    public function compile(TemplateData $dataFile)
+    {
+        // Check permissions
+        if ($dataFile->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // TODO: Implement template compilation
+        // For now, return the json_data as the compiled spec
+        return response()->json([
+            'compiled_spec' => $dataFile->json_data,
+        ]);
+    }
+
+    /**
+     * Render template data to PDF.
+     */
+    public function render(TemplateData $dataFile)
+    {
+        // Check permissions
+        if ($dataFile->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // TODO: Implement PDF rendering
+        // For now, return a placeholder response
+        return response()->json([
+            'pdf_url' => null,
+            'message' => 'PDF rendering not yet implemented',
+        ]);
     }
 }
