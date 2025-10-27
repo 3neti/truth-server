@@ -622,9 +622,9 @@ JSON;
       "choices": [
         {{#each candidates}}
         {
-          "code": "OPT_{{@index}}",
+          "code": "{{code}}",
           "label": "{{name}} ({{party}})",
-          "index": {{@index}}
+          "number": {{number}}
         }{{#unless @last}},{{/unless}}
         {{/each}}
       ]
@@ -662,9 +662,9 @@ JSON;
       "choices": [
         {{#each candidates}}
         {
-          "code": "OPT_{{@index}}",
+          "code": "{{code}}",
           "label": "",
-          "index": {{@index}}
+          "number": {{number}}
         }{{#unless @last}},{{/unless}}
         {{/each}}
       ]

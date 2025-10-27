@@ -194,6 +194,19 @@ class InstructionalDataSeeder extends Seeder
         // Load election and precinct configuration
         $electionConfig = json_decode(file_get_contents(config_path('election.json')), true);
         $precinctConfig = Yaml::parseFile(config_path('precinct.yaml'));
+        $mappingConfig = Yaml::parseFile(config_path('mapping.yaml'));
+
+        // Build a lookup map: candidate code => ordinal number from mapping
+        $candidateNumbers = [];
+        foreach ($mappingConfig['marks'] as $mark) {
+            $key = $mark['key']; // e.g., 'A1', 'B2', 'C10'
+            $candidateCode = $mark['value']; // e.g., 'LD_001'
+            // Extract the numeric part from the key (e.g., '1' from 'A1', '10' from 'C10')
+            preg_match('/[A-Z]+(\d+)/', $key, $matches);
+            if (isset($matches[1])) {
+                $candidateNumbers[$candidateCode] = (int)$matches[1];
+            }
+        }
 
         // Build positions array from election config
         $positions = [];
@@ -206,13 +219,15 @@ class InstructionalDataSeeder extends Seeder
                 'candidates' => [],
             ];
 
-            // Add candidates for this position
+            // Add candidates for this position with ordinal numbers from mapping
             if (isset($electionConfig['candidates'][$position['code']])) {
                 foreach ($electionConfig['candidates'][$position['code']] as $candidate) {
+                    $candidateCode = $candidate['code'];
                     $positionData['candidates'][] = [
-                        'code' => $candidate['code'],
+                        'code' => $candidateCode,
                         'name' => $candidate['name'],
                         'party' => $candidate['alias'] ?? null,
+                        'number' => $candidateNumbers[$candidateCode] ?? 0, // Default to 0 if not in mapping
                     ];
                 }
             }
