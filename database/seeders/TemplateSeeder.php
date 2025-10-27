@@ -26,26 +26,83 @@ class TemplateSeeder extends Seeder
         // 1. Election Family
         $this->createElectionFamily($user);
 
-        // 2. Survey Family
+        // 2. Philippine Election Ballot Templates
+        $this->createPhilippineBallotTemplates($user);
+
+        // 3. Survey Family
         $this->createSurveyFamily($user);
 
-        // 3. Test/Exam Family
+        // 4. Test/Exam Family
         $this->createTestFamily($user);
 
         $this->command->info('✅ Template families created successfully!');
         $this->command->table(
             ['Family', 'Variants', 'Category'],
             [
-                ['Election Ballot', '2', 'election'],
+                ['Election Ballot', '4', 'election'],
                 ['Survey Form', '2', 'survey'],
                 ['Test/Exam', '2', 'test'],
             ]
         );
     }
 
+    private function createPhilippineBallotTemplates(User $user): void
+    {
+        $family = TemplateFamily::where('slug', 'election-ballot')->first();
+
+        if (!$family) {
+            $this->command->warn('Election family not found, skipping Philippine templates');
+            return;
+        }
+
+        // Questionnaire template
+        Template::updateOrCreate(
+            [
+                'family_id' => $family->id,
+                'layout_variant' => 'questionnaire',
+            ],
+            [
+                'name' => 'Election Questionnaire - Candidate List',
+                'description' => 'Full candidate list with all details for posting and reference',
+                'category' => 'election',
+                'storage_type' => 'local',
+                'handlebars_template' => $this->getQuestionnaireTemplate(),
+                'sample_data' => $this->getPhilippineBallotSampleData(),
+                'json_schema' => $this->getPhilippineBallotSchema(),
+                'is_public' => true,
+                'user_id' => $user->id,
+                'version' => '1.0.0',
+            ]
+        );
+
+        // Answer sheet template
+        Template::updateOrCreate(
+            [
+                'family_id' => $family->id,
+                'layout_variant' => 'answer-sheet',
+            ],
+            [
+                'name' => 'Election Ballot - Answer Sheet',
+                'description' => 'Official ballot for voter marking with ovals for optical scanning',
+                'category' => 'election',
+                'storage_type' => 'local',
+                'handlebars_template' => $this->getAnswerSheetTemplate(),
+                'sample_data' => $this->getPhilippineBallotSampleData(),
+                'json_schema' => $this->getPhilippineBallotSchema(),
+                'is_public' => true,
+                'user_id' => $user->id,
+                'version' => '1.0.0',
+            ]
+        );
+
+        $this->command->info('  ✓ Philippine ballot templates created');
+    }
+
     private function createElectionFamily(User $user): void
     {
-        $family = TemplateFamily::create([
+        $family = TemplateFamily::firstOrCreate(
+            ['slug' => 'election-ballot'],
+            [
             'slug' => 'election-ballot',
             'name' => 'Election Ballot',
             'description' => 'Templates for election ballots and voting forms',
@@ -91,7 +148,9 @@ class TemplateSeeder extends Seeder
 
     private function createSurveyFamily(User $user): void
     {
-        $family = TemplateFamily::create([
+        $family = TemplateFamily::firstOrCreate(
+            ['slug' => 'survey-form'],
+            [
             'slug' => 'survey-form',
             'name' => 'Survey Form',
             'description' => 'Templates for surveys, questionnaires, and feedback forms',
@@ -137,7 +196,9 @@ class TemplateSeeder extends Seeder
 
     private function createTestFamily(User $user): void
     {
-        $family = TemplateFamily::create([
+        $family = TemplateFamily::firstOrCreate(
+            ['slug' => 'test-exam'],
+            [
             'slug' => 'test-exam',
             'name' => 'Test/Exam',
             'description' => 'Templates for educational assessments, quizzes, and exams',
@@ -528,6 +589,160 @@ JSON;
                     'type' => 'array',
                     'minItems' => 1,
                 ]
+            ]
+        ];
+    }
+
+    // Philippine Ballot Templates
+
+    private function getQuestionnaireTemplate(): string
+    {
+        return <<<'JSON'
+{
+  "spec_version": "1.0",
+  "document": {
+    "title": "{{election_name}} - Candidate List",
+    "type": "questionnaire",
+    "page_size": "letter",
+    "orientation": "portrait"
+  },
+  "header": {
+    "election_name": "{{election_name}}",
+    "precinct_code": "{{precinct_code}}",
+    "precinct_location": "{{precinct_location}}",
+    "date": "{{date}}"
+  },
+  "sections": [
+    {{#each positions}}
+    {
+      "type": "position_candidates",
+      "position_code": "{{code}}",
+      "position_title": "{{title}}",
+      "level": "{{level}}",
+      "max_selections": {{max_selections}},
+      "candidates": [
+        {{#each candidates}}
+        {
+          "code": "{{code}}",
+          "name": "{{name}}",
+          "party": "{{party}}"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ],
+  "footer": {
+    "electoral_inspectors": [
+      {{#each electoral_inspectors}}
+      {
+        "id": "{{id}}",
+        "name": "{{name}}",
+        "role": "{{role}}"
+      }{{#unless @last}},{{/unless}}
+      {{/each}}
+    ]
+  }
+}
+JSON;
+    }
+
+    private function getAnswerSheetTemplate(): string
+    {
+        return <<<'JSON'
+{
+  "spec_version": "1.0",
+  "document": {
+    "title": "{{election_name}} - Official Ballot",
+    "type": "ballot",
+    "page_size": "legal",
+    "orientation": "portrait"
+  },
+  "header": {
+    "election_name": "{{election_name}}",
+    "precinct_code": "{{precinct_code}}",
+    "precinct_location": "{{precinct_location}}",
+    "date": "{{date}}"
+  },
+  "instructions": [
+    {{#each instructions}}
+    "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  ],
+  "positions": [
+    {{#each positions}}
+    {
+      "code": "{{code}}",
+      "title": "{{title}}",
+      "level": "{{level}}",
+      "max_selections": {{max_selections}},
+      "instruction": "Vote for not more than {{max_selections}}",
+      "candidates": [
+        {{#each candidates}}
+        {
+          "code": "{{code}}",
+          "name": "{{name}}",
+          "party": "{{party}}",
+          "oval": "○"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}
+JSON;
+    }
+
+    private function getPhilippineBallotSampleData(): array
+    {
+        return [
+            'election_name' => 'Philippine National Elections 2025',
+            'precinct_code' => 'PRE-001',
+            'precinct_location' => 'Sample High School',
+            'date' => '2025-05-12',
+            'instructions' => [
+                'Use a black or blue pen to shade the oval completely.',
+                'Do not overvote.',
+            ],
+            'positions' => [
+                [
+                    'code' => 'PRESIDENT',
+                    'title' => 'President of the Philippines',
+                    'level' => 'national',
+                    'max_selections' => 1,
+                    'candidates' => [
+                        ['code' => 'P01', 'name' => 'Leonardo DiCaprio', 'party' => 'LD'],
+                        ['code' => 'P02', 'name' => 'Scarlett Johansson', 'party' => 'SJ'],
+                    ],
+                ],
+            ],
+            'electoral_inspectors' => [
+                ['id' => 'uuid-1', 'name' => 'Juan dela Cruz', 'role' => 'chairperson'],
+            ],
+        ];
+    }
+
+    private function getPhilippineBallotSchema(): array
+    {
+        return [
+            'type' => 'object',
+            'required' => ['election_name', 'precinct_code', 'precinct_location', 'date', 'positions'],
+            'properties' => [
+                'election_name' => ['type' => 'string', 'title' => 'Election Name'],
+                'precinct_code' => ['type' => 'string', 'title' => 'Precinct Code'],
+                'precinct_location' => ['type' => 'string', 'title' => 'Precinct Location'],
+                'date' => ['type' => 'string', 'format' => 'date', 'title' => 'Election Date'],
+                'instructions' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'positions' => [
+                    'type' => 'array',
+                    'title' => 'Positions',
+                    'minItems' => 1,
+                ],
+                'electoral_inspectors' => [
+                    'type' => 'array',
+                    'title' => 'Electoral Inspectors',
+                ],
             ]
         ];
     }
