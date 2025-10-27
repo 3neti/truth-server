@@ -56,7 +56,7 @@ class MultipleChoiceRenderer implements SectionRenderer
         $choicesPerCol = ceil(count($choices) / $numCols);
         $choiceIndex = 0;
         
-        foreach ($choices as $choice) {
+        foreach ($choices as $index => $choice) {
             $col = intval($choiceIndex / $choicesPerCol);
             $row = $choiceIndex % $choicesPerCol;
             
@@ -67,10 +67,12 @@ class MultipleChoiceRenderer implements SectionRenderer
             $bubbleId = "{$code}_{$choice['code']}";
             $this->omrDrawer->drawBubble($x, $y, $bubbleId);
             
-            // Draw label
+            // Draw label with 1-based number prepended
             $labelX = $x + $bubbleDiameter + $labelGap;
             $pdf->SetXY($labelX, $y);
-            $pdf->Cell($colWidth - $bubbleDiameter - $labelGap, $bubbleDiameter, $choice['label'], 0, 0, 'L');
+            $ordinalNumber = ($index + 1);
+            $displayLabel = empty($choice['label']) ? (string)$ordinalNumber : "{$ordinalNumber}. {$choice['label']}";
+            $pdf->Cell($colWidth - $bubbleDiameter - $labelGap, $bubbleDiameter, $displayLabel, 0, 0, 'L');
             
             $choiceIndex++;
         }
