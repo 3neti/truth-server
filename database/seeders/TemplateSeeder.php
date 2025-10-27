@@ -599,50 +599,38 @@ JSON;
     {
         return <<<'JSON'
 {
-  "spec_version": "1.0",
   "document": {
     "title": "{{election_name}} - Candidate List",
-    "type": "questionnaire",
-    "page_size": "letter",
-    "orientation": "portrait"
-  },
-  "header": {
-    "election_name": "{{election_name}}",
-    "precinct_code": "{{precinct_code}}",
-    "precinct_location": "{{precinct_location}}",
-    "date": "{{date}}"
+    "unique_id": "{{precinct_code}}-questionnaire-{{date}}",
+    "date": "{{date}}",
+    "precinct": "{{precinct_code}}",
+    "location": "{{precinct_location}}",
+    "layout": "questionnaire"
   },
   "sections": [
     {{#each positions}}
     {
-      "type": "position_candidates",
-      "position_code": "{{code}}",
-      "position_title": "{{title}}",
-      "level": "{{level}}",
-      "max_selections": {{max_selections}},
-      "candidates": [
+      "type": "multiple_choice",
+      "code": "{{code}}",
+      "title": "{{title}}",
+      "question": "{{title}} - Vote for not more than {{max_selections}}",
+      "maxSelections": {{max_selections}},
+      "layout": "single-column",
+      "metadata": {
+        "level": "{{level}}"
+      },
+      "choices": [
         {{#each candidates}}
         {
           "code": "{{code}}",
-          "name": "{{name}}",
-          "party": "{{party}}"
+          "label": "{{name}}",
+          "description": "{{party}}"
         }{{#unless @last}},{{/unless}}
         {{/each}}
       ]
     }{{#unless @last}},{{/unless}}
     {{/each}}
-  ],
-  "footer": {
-    "electoral_inspectors": [
-      {{#each electoral_inspectors}}
-      {
-        "id": "{{id}}",
-        "name": "{{name}}",
-        "role": "{{role}}"
-      }{{#unless @last}},{{/unless}}
-      {{/each}}
-    ]
-  }
+  ]
 }
 JSON;
     }
@@ -651,39 +639,32 @@ JSON;
     {
         return <<<'JSON'
 {
-  "spec_version": "1.0",
   "document": {
     "title": "{{election_name}} - Official Ballot",
-    "type": "ballot",
-    "page_size": "legal",
-    "orientation": "portrait"
+    "unique_id": "{{precinct_code}}-ballot-{{date}}",
+    "date": "{{date}}",
+    "precinct": "{{precinct_code}}",
+    "location": "{{precinct_location}}",
+    "layout": "ballot"
   },
-  "header": {
-    "election_name": "{{election_name}}",
-    "precinct_code": "{{precinct_code}}",
-    "precinct_location": "{{precinct_location}}",
-    "date": "{{date}}"
-  },
-  "instructions": [
-    {{#each instructions}}
-    "{{this}}"{{#unless @last}},{{/unless}}
-    {{/each}}
-  ],
-  "positions": [
+  "sections": [
     {{#each positions}}
     {
+      "type": "multiple_choice",
       "code": "{{code}}",
       "title": "{{title}}",
-      "level": "{{level}}",
-      "max_selections": {{max_selections}},
-      "instruction": "Vote for not more than {{max_selections}}",
-      "candidates": [
+      "question": "Vote for not more than {{max_selections}}",
+      "maxSelections": {{max_selections}},
+      "layout": "single-column",
+      "metadata": {
+        "level": "{{level}}"
+      },
+      "choices": [
         {{#each candidates}}
         {
           "code": "{{code}}",
-          "name": "{{name}}",
-          "party": "{{party}}",
-          "oval": "○"
+          "label": "{{name}}",
+          "description": "{{party}}"
         }{{#unless @last}},{{/unless}}
         {{/each}}
       ]
