@@ -27,6 +27,30 @@ mkdir -p "${RUN_DIR}"
 
 # Capture environment info
 echo -e "${YELLOW}Capturing environment info...${NC}"
+
+# Detect fiducial capabilities
+ARUCO_AVAILABLE="false"
+APRILTAG_AVAILABLE="false"
+if python3 -c "import cv2; cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)" 2>/dev/null; then
+    ARUCO_AVAILABLE="true"
+fi
+if python3 -c "import apriltag" 2>/dev/null || python3 -c "from pupil_apriltags import Detector" 2>/dev/null; then
+    APRILTAG_AVAILABLE="true"
+fi
+
+# Check if ArUco markers exist, generate if missing and ArUco is available
+if [ "${ARUCO_AVAILABLE}" = "true" ]; then
+    ARUCO_MARKER_DIR="storage/app/fiducial-markers/aruco"
+    if [ ! -d "${ARUCO_MARKER_DIR}" ] || [ -z "$(ls -A "${ARUCO_MARKER_DIR}" 2>/dev/null)" ]; then
+        echo -e "${YELLOW}⚠ ArUco markers not found, generating...${NC}"
+        if python3 scripts/generate_aruco_markers.py --size 200; then
+            echo -e "${GREEN}✓ ArUco markers generated${NC}"
+        else
+            echo -e "${RED}✗ Failed to generate ArUco markers${NC}"
+        fi
+    fi
+fi
+
 cat > "${RUN_DIR}/environment.json" <<EOF
 {
   "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
@@ -35,9 +59,35 @@ cat > "${RUN_DIR}/environment.json" <<EOF
   "php_version": "$(php -r 'echo PHP_VERSION;')",
   "python_version": "$(python3 --version 2>&1 | cut -d' ' -f2)",
   "imagick_version": "$(php -r 'echo (new Imagick())->getVersion()[\"versionString\"];' 2>/dev/null || echo 'not available')",
-  "opencv_version": "$(python3 -c 'import cv2; print(cv2.__version__)' 2>/dev/null || echo 'not available')"
+  "opencv_version": "$(python3 -c 'import cv2; print(cv2.__version__)' 2>/dev/null || echo 'not available')",
+  "fiducial_support": {
+    "black_square": true,
+    "aruco": ${ARUCO_AVAILABLE},
+    "apriltag": ${APRILTAG_AVAILABLE}
+  },
+  "omr_fiducial_mode": "${OMR_FIDUCIAL_MODE:-black_square}"
 }
 EOF
+
+# Display fiducial mode
+if [ -z "${OMR_FIDUCIAL_MODE}" ]; then
+    echo -e "${BLUE}Fiducial Mode:${NC} black_square (default)"
+else
+    echo -e "${BLUE}Fiducial Mode:${NC} ${OMR_FIDUCIAL_MODE}"
+fi
+
+if [ "${ARUCO_AVAILABLE}" = "true" ]; then
+    echo -e "${GREEN}✓ ArUco detection available${NC}"
+else
+    echo -e "${YELLOW}⚠ ArUco detection unavailable${NC}"
+fi
+
+if [ "${APRILTAG_AVAILABLE}" = "true" ]; then
+    echo -e "${GREEN}✓ AprilTag detection available${NC}"
+else
+    echo -e "${YELLOW}⚠ AprilTag detection unavailable${NC}"
+fi
+echo ""
 
 # Run tests with timestamped directory
 echo -e "${YELLOW}Running OMR appreciation tests...${NC}"
@@ -75,7 +125,8 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
   "scenarios": [
     $([ -d "${RUN_DIR}/scenario-1-normal" ] && echo '{"id": "scenario-1-normal", "name": "Normal Ballot", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-2-overvote" ] && echo '{"id": "scenario-2-overvote", "name": "Overvote Detection", "status": "executed"},' || echo '')
-    $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"}' || echo '')
+    $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"},' || echo '')
+    $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"}' || echo '')
   ]
 }
 EOF
@@ -129,10 +180,52 @@ Tests sensitivity to faint marks:
 - Lower detection threshold (0.25 vs 0.30)
 - Demonstrates threshold tuning challenges
 
+### Scenario 4: Fiducial Marker Detection
+**Directory:** `scenario-4-fiducials/`
+
+Tests fiducial marker detection and alignment:
+- Generates ballots with ArUco markers (if available)
+- Tests fiducial detection WITHOUT `--no-align` flag
+- Validates perspective correction and corner detection
+- Compares detection across available modes
+
 ## Template Files
 
 - `template/ballot.pdf` - Source ballot PDF
 - `template/coordinates.json` - Bubble coordinate mappings
+
+## Fiducial Markers
+
+Scenario 4 generates ballots with the current fiducial mode and tests detection:
+
+```bash
+# View blank ballot with fiducial markers (PNG and PDF)
+open scenario-4-fiducials/blank_with_fiducials.png
+open scenario-4-fiducials/ballot_with_fiducials.pdf
+
+# View filled ballot (with simulated marks)
+open scenario-4-fiducials/blank_with_fiducials_filled.png
+
+# Check fiducial detection results
+cat scenario-4-fiducials/fiducial_debug.log
+cat scenario-4-fiducials/metadata.json
+
+# Check appreciation output (if detection ran)
+cat scenario-4-fiducials/appreciation_output.txt
+```
+
+**Artifacts:**
+- `blank_with_fiducials.png` - Blank ballot showing fiducial markers in corners
+- `ballot_with_fiducials.pdf` - High-resolution PDF with embedded markers
+- `blank_with_fiducials_filled.png` - Ballot with simulated filled bubbles
+- `fiducial_debug.log` - Fiducial detection debug output
+- `appreciation_output.txt` - Full appreciation script output
+- `metadata.json` - Test metadata including fiducial mode
+
+The markers appear in the **corners** of the ballot:
+- **Black squares**: Traditional 10mm×10mm black rectangles
+- **ArUco markers**: QR-code-like patterns with unique IDs (101-104)
+- **AprilTag markers**: Similar to ArUco but different encoding (IDs 0-3)
 
 ## Environment
 
@@ -143,6 +236,12 @@ See `environment.json` for complete environment details.
 - Python: $(python3 --version 2>&1 | cut -d' ' -f2)
 - ImageMagick/Imagick: Available
 - OpenCV: Available
+
+**Fiducial Detection Support:**
+- Black Squares: ✅ Always available
+- ArUco: $([ "${ARUCO_AVAILABLE}" = "true" ] && echo "✅ Available" || echo "❌ Not available")
+- AprilTag: $([ "${APRILTAG_AVAILABLE}" = "true" ] && echo "✅ Available" || echo "❌ Not available")
+- Current Mode: \`${OMR_FIDUCIAL_MODE:-black_square}\`
 
 ## Viewing Results
 
@@ -173,6 +272,26 @@ cat test-output.txt
 - The `--no-align` flag is used to skip fiducial alignment for perfect synthetic images
 - Template artifacts may cause false positives; filtered using fill_ratio >= 0.95 threshold
 - Faint marks demonstrate the sensitivity/specificity tradeoff in mark detection
+
+### Fiducial Alignment
+
+The `--no-align` flag skips perspective correction because test images are perfect synthetic ballots. For real scanned ballots:
+
+```bash
+# Enable fiducial detection (removes --no-align)
+python3 appreciate.py <image> <coords> --threshold 0.3
+
+# Use specific fiducial mode
+export OMR_FIDUCIAL_MODE=aruco
+python3 appreciate.py <image> <coords> --threshold 0.3
+```
+
+**Fiducial Modes:**
+- \`black_square\`: Traditional corner squares (default)
+- \`aruco\`: ArUco markers with unique IDs (recommended for production)
+- \`apriltag\`: AprilTag markers (maximum robustness)
+
+To test with fiducial alignment, print the ballot PDF and scan it, then run appreciation without \`--no-align\`.
 
 ## Next Steps
 
