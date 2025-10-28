@@ -45,6 +45,7 @@ const saveForm = ref({
   name: '',
   description: '',
   template_ref: '',
+  document_type: '',
   category: 'general',
   is_public: false,
 })
@@ -117,19 +118,24 @@ async function loadTemplateData(id: number) {
 function openSaveDialog() {
   if (store.currentTemplateData) {
     // Editing existing file
+    // Extract document_type from JSON data if it exists
+    const documentType = store.currentTemplateData.data?.document?.type || ''
     saveForm.value = {
       name: store.currentTemplateData.name,
       description: store.currentTemplateData.description || '',
       template_ref: store.currentTemplateData.template_ref || '',
+      document_type: documentType,
       category: store.currentTemplateData.category,
       is_public: store.currentTemplateData.is_public,
     }
   } else {
-    // New file
+    // New file - try to infer document_type from current data
+    const documentType = dataObject.value?.document?.type || ''
     saveForm.value = {
       name: '',
       description: '',
       template_ref: '',
+      document_type: documentType,
       category: 'general',
       is_public: false,
     }
@@ -144,18 +150,30 @@ async function saveTemplateData() {
   }
 
   try {
+    // Merge document_type into the data object before saving
+    const dataToSave = { ...dataObject.value }
+    if (saveForm.value.document_type) {
+      if (!dataToSave.document) {
+        dataToSave.document = {}
+      }
+      dataToSave.document.type = saveForm.value.document_type
+    }
+    
+    // Remove document_type from saveForm before sending (it's not a model field)
+    const { document_type, ...formData } = saveForm.value
+    
     if (store.currentTemplateData) {
       // Update existing
       await store.updateTemplateData(store.currentTemplateData.id, {
-        ...saveForm.value,
-        data: dataObject.value,
+        ...formData,
+        data: dataToSave,
       })
       currentFileName.value = saveForm.value.name
     } else {
       // Create new
       const newFile = await store.createTemplateData({
-        ...saveForm.value,
-        data: dataObject.value,
+        ...formData,
+        data: dataToSave,
       })
       currentFileName.value = newFile.name
       
@@ -164,6 +182,9 @@ async function saveTemplateData() {
       url.searchParams.set('id', newFile.id.toString())
       window.history.pushState({}, '', url)
     }
+    
+    // Update local data object with document type
+    dataObject.value = dataToSave
     
     isModified.value = false
     showSaveDialog.value = false
@@ -520,6 +541,25 @@ function togglePreview() {
             />
             <p class="text-xs text-gray-500 mt-1">
               Link this data file to a template for validation and rendering
+            </p>
+          </div>
+
+          <div>
+            <Label>Document Type (Optional)</Label>
+            <select
+              v-model="saveForm.document_type"
+              class="w-full h-9 px-3 rounded-md border border-gray-300 text-sm"
+            >
+              <option value="">-- None --</option>
+              <option value="questionnaire">Questionnaire</option>
+              <option value="ballot">Ballot</option>
+              <option value="answer_sheet">Answer Sheet</option>
+              <option value="standard">Standard</option>
+              <option value="compact">Compact</option>
+              <option value="grid">Grid</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              Specify the document type for layout and rendering purposes
             </p>
           </div>
 

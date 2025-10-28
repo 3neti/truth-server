@@ -42,7 +42,7 @@ Route::prefix('truth-templates')
 
         // Data editor
         Route::get('/data/editor', function () {
-            return Inertia::render('TemplateDataEditor');
+            return Inertia::render('TruthTemplatesUi/pages/DataEditor');
         })->name('data.editor');
 
         // Data editor demo (possibly public)
