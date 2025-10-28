@@ -98,6 +98,43 @@ class OMRSimulator
     }
 
     /**
+     * Find candidate name from bubble ID using questionnaire data
+     * 
+     * @param string $bubbleId Bubble ID like 'PRESIDENT_LD_001'
+     * @param array|null $questionnaireData Questionnaire JSON with positions and candidates
+     * @return string|null Candidate name or null if not found
+     */
+    protected static function findCandidateName(string $bubbleId, ?array $questionnaireData): ?string
+    {
+        if (!$questionnaireData || !isset($questionnaireData['positions'])) {
+            return null;
+        }
+        
+        // Parse bubble ID: PRESIDENT_LD_001 -> position=PRESIDENT, code=LD_001
+        $parts = explode('_', $bubbleId, 2);
+        if (count($parts) < 2) {
+            return null;
+        }
+        
+        $positionCode = $parts[0];
+        $candidateCode = $parts[1];
+        
+        // Find position in questionnaire data
+        foreach ($questionnaireData['positions'] as $position) {
+            if ($position['code'] === $positionCode) {
+                // Find candidate in this position
+                foreach ($position['candidates'] as $candidate) {
+                    if ($candidate['code'] === $candidateCode) {
+                        return $candidate['name'];
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
      * Find bubble coordinates in the coordinates structure
      */
     protected static function findBubbleInCoordinates(array $coordinates, string $bubbleId): ?array
@@ -149,12 +186,16 @@ class OMRSimulator
         array $coordinates,
         array $options = []
     ): string {
+        // Load config with options override
+        $config = config('omr-template.overlay', []);
+        
         $dpi = $options['dpi'] ?? 300;
         $scenario = $options['scenario'] ?? 'normal';
         $contestLimits = $options['contest_limits'] ?? [];
         $showUnfilled = $options['show_unfilled'] ?? false;
-        $showLegend = $options['show_legend'] ?? true;
+        $showLegend = $options['show_legend'] ?? ($config['legend']['enabled'] ?? true);
         $outputPath = $options['output_path'] ?? null;
+        $questionnaireData = $options['questionnaire'] ?? null;
         
         // Detect overvotes if contest limits provided
         if (!empty($contestLimits)) {
@@ -185,30 +226,56 @@ class OMRSimulator
             $stats[$style['category']]++;
             
             // Draw circle with color coding
+            $radiusOffset = $config['circles']['radius_offset'] ?? 5;
             $draw->setStrokeColor(new ImagickPixel($style['color']));
             $draw->setStrokeWidth($style['thickness']);
             $draw->setFillOpacity(0);
-            $draw->ellipse($x, $y, $r + 5, $r + 5, 0, 360);
+            $draw->ellipse($x, $y, $r + $radiusOffset, $r + $radiusOffset, 0, 360);
             
-            // Add confidence and status labels
-            $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
+            // Build annotation text horizontally: percentage | status | candidate name
+            $fontPath = $config['font_path'] ?? '/System/Library/Fonts/Supplemental/Arial.ttf';
             if (file_exists($fontPath)) {
                 $draw->setFont($fontPath);
             }
-            $draw->setFontSize(11);
-            $draw->setFillColor(new ImagickPixel($style['color']));
             
-            // Confidence percentage
+            $textParts = [];
+            
+            // Confidence percentage (size 12)
             if (isset($mark['confidence']) || isset($mark['fill_ratio'])) {
                 $value = $mark['fill_ratio'] ?? $mark['confidence'];
-                $label = sprintf('%.0f%%', $value * 100);
-                $draw->annotation($x + $r + 10, $y, $label);
+                $textParts[] = sprintf('%.0f%%', $value * 100);
             }
             
-            // Status label (if applicable)
+            // Status label (if applicable, size 12)
             if (!empty($style['label'])) {
-                $draw->setFontSize(9);
-                $draw->annotation($x + $r + 10, $y + 12, $style['label']);
+                $textParts[] = $style['label'];
+            }
+            
+            // Candidate name for valid marks (size 14 - larger!)
+            $candidateName = null;
+            if ($questionnaireData && $style['category'] === 'valid') {
+                $candidateName = self::findCandidateName($bubbleId, $questionnaireData);
+                if ($candidateName) {
+                    $textParts[] = $candidateName;
+                }
+            }
+            
+            // Draw all parts horizontally in one line
+            if (!empty($textParts)) {
+                $separator = $config['layout']['separator'] ?? ' | ';
+                $text = implode($separator, $textParts);
+                
+                // Use font sizes from config
+                $fontSize = $candidateName 
+                    ? ($config['fonts']['valid_marks'] ?? 40)
+                    : ($config['fonts']['other_marks'] ?? 35);
+                $draw->setFontSize($fontSize);
+                $draw->setFillColor(new ImagickPixel($style['color']));
+                
+                // Position from config
+                $offsetX = $config['layout']['text_offset_x'] ?? 12;
+                $offsetY = $config['layout']['text_offset_y'] ?? 5;
+                $draw->annotation($x + $r + $offsetX, $y + $offsetY, $text);
             }
         }
         
@@ -233,11 +300,15 @@ class OMRSimulator
      */
     protected static function getMarkStyle(array $mark): array
     {
+        $config = config('omr-template.overlay', []);
+        $colors = $config['colors'] ?? [];
+        $circles = $config['circles'] ?? [];
+        
         // Red for overvotes
         if ($mark['is_overvote'] ?? false) {
             return [
-                'color' => 'red',
-                'thickness' => 4,
+                'color' => $colors['overvote'] ?? 'red',
+                'thickness' => $circles['overvote_thickness'] ?? 4,
                 'category' => 'overvote',
                 'label' => 'OVERVOTE',
             ];
@@ -246,8 +317,8 @@ class OMRSimulator
         // Orange/Yellow for ambiguous marks
         if (in_array('ambiguous', $mark['warnings'] ?? [])) {
             return [
-                'color' => 'orange',
-                'thickness' => 3,
+                'color' => $colors['ambiguous'] ?? 'orange',
+                'thickness' => $circles['other_thickness'] ?? 3,
                 'category' => 'ambiguous',
                 'label' => '⚠ AMBIGUOUS',
             ];
@@ -256,8 +327,8 @@ class OMRSimulator
         // Green for valid filled marks
         if (($mark['filled'] ?? false) && ($mark['fill_ratio'] ?? 0) >= 0.95) {
             return [
-                'color' => 'lime',
-                'thickness' => 4,
+                'color' => $colors['valid'] ?? 'lime',
+                'thickness' => $circles['valid_thickness'] ?? 4,
                 'category' => 'valid',
                 'label' => '',
             ];
@@ -266,8 +337,8 @@ class OMRSimulator
         // Yellow for filled but lower confidence
         if ($mark['filled'] ?? false) {
             return [
-                'color' => 'yellow',
-                'thickness' => 3,
+                'color' => $colors['low_confidence'] ?? 'yellow',
+                'thickness' => $circles['other_thickness'] ?? 3,
                 'category' => 'ambiguous',
                 'label' => 'LOW CONF',
             ];
@@ -279,8 +350,8 @@ class OMRSimulator
         $fillRatio = $mark['fill_ratio'] ?? null;
         if ($fillRatio !== null && $fillRatio >= 0.16 && $fillRatio < 0.45) {
             return [
-                'color' => 'orange',
-                'thickness' => 2,
+                'color' => $colors['faint'] ?? 'orange',
+                'thickness' => $circles['unfilled_thickness'] ?? 2,
                 'category' => 'ambiguous',
                 'label' => 'TOO FAINT',
             ];
@@ -288,8 +359,8 @@ class OMRSimulator
         
         // Gray for unfilled (no mark detected)
         return [
-            'color' => 'gray',
-            'thickness' => 2,
+            'color' => $colors['unfilled'] ?? 'gray',
+            'thickness' => $circles['unfilled_thickness'] ?? 2,
             'category' => 'unfilled',
             'label' => '',
         ];
@@ -344,39 +415,47 @@ class OMRSimulator
         array $stats,
         string $scenario
     ): void {
+        $config = config('omr-template.overlay.legend', []);
+        $colors = config('omr-template.overlay.colors', []);
+        $fonts = config('omr-template.overlay.fonts', []);
+        
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
         
-        // Legend position (top-right)
-        $legendX = $width - 280;
-        $legendY = 20;
-        $legendWidth = 260;
-        $legendHeight = 140;
+        // Legend position from config
+        $legendX = $width - ($config['margin_x'] ?? 280);
+        $legendY = $config['margin_y'] ?? 20;
+        $legendWidth = $config['width'] ?? 260;
+        $legendHeight = $config['height'] ?? 140;
         
         // Draw semi-transparent background
-        $draw->setFillColor(new ImagickPixel('rgba(255, 255, 255, 0.9)'));
-        $draw->setStrokeColor(new ImagickPixel('black'));
-        $draw->setStrokeWidth(2);
+        $bgColor = $config['background'] ?? 'rgba(255, 255, 255, 0.9)';
+        $borderColor = $config['border_color'] ?? 'black';
+        $borderWidth = $config['border_width'] ?? 2;
+        
+        $draw->setFillColor(new ImagickPixel($bgColor));
+        $draw->setStrokeColor(new ImagickPixel($borderColor));
+        $draw->setStrokeWidth($borderWidth);
         $draw->rectangle($legendX, $legendY, $legendX + $legendWidth, $legendY + $legendHeight);
         
         // Title
-        $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
+        $fontPath = config('omr-template.overlay.font_path', '/System/Library/Fonts/Supplemental/Arial.ttf');
         if (file_exists($fontPath)) {
             $draw->setFont($fontPath);
         }
-        $draw->setFontSize(14);
+        $draw->setFontSize($fonts['legend_title'] ?? 14);
         $draw->setFillColor(new ImagickPixel('black'));
         $draw->annotation($legendX + 10, $legendY + 25, 'Scenario: ' . ucfirst($scenario));
         
         // Color legend
-        $draw->setFontSize(11);
+        $draw->setFontSize($fonts['legend_text'] ?? 11);
         $yOffset = 50;
         
         $items = [
-            ['color' => 'lime', 'text' => "✓ Valid: {$stats['valid']}"],
-            ['color' => 'red', 'text' => "✗ Overvote: {$stats['overvote']}"],
-            ['color' => 'orange', 'text' => "⚠ Ambiguous: {$stats['ambiguous']}"],
-            ['color' => 'gray', 'text' => "○ Unfilled: {$stats['unfilled']}"],
+            ['color' => $colors['valid'] ?? 'lime', 'text' => "✓ Valid: {$stats['valid']}"],
+            ['color' => $colors['overvote'] ?? 'red', 'text' => "✗ Overvote: {$stats['overvote']}"],
+            ['color' => $colors['ambiguous'] ?? 'orange', 'text' => "⚠ Ambiguous: {$stats['ambiguous']}"],
+            ['color' => $colors['unfilled'] ?? 'gray', 'text' => "○ Unfilled: {$stats['unfilled']}"],
         ];
         
         foreach ($items as $item) {

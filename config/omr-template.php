@@ -268,4 +268,106 @@ return [
     |
     */
     'default_fiducial_layout' => env('OMR_FIDUCIAL_LAYOUT', 'default'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Overlay Visualization Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for visual overlays showing detected marks with color
+    | coding, confidence percentages, and candidate names.
+    |
+    | These overlays are generated during testing and appreciation to provide
+    | visual feedback on mark detection quality and results.
+    |
+    */
+    'overlay' => [
+        /*
+        | Font Sizes
+        |
+        | Sizes in points (pt) for different text elements on the overlay.
+        | Larger fonts improve readability for verification and auditing.
+        */
+        'fonts' => [
+            'valid_marks' => env('OMR_OVERLAY_FONT_VALID', 40),     // Valid marks with candidate names
+            'other_marks' => env('OMR_OVERLAY_FONT_OTHER', 35),     // Overvotes, faint marks, low confidence
+            'legend_title' => env('OMR_OVERLAY_FONT_LEGEND_TITLE', 14),
+            'legend_text' => env('OMR_OVERLAY_FONT_LEGEND_TEXT', 11),
+        ],
+
+        /*
+        | Colors
+        |
+        | Color coding for different mark types.
+        | Supports CSS color names, hex codes, or rgb() values.
+        */
+        'colors' => [
+            'valid' => env('OMR_OVERLAY_COLOR_VALID', 'lime'),              // High-confidence valid marks
+            'overvote' => env('OMR_OVERLAY_COLOR_OVERVOTE', 'red'),         // Multiple marks in single-choice
+            'ambiguous' => env('OMR_OVERLAY_COLOR_AMBIGUOUS', 'orange'),    // Marks with warnings
+            'faint' => env('OMR_OVERLAY_COLOR_FAINT', 'orange'),            // Below threshold (16-45% fill)
+            'unfilled' => env('OMR_OVERLAY_COLOR_UNFILLED', 'gray'),        // No mark detected
+            'low_confidence' => env('OMR_OVERLAY_COLOR_LOW_CONF', 'yellow'), // Filled but <95% confidence
+        ],
+
+        /*
+        | Circle Styles
+        |
+        | Visual styling for mark circles drawn on the overlay.
+        */
+        'circles' => [
+            'valid_thickness' => 4,      // Thick border for valid marks
+            'overvote_thickness' => 4,   // Thick border for overvotes
+            'other_thickness' => 3,      // Medium border for ambiguous/low confidence
+            'unfilled_thickness' => 2,   // Thin border for unfilled
+            'radius_offset' => 5,        // Extra pixels added to bubble radius
+        ],
+
+        /*
+        | Text Layout
+        |
+        | Positioning and formatting of text annotations.
+        */
+        'layout' => [
+            'separator' => env('OMR_OVERLAY_SEPARATOR', ' | '),  // Between percentage, status, name
+            'text_offset_x' => 12,       // Horizontal distance from bubble edge (pixels)
+            'text_offset_y' => 5,        // Vertical adjustment for centering (pixels)
+        ],
+
+        /*
+        | Legend Box
+        |
+        | Statistics and color key displayed on the overlay.
+        */
+        'legend' => [
+            'enabled' => env('OMR_OVERLAY_LEGEND', true),
+            'position' => 'top-right',   // Position on image
+            'width' => 260,              // Box width in pixels
+            'height' => 140,             // Box height in pixels
+            'margin_x' => 280,           // Distance from right edge
+            'margin_y' => 20,            // Distance from top edge
+            'background' => 'rgba(255, 255, 255, 0.9)',  // Semi-transparent white
+            'border_color' => 'black',
+            'border_width' => 2,
+        ],
+
+        /*
+        | Candidate Names
+        |
+        | Configuration for displaying candidate names on valid marks.
+        */
+        'candidates' => [
+            'enabled' => env('OMR_OVERLAY_SHOW_NAMES', true),
+            'questionnaire_document_id' => env('OMR_QUESTIONNAIRE_ID', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001'),
+            'auto_load' => true,         // Automatically load questionnaire in tests
+        ],
+
+        /*
+        | Font Path
+        |
+        | Path to TrueType font file for text rendering.
+        | Falls back to system default if not found.
+        */
+        'font_path' => '/System/Library/Fonts/Supplemental/Arial.ttf',
+    ],
 ];

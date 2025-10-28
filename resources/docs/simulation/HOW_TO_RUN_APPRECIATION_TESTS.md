@@ -377,6 +377,71 @@ Your test passes when:
 
 ---
 
+## 🎨 Customize Overlay Appearance
+
+### Change Font Sizes
+
+```bash
+# Larger fonts for presentations
+OMR_OVERLAY_FONT_VALID=60 OMR_OVERLAY_FONT_OTHER=50 php artisan test --filter=appreciation
+
+# Smaller fonts for documentation
+OMR_OVERLAY_FONT_VALID=25 OMR_OVERLAY_FONT_OTHER=20 php artisan test --filter=appreciation
+```
+
+### Change Colors
+
+```bash
+# Custom color scheme
+OMR_OVERLAY_COLOR_VALID=green OMR_OVERLAY_COLOR_OVERVOTE=darkred php artisan test --filter=appreciation
+
+# Blue theme
+OMR_OVERLAY_COLOR_VALID='#00FF00' OMR_OVERLAY_COLOR_UNFILLED='#808080' php artisan test --filter=appreciation
+```
+
+### Hide Legend
+
+```bash
+# Minimal overlay without legend box
+OMR_OVERLAY_LEGEND=false php artisan test --filter=appreciation
+
+# Or run the full test suite
+OMR_OVERLAY_LEGEND=false ./scripts/test-omr-appreciation.sh
+```
+
+### Hide Candidate Names
+
+```bash
+# Show only marks without names
+OMR_OVERLAY_SHOW_NAMES=false php artisan test --filter=appreciation
+```
+
+### Permanent Configuration
+
+Edit `config/omr-template.php` under the `overlay` section:
+
+```php
+'overlay' => [
+    'fonts' => [
+        'valid_marks' => 40,     // Adjust as needed
+        'other_marks' => 35,
+    ],
+    'colors' => [
+        'valid' => 'lime',       // Change colors
+        'overvote' => 'red',
+    ],
+    'legend' => [
+        'enabled' => true,       // Toggle legend
+        'width' => 260,
+        'height' => 140,
+    ],
+],
+```
+
+**See also:** [OMR Overlay Configuration Guide](../../../docs/OMR_OVERLAY_CONFIGURATION.md)
+
+---
+
 ## 🚀 Advanced Usage
 
 ### Simulate Noise

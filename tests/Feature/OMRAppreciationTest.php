@@ -43,14 +43,20 @@ it('appreciates simulated Philippine ballot correctly', function () {
     $scenarioDir = "{$this->runDir}/scenario-1-normal";
     mkdir($scenarioDir, 0755, true);
     
-    // 1. Load template and data
+    // 1. Load templates and data
     $template = Template::where('layout_variant', 'answer-sheet')->first();
     $data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
     
+    // Load questionnaire template and data for candidate names
+    $questionnaireTemplate = Template::where('layout_variant', 'questionnaire')->first();
+    $questionnaireData = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
+    
     expect($template)->not->toBeNull('Template with layout_variant "answer-sheet" not found');
     expect($data)->not->toBeNull('Template data with document_id "PH-2025-BALLOT-CURRIMAO-001" not found');
+    expect($questionnaireTemplate)->not->toBeNull('Questionnaire template not found');
+    expect($questionnaireData)->not->toBeNull('Questionnaire data not found');
     
-    // 2. Compile and render
+    // 2. Compile and render ballot
     $spec = CompileHandlebarsTemplate::run(
         $template->handlebars_template, 
         $data->json_data
@@ -60,6 +66,13 @@ it('appreciates simulated Philippine ballot correctly', function () {
     $pdfPath = $result['pdf'];
     $coordsPath = $result['coords'];
     
+    // Render questionnaire
+    $questionnaireSpec = CompileHandlebarsTemplate::run(
+        $questionnaireTemplate->handlebars_template,
+        $questionnaireData->json_data
+    );
+    $questionnaireResult = RenderTemplateSpec::run($questionnaireSpec);
+    
     // Copy template files to run directory (ensure directory exists)
     $templateDir = "{$this->runDir}/template";
     if (!is_dir($templateDir)) {
@@ -67,6 +80,7 @@ it('appreciates simulated Philippine ballot correctly', function () {
     }
     copy($pdfPath, "{$templateDir}/ballot.pdf");
     copy($coordsPath, "{$templateDir}/coordinates.json");
+    copy($questionnaireResult['pdf'], "{$templateDir}/questionnaire.pdf");
     
     expect($pdfPath)->toBeFile();
     expect($coordsPath)->toBeFile();
@@ -167,6 +181,7 @@ it('appreciates simulated Philippine ballot correctly', function () {
             'show_legend' => true,
             'show_unfilled' => false,
             'output_path' => "{$scenarioDir}/overlay.png",
+            'questionnaire' => $questionnaireData->json_data,
         ]
     );
     
@@ -205,9 +220,11 @@ it('handles overvote scenario for President', function () {
     
     $template = Template::where('layout_variant', 'answer-sheet')->first();
     $data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+    $questionnaireData = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
     
     expect($template)->not->toBeNull();
     expect($data)->not->toBeNull();
+    expect($questionnaireData)->not->toBeNull();
     
     $spec = CompileHandlebarsTemplate::run($template->handlebars_template, $data->json_data);
     $result = RenderTemplateSpec::run($spec);
@@ -256,6 +273,7 @@ it('handles overvote scenario for President', function () {
             'contest_limits' => ['PRESIDENT' => 1],
             'show_legend' => true,
             'output_path' => "{$scenarioDir}/overlay.png",
+            'questionnaire' => $questionnaireData->json_data,
         ]
     );
     
@@ -285,9 +303,11 @@ it('handles faint marks with lower threshold', function () {
     
     $template = Template::where('layout_variant', 'answer-sheet')->first();
     $data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+    $questionnaireData = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
     
     expect($template)->not->toBeNull();
     expect($data)->not->toBeNull();
+    expect($questionnaireData)->not->toBeNull();
     
     $spec = CompileHandlebarsTemplate::run($template->handlebars_template, $data->json_data);
     $result = RenderTemplateSpec::run($spec);
@@ -354,6 +374,7 @@ it('handles faint marks with lower threshold', function () {
             'show_unfilled' => true,  // Show the faint mark even if not detected as filled
             'highlight_ambiguous' => true,
             'output_path' => "{$scenarioDir}/overlay.png",
+            'questionnaire' => $questionnaireData->json_data,
         ]
     );
     

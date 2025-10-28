@@ -4,6 +4,10 @@
 
 The enhanced overlay system provides color-coded visual feedback for OMR appreciation results, making it easy to identify valid marks, overvotes, ambiguous marks, and unfilled bubbles at a glance.
 
+**New in this version:**
+- **Candidate names** displayed next to valid (green) marks
+- **Questionnaire PDF** artifact showing full candidate list for reference
+
 ## Color Coding Scheme
 
 ### Mark Status Colors
@@ -43,12 +47,14 @@ The enhanced overlay system provides color-coded visual feedback for OMR appreci
 **Visual Appearance:**
 - 5 bright **green circles** with thick borders
 - Each shows percentage (e.g., "100%")
+- **Candidate names** displayed next to each valid mark (e.g., "Leonardo DiCaprio")
 - Legend shows: "✓ Valid: 5"
 
 **Interpretation:**
 - All expected marks detected
 - High confidence on all marks
 - No issues or warnings
+- Easy to verify correct candidates were selected
 
 ```
 ┌─────────────────────────────────────┐
@@ -58,6 +64,11 @@ The enhanced overlay system provides color-coded visual feedback for OMR appreci
 │ ⚠ Ambiguous: 0                      │
 │ ○ Unfilled: 0                       │
 └─────────────────────────────────────┘
+
+PRESIDENT_LD_001:  🟢 100%  Leonardo DiCaprio
+VICE-PRESIDENT_VD_002:  🟢 100%  Viola Davis
+SENATOR_JD_001:  🟢 100%  Johnny Depp
+...
 ```
 
 ### Scenario 2: Overvote Detection
@@ -126,7 +137,9 @@ $overlayPath = OMRSimulator::createOverlay(
             'PRESIDENT' => 1,
             'SENATOR' => 12,
         ],
+        'questionnaire' => $questionnaireData,  // Candidate names data
         'dpi' => 300,                   // Image resolution
+        'output_path' => 'overlay.png', // Custom output path
     ]
 );
 ```
@@ -139,6 +152,8 @@ $overlayPath = OMRSimulator::createOverlay(
 | `show_legend` | bool | `true` | Display legend box |
 | `show_unfilled` | bool | `false` | Show unfilled bubbles in gray |
 | `contest_limits` | array | `[]` | Max selections per contest for overvote detection |
+| `questionnaire` | array | `null` | Questionnaire data with positions/candidates for name display |
+| `output_path` | string | `null` | Custom output path (auto-generated if not provided) |
 | `dpi` | int | `300` | Image resolution (dots per inch) |
 | `highlight_ambiguous` | bool | `false` | Extra emphasis on ambiguous marks |
 
@@ -253,6 +268,9 @@ The overlay is automatically generated for each test scenario:
 # View overlays after test run
 cd storage/app/tests/omr-appreciation/latest
 
+# View questionnaire (candidate reference)
+open template/questionnaire.pdf
+
 # Normal ballot
 open scenario-1-normal/overlay.png
 
@@ -261,6 +279,26 @@ open scenario-2-overvote/overlay.png
 
 # Faint marks
 open scenario-3-faint/overlay.png
+```
+
+### Test Artifacts Structure
+
+```
+storage/app/tests/omr-appreciation/runs/2025-10-28_171410/
+├── template/
+│   ├── ballot.pdf              # Blank ballot template
+│   ├── coordinates.json        # Bubble coordinates
+│   └── questionnaire.pdf       # Candidate list (NEW!)
+├── scenario-1-normal/
+│   ├── blank.png
+│   ├── blank_filled.png
+│   ├── overlay.png            # With candidate names (NEW!)
+│   ├── results.json
+│   └── metadata.json
+├── scenario-2-overvote/
+│   └── ...
+└── scenario-3-faint/
+    └── ...
 ```
 
 ## Comparison Workflow
