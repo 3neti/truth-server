@@ -214,19 +214,66 @@ return [
     | Fiducial Markers (Orientation Detection)
     |--------------------------------------------------------------------------
     |
-    | Fiducial markers are black squares positioned at page corners to help
-    | OpenCV detect page orientation (0°, 90°, 180°, 270°).
+    | Fiducial markers help OpenCV detect page alignment and orientation.
     |
-    | Layouts:
-    | - default: Symmetrical corners (basic alignment only)
-    | - asymmetrical_right: Right side offset for orientation detection
-    | - asymmetrical_diagonal: Diagonal pattern for robust detection
+    | Supported modes:
+    | - black_square: Simple black squares (current default, no unique IDs)
+    | - aruco: ArUco markers with unique IDs (built into OpenCV)
+    | - apriltag: AprilTag markers (requires apriltag library)
+    |
+    | Mode Selection:
+    | Set OMR_FIDUCIAL_MODE environment variable to switch modes.
+    | ArUco/AprilTag provide unique IDs per corner for unambiguous matching.
     |
     | Coordinates are in millimeters for A4 (210mm x 297mm).
     | At 300 DPI: 1mm ≈ 11.811 pixels
     |
     */
     'fiducials' => [
+        /*
+        | Fiducial Mode
+        |
+        | Detection mode for fiducial markers.
+        | Options: 'black_square', 'aruco', 'apriltag'
+        */
+        'mode' => env('OMR_FIDUCIAL_MODE', 'black_square'),
+        
+        /*
+        | ArUco Configuration
+        |
+        | Settings for ArUco marker detection and generation.
+        | Only used when mode = 'aruco'
+        */
+        'aruco' => [
+            'enabled' => env('OMR_ARUCO_ENABLED', false),
+            'dictionary' => env('OMR_ARUCO_DICTIONARY', 'DICT_6X6_250'),
+            'corner_ids' => [101, 102, 103, 104],  // TL, TR, BR, BL
+            'size_mm' => env('OMR_ARUCO_SIZE_MM', 10),  // 10mm = ~0.39 inches (same as black squares)
+            'quiet_zone_mm' => 2,  // White border around marker
+            'marker_resource_path' => 'fiducials/aruco',  // Path in resources/
+        ],
+        
+        /*
+        | AprilTag Configuration
+        |
+        | Settings for AprilTag marker detection and generation.
+        | Only used when mode = 'apriltag'
+        */
+        'apriltag' => [
+            'enabled' => env('OMR_APRILTAG_ENABLED', false),
+            'family' => env('OMR_APRILTAG_FAMILY', 'tag36h11'),
+            'corner_ids' => [0, 1, 2, 3],  // TL, TR, BR, BL
+            'size_mm' => env('OMR_APRILTAG_SIZE_MM', 10),  // 10mm = ~0.39 inches (same as black squares)
+            'quiet_zone_mm' => 2,
+            'marker_resource_path' => 'fiducials/apriltag',
+        ],
+        
+        /*
+        | Black Square Layouts (Legacy/Default)
+        |
+        | Traditional black square fiducials without unique IDs.
+        | Used when mode = 'black_square'
+        */
         'default' => [
             'top_left' => ['x' => 10, 'y' => 10],
             'top_right' => ['x' => 190, 'y' => 10],

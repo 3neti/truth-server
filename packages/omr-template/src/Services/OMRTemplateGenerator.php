@@ -105,15 +105,22 @@ class OMRTemplateGenerator
     {
         // Fiducial markers
         if (isset($data['fiducials']) && is_array($data['fiducials'])) {
-            $pdf->SetFillColor(0, 0, 0);
-            foreach ($data['fiducials'] as $fiducial) {
-                $pdf->Rect(
-                    $fiducial['x'],
-                    $fiducial['y'],
-                    $fiducial['width'] ?? 10,
-                    $fiducial['height'] ?? 10,
-                    'F'
-                );
+            $fiducialMode = $this->getConfigValue('fiducials.mode', 'black_square');
+            
+            if ($fiducialMode === 'aruco') {
+                $this->renderArucoMarkers($pdf, $data['fiducials']);
+            } else {
+                // Default: black square markers
+                $pdf->SetFillColor(0, 0, 0);
+                foreach ($data['fiducials'] as $fiducial) {
+                    $pdf->Rect(
+                        $fiducial['x'],
+                        $fiducial['y'],
+                        $fiducial['width'] ?? 10,
+                        $fiducial['height'] ?? 10,
+                        'F'
+                    );
+                }
             }
         }
 
@@ -273,6 +280,79 @@ class OMRTemplateGenerator
         }
     }
 
+    /**
+     * Render ArUco markers by embedding PNG images
+     * 
+     * @param TCPDF $pdf PDF instance
+     * @param array $fiducials Array of fiducial marker positions
+     */
+    protected function renderArucoMarkers(TCPDF $pdf, array $fiducials): void
+    {
+        $arucoConfig = $this->getConfigValue('fiducials.aruco', []);
+        $cornerIds = $arucoConfig['corner_ids'] ?? [101, 102, 103, 104];
+        $resourcePath = $arucoConfig['marker_resource_path'] ?? 'fiducials/aruco';
+        
+        // Map positions to marker IDs
+        $positionToId = [
+            'top_left' => $cornerIds[0],
+            'top_right' => $cornerIds[1],
+            'bottom_right' => $cornerIds[2],
+            'bottom_left' => $cornerIds[3],
+        ];
+        
+        foreach ($fiducials as $fiducial) {
+            $position = $fiducial['position'] ?? null;
+            if (!$position || !isset($positionToId[$position])) {
+                continue;
+            }
+            
+            $markerId = $positionToId[$position];
+            $markerPath = $this->getResourcePath("{$resourcePath}/marker_{$markerId}.png");
+            
+            if (!file_exists($markerPath)) {
+                // Fallback to black square if ArUco marker not found
+                $pdf->SetFillColor(0, 0, 0);
+                $pdf->Rect(
+                    $fiducial['x'],
+                    $fiducial['y'],
+                    $fiducial['width'] ?? 10,
+                    $fiducial['height'] ?? 10,
+                    'F'
+                );
+                continue;
+            }
+            
+            // Embed ArUco marker PNG
+            $pdf->Image(
+                $markerPath,
+                $fiducial['x'],
+                $fiducial['y'],
+                $fiducial['width'] ?? 10,
+                $fiducial['height'] ?? 10,
+                'PNG'
+            );
+        }
+    }
+    
+    /**
+     * Get resource path (works in Laravel and standalone)
+     */
+    protected function getResourcePath(string $path): string
+    {
+        // Try Laravel's resource_path() if available
+        if (function_exists('resource_path')) {
+            try {
+                return resource_path($path);
+            } catch (\Exception $e) {
+                // Fall through
+            }
+        }
+        
+        // Fallback for standalone
+        $baseDir = __DIR__ . '/../../resources';
+        return $baseDir . '/' . ltrim($path, '/');
+    }
+    
     /**
      * Get fiducials for a specific layout
      * 

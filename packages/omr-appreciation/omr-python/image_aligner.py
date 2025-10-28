@@ -2,11 +2,145 @@
 
 import cv2
 import numpy as np
+import os
 from typing import List, Tuple, Optional
 
 
+def detect_apriltag_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[int, int]]]:
+    """Detect AprilTag fiducial markers in the image.
+    
+    Args:
+        image: Input image (BGR)
+        template: Template dictionary containing AprilTag config
+        
+    Returns:
+        List of 4 (x, y) coordinates for fiducials [TL, TR, BL, BR], or None if detection fails
+    """
+    # Get AprilTag configuration
+    tag_family = os.getenv('OMR_APRILTAG_FAMILY', 'tag36h11')
+    corner_ids = [0, 1, 2, 3]  # TL, TR, BR, BL
+    
+    try:
+        # Try importing apriltag library
+        try:
+            import apriltag
+            detector = apriltag.Detector(apriltag.DetectorOptions(families=tag_family))
+        except ImportError:
+            try:
+                from pupil_apriltags import Detector
+                detector = Detector(families=tag_family)
+            except ImportError:
+                print("AprilTag library not found. Install: pip3 install apriltag")
+                return None
+        
+        # Convert to grayscale
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        
+        # Detect tags
+        detections = detector.detect(gray)
+        
+        if len(detections) < 4:
+            return None
+        
+        # Map detected IDs to positions
+        detected = {}
+        for detection in detections:
+            tag_id = detection.tag_id
+            if tag_id in corner_ids:
+                # Get center of tag
+                cx, cy = detection.center
+                detected[tag_id] = (int(cx), int(cy))
+        
+        # Check if we have all 4 corners
+        if len(detected) < 4:
+            return None
+        
+        # Return in order: TL, TR, BL, BR
+        fiducials = [
+            detected.get(corner_ids[0]),  # TL (0)
+            detected.get(corner_ids[1]),  # TR (1)
+            detected.get(corner_ids[3]),  # BL (3)
+            detected.get(corner_ids[2]),  # BR (2)
+        ]
+        
+        # Verify all markers found
+        if any(f is None for f in fiducials):
+            return None
+            
+        return fiducials
+        
+    except Exception as e:
+        print(f"AprilTag detection error: {e}")
+        return None
+
+
+def detect_aruco_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[int, int]]]:
+    """Detect ArUco fiducial markers in the image.
+    
+    Args:
+        image: Input image (BGR)
+        template: Template dictionary containing ArUco config
+        
+    Returns:
+        List of 4 (x, y) coordinates for fiducials [TL, TR, BL, BR], or None if detection fails
+    """
+    # Get ArUco configuration
+    aruco_dict_name = os.getenv('OMR_ARUCO_DICTIONARY', 'DICT_6X6_250')
+    corner_ids = [101, 102, 103, 104]  # TL, TR, BR, BL
+    
+    try:
+        # Get ArUco dictionary
+        aruco_dict_id = getattr(cv2.aruco, aruco_dict_name)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_id)
+        aruco_params = cv2.aruco.DetectorParameters()
+        
+        # Detect markers
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=aruco_params)
+        
+        if ids is None or len(ids) < 4:
+            return None
+        
+        # Map detected IDs to positions
+        detected = {}
+        for i, marker_id in enumerate(ids.flatten()):
+            if marker_id in corner_ids:
+                # Get center of marker
+                corner = corners[i][0]
+                cx = int(np.mean(corner[:, 0]))
+                cy = int(np.mean(corner[:, 1]))
+                detected[marker_id] = (cx, cy)
+        
+        # Check if we have all 4 corners
+        if len(detected) < 4:
+            return None
+        
+        # Return in order: TL, TR, BL, BR
+        fiducials = [
+            detected.get(corner_ids[0]),  # TL (101)
+            detected.get(corner_ids[1]),  # TR (102)
+            detected.get(corner_ids[3]),  # BL (104)
+            detected.get(corner_ids[2]),  # BR (103)
+        ]
+        
+        # Verify all markers found
+        if any(f is None for f in fiducials):
+            return None
+            
+        return fiducials
+        
+    except (AttributeError, cv2.error) as e:
+        print(f"ArUco detection error: {e}")
+        return None
+
+
 def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[int, int]]]:
-    """Detect 4 fiducial markers (black squares) in the image.
+    """Detect 4 fiducial markers in the image.
+    
+    Supports multiple fiducial modes:
+    - black_square: Traditional black square detection (default)
+    - aruco: ArUco marker detection with unique IDs
+    - apriltag: AprilTag marker detection with unique IDs
     
     Args:
         image: Input image (BGR)
@@ -15,6 +149,22 @@ def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[i
     Returns:
         List of 4 (x, y) coordinates for fiducials, or None if detection fails
     """
+    # Check fiducial mode from environment
+    fiducial_mode = os.getenv('OMR_FIDUCIAL_MODE', 'black_square')
+    
+    # Try AprilTag detection if enabled
+    if fiducial_mode == 'apriltag':
+        apriltag_result = detect_apriltag_fiducials(image, template)
+        if apriltag_result is not None:
+            return apriltag_result
+        print("AprilTag detection failed, falling back to black square detection")
+    
+    # Try ArUco detection if enabled
+    elif fiducial_mode == 'aruco':
+        aruco_result = detect_aruco_fiducials(image, template)
+        if aruco_result is not None:
+            return aruco_result
+        print("ArUco detection failed, falling back to black square detection")
     # Handle both formats: 'fiducials' (array) or 'fiducial' (dict with tl/tr/bl/br)
     expected_fiducials = template.get('fiducials', [])
     
