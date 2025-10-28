@@ -618,7 +618,8 @@ JSON;
       "layout": "single-column",
       "metadata": {
         "level": "{{level}}",
-        "show_bubbles": false
+        "show_bubbles": false,
+        "row_gap": 3.0
       },
       "choices": [
         {{#each candidates}}
@@ -659,7 +660,8 @@ JSON;
       "layout": "single-column",
       "metadata": {
         "level": "{{level}}",
-        "show_bubbles": true
+        "show_bubbles": true,
+        "row_gap": 0.5
       },
       "choices": [
         {{#each candidates}}

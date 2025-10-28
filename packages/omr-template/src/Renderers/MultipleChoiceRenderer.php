@@ -40,7 +40,8 @@ class MultipleChoiceRenderer implements SectionRenderer
         $layoutConfig = $this->config['layouts'][$layout] ?? $this->config['layouts']['2-col'];
         $numCols = $layoutConfig['cols'];
         $gutter = $layoutConfig['gutter'];
-        $rowGap = $layoutConfig['row_gap'];
+        // Allow section-level row_gap override via metadata
+        $rowGap = $section['metadata']['row_gap'] ?? $layoutConfig['row_gap'];
         
         // Render section title
         $fontConfig = $this->config['fonts']['header'];

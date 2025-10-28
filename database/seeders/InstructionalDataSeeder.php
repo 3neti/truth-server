@@ -199,7 +199,7 @@ class InstructionalDataSeeder extends Seeder
         $precinctConfig = Yaml::parseFile(config_path('precinct.yaml'));
         $mappingConfig = Yaml::parseFile(config_path('mapping.yaml'));
 
-        // Build a lookup map: candidate code => ordinal number from mapping
+        // Build a lookup map: candidate code => ordinal number from mapping (optional)
         $candidateNumbers = [];
         foreach ($mappingConfig['marks'] as $mark) {
             $key = $mark['key']; // e.g., 'A1', 'B2', 'C10'
@@ -222,16 +222,19 @@ class InstructionalDataSeeder extends Seeder
                 'candidates' => [],
             ];
 
-            // Add candidates for this position with ordinal numbers from mapping
+            // Add candidates for this position with auto-assigned sequential ordinal numbers
             if (isset($electionConfig['candidates'][$position['code']])) {
+                $ordinalNumber = 1; // Start numbering from 1 for each position
                 foreach ($electionConfig['candidates'][$position['code']] as $candidate) {
                     $candidateCode = $candidate['code'];
                     $positionData['candidates'][] = [
                         'code' => $candidateCode,
                         'name' => $candidate['name'],
                         'party' => $candidate['alias'] ?? null,
-                        'number' => $candidateNumbers[$candidateCode] ?? 0, // Default to 0 if not in mapping
+                        // Use mapping if available, otherwise auto-assign sequential number
+                        'number' => $candidateNumbers[$candidateCode] ?? $ordinalNumber,
                     ];
+                    $ordinalNumber++;
                 }
             }
 

@@ -39,9 +39,9 @@ return [
     |
     */
     'layouts' => [
-        '1-col' => ['cols' => 1, 'gutter' => 6, 'row_gap' => 0.5, 'cell_pad' => 2],
-        '2-col' => ['cols' => 2, 'gutter' => 10, 'row_gap' => 0.5, 'cell_pad' => 2],
-        '3-col' => ['cols' => 3, 'gutter' => 10, 'row_gap' => 0.5, 'cell_pad' => 2],
+        '1-col' => ['cols' => 1, 'gutter' => 6, 'row_gap' => 1.5, 'cell_pad' => 2],
+        '2-col' => ['cols' => 2, 'gutter' => 10, 'row_gap' => 1.5, 'cell_pad' => 2],
+        '3-col' => ['cols' => 3, 'gutter' => 10, 'row_gap' => 1.5, 'cell_pad' => 2],
     ],
 
     /*
@@ -52,7 +52,7 @@ return [
     | Vertical spacing between sections (in mm).
     |
     */
-    'section_spacing' => 0.5,
+    'section_spacing' => 1.5,
 
     /*
     |--------------------------------------------------------------------------
