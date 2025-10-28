@@ -13,6 +13,7 @@ The enhanced overlay system provides color-coded visual feedback for OMR appreci
 | 🟢 **Green** | Valid | Filled mark with high confidence (≥95%) | Normal valid votes |
 | 🔴 **Red** | Overvote | Multiple marks in single-choice position | Invalid - won't be counted |
 | 🟠 **Orange** | Ambiguous | Mark detected but with warnings | Needs review |
+| 🟠 **Orange** | Too Faint | Fill ratio 16-45% (above noise, below threshold) | Not detected as filled |
 | 🟡 **Yellow** | Low Confidence | Filled but below high confidence threshold | May need verification |
 | ⚪ **Gray** | Unfilled | No mark detected (optional display) | Reference only |
 
@@ -80,18 +81,20 @@ PRESIDENT_SJ_002:  ⭕ 95% OVERVOTE
 ### Scenario 3: Faint Marks
 
 **Visual Appearance:**
-- **Orange circle** on faint mark
-- Label: "⚠ AMBIGUOUS"
-- Lower percentage shown
-- May include unfilled marks for context
+- **Orange circle** on faint mark with thin border
+- Label: "TOO FAINT" + percentage (e.g., "20%")
+- **Gray circles** on all other bubbles for context
+- Legend shows: "⚠ Ambiguous: 1" + "○ Unfilled: 244"
 
 **Interpretation:**
-- Mark detected but below ideal threshold
-- May need manual review
-- Demonstrates sensitivity limits
+- Mark has some darkness but below detection threshold
+- Fill ratio 16-45% range (above background noise ~14%, below threshold)
+- Demonstrates the challenge of faint mark detection
+- Shows all bubbles to provide context (noise shows as gray)
 
 ```
-PRESIDENT_LD_001:  ⚠ 20% ⚠ AMBIGUOUS
+PRESIDENT_LD_001:  ⚕ 20% TOO FAINT
+(with gray circles on all other unfilled bubbles)
 ```
 
 ## Using the Overlay System

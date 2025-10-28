@@ -166,9 +166,9 @@ it('appreciates simulated Philippine ballot correctly', function () {
             'scenario' => 'normal',
             'show_legend' => true,
             'show_unfilled' => false,
+            'output_path' => "{$scenarioDir}/overlay.png",
         ]
     );
-    copy($overlayPath, "{$scenarioDir}/overlay.png");
     
     expect($overlayPath)->toBeFile();
     
@@ -255,9 +255,9 @@ it('handles overvote scenario for President', function () {
             'scenario' => 'overvote',
             'contest_limits' => ['PRESIDENT' => 1],
             'show_legend' => true,
+            'output_path' => "{$scenarioDir}/overlay.png",
         ]
     );
-    copy($overlayPath, "{$scenarioDir}/overlay.png");
     
     // Save report
     file_put_contents(
@@ -343,6 +343,7 @@ it('handles faint marks with lower threshold', function () {
     // In production, you may need to tune thresholds based on scanner characteristics
     
     // Generate overlay highlighting ambiguous marks
+    // Show all marks including the faint one (even if below threshold)
     $overlayPath = OMRSimulator::createOverlay(
         $filledPng, 
         $appreciationResult['results'], 
@@ -350,10 +351,11 @@ it('handles faint marks with lower threshold', function () {
         [
             'scenario' => 'faint',
             'show_legend' => true,
+            'show_unfilled' => true,  // Show the faint mark even if not detected as filled
             'highlight_ambiguous' => true,
+            'output_path' => "{$scenarioDir}/overlay.png",
         ]
     );
-    copy($overlayPath, "{$scenarioDir}/overlay.png");
     
     // Save report
     file_put_contents(

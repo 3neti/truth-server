@@ -140,7 +140,7 @@ class OMRSimulator
      * @param string $basePath Path to base image
      * @param array $detectedMarks Array of detected marks from appreciation
      * @param array $coordinates Coordinates JSON
-     * @param array $options Display options
+     * @param array $options Display options (output_path, dpi, scenario, etc.)
      * @return string Path to overlay image
      */
     public static function createOverlay(
@@ -154,6 +154,7 @@ class OMRSimulator
         $contestLimits = $options['contest_limits'] ?? [];
         $showUnfilled = $options['show_unfilled'] ?? false;
         $showLegend = $options['show_legend'] ?? true;
+        $outputPath = $options['output_path'] ?? null;
         
         // Detect overvotes if contest limits provided
         if (!empty($contestLimits)) {
@@ -218,7 +219,8 @@ class OMRSimulator
         
         $imagick->drawImage($draw);
         
-        $overlayPath = str_replace('.png', '_overlay.png', $basePath);
+        // Use custom output path if provided, otherwise auto-generate
+        $overlayPath = $outputPath ?? str_replace('.png', '_overlay.png', $basePath);
         $imagick->writeImage($overlayPath);
         $imagick->clear();
         $imagick->destroy();
@@ -271,7 +273,20 @@ class OMRSimulator
             ];
         }
         
-        // Gray for unfilled
+        // Orange for marks that are faint but still visible
+        // Marks with fill_ratio 0.16-0.45 (above noise floor ~0.14 but below threshold)
+        // Background noise is typically 0.13-0.15, actual faint marks are 0.16+
+        $fillRatio = $mark['fill_ratio'] ?? null;
+        if ($fillRatio !== null && $fillRatio >= 0.16 && $fillRatio < 0.45) {
+            return [
+                'color' => 'orange',
+                'thickness' => 2,
+                'category' => 'ambiguous',
+                'label' => 'TOO FAINT',
+            ];
+        }
+        
+        // Gray for unfilled (no mark detected)
         return [
             'color' => 'gray',
             'thickness' => 2,
