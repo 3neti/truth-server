@@ -33,6 +33,7 @@ const documentId = ref('')
 const name = ref('')
 const selectedTemplateId = ref<number | null>(null)
 const templateRef = ref('')
+const documentType = ref('')
 const portableFormat = ref(false)
 const jsonData = ref<Record<string, any>>({})
 
@@ -142,6 +143,9 @@ onMounted(async () => {
           ? JSON.parse(fetchedData.json_data)
           : fetchedData.json_data
       }
+
+      // Pre-fill documentType from json data if available
+      documentType.value = jsonData.value?.document?.type || ''
     }
   }
 
@@ -186,13 +190,23 @@ async function handleSave() {
   saving.value = true
 
   try {
+    // Merge documentType into JSON data before saving
+    const dataToSave = { ...jsonData.value }
+    if (documentType.value) {
+      if (!dataToSave.document) dataToSave.document = {}
+      dataToSave.document.type = documentType.value
+    } else if (dataToSave.document && dataToSave.document.type) {
+      // If cleared, remove the field to avoid stale values
+      delete dataToSave.document.type
+    }
+
     const payload = {
       document_id: documentId.value,
       name: name.value || null,
       template_id: selectedTemplateId.value,
       template_ref: templateRef.value || null,
       portable_format: portableFormat.value,
-      json_data: jsonData.value,
+      json_data: dataToSave,
     }
 
     if (isEditMode.value && props.id) {
@@ -463,6 +477,22 @@ function getFieldType(schema: any): string {
                     Auto-populated from selected template
                   </template>
                 </va-input>
+
+                <va-select
+                  v-model="documentType"
+                  :options="[
+                    { text: '-- None --', value: '' },
+                    { text: 'Questionnaire', value: 'questionnaire' },
+                    { text: 'Ballot', value: 'ballot' },
+                    { text: 'Answer Sheet', value: 'answer_sheet' },
+                    { text: 'Standard', value: 'standard' },
+                    { text: 'Compact', value: 'compact' },
+                    { text: 'Grid', value: 'grid' },
+                  ]"
+                  label="Document Type"
+                  placeholder="Optional"
+                  class="field"
+                />
 
                 <va-checkbox
                   v-model="portableFormat"
