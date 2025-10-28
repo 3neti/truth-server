@@ -3,7 +3,17 @@
 import cv2
 import numpy as np
 import os
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
+
+try:
+    from quality_metrics import (
+        compute_quality_metrics,
+        check_quality_thresholds,
+        format_quality_report
+    )
+    QUALITY_METRICS_AVAILABLE = True
+except ImportError:
+    QUALITY_METRICS_AVAILABLE = False
 
 
 def detect_apriltag_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[int, int]]]:
@@ -267,16 +277,19 @@ def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[i
     return fiducials
 
 
-def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: dict) -> np.ndarray:
+def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: dict, 
+               verbose: bool = False) -> Tuple[np.ndarray, Optional[Dict[str, float]]]:
     """Apply perspective transform to align image based on fiducials.
     
     Args:
         image: Input image
-        fiducials: List of 4 detected fiducial coordinates
+        fiducials: List of 4 detected fiducial coordinates [TL, TR, BL, BR]
         template: Template dictionary with expected fiducial positions
+        verbose: If True, print quality metrics report
         
     Returns:
-        Aligned (deskewed) image
+        Tuple of (aligned_image, quality_metrics_dict)
+        quality_metrics_dict is None if quality metrics not available
     """
     # Get expected fiducial positions from template
     expected = template.get('fiducials', [])
@@ -316,8 +329,28 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
     # Compute perspective transform matrix
     matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     
+    # Compute quality metrics if available
+    quality_metrics = None
+    if QUALITY_METRICS_AVAILABLE and os.getenv('OMR_COMPUTE_QUALITY_METRICS', 'true').lower() == 'true':
+        try:
+            h, w = image.shape[:2]
+            quality_metrics = compute_quality_metrics(src_points, matrix, w, h)
+            verdicts = check_quality_thresholds(quality_metrics)
+            
+            if verbose or os.getenv('OMR_VERBOSE_QUALITY', 'false').lower() == 'true':
+                print(format_quality_report(quality_metrics, verdicts))
+            else:
+                # Print compact summary
+                print(f"Quality: θ={quality_metrics['theta_deg']:+.2f}° " 
+                      f"shear={quality_metrics['shear_deg']:.2f}° "
+                      f"ratio={min(quality_metrics['ratio_tb'], quality_metrics['ratio_lr']):.3f} "
+                      f"reproj={quality_metrics['reproj_error_px']:.2f}px "
+                      f"[{verdicts['overall'].upper()}]")
+        except Exception as e:
+            print(f"Warning: Failed to compute quality metrics: {e}")
+    
     # Apply transform
     h, w = image.shape[:2]
     aligned = cv2.warpPerspective(image, matrix, (w, h))
     
-    return aligned
+    return aligned, quality_metrics
