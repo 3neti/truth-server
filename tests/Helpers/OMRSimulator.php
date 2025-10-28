@@ -135,33 +135,42 @@ class OMRSimulator
     }
 
     /**
-     * Create visual overlay showing detected marks
+     * Create visual overlay showing detected marks with color coding
      * 
      * @param string $basePath Path to base image
      * @param array $detectedMarks Array of detected marks from appreciation
      * @param array $coordinates Coordinates JSON
-     * @param int $dpi DPI used (default: 300)
+     * @param array $options Display options
      * @return string Path to overlay image
      */
     public static function createOverlay(
         string $basePath,
         array $detectedMarks,
         array $coordinates,
-        int $dpi = 300
+        array $options = []
     ): string {
+        $dpi = $options['dpi'] ?? 300;
+        $scenario = $options['scenario'] ?? 'normal';
+        $contestLimits = $options['contest_limits'] ?? [];
+        $showUnfilled = $options['show_unfilled'] ?? false;
+        $showLegend = $options['show_legend'] ?? true;
+        
+        // Detect overvotes if contest limits provided
+        if (!empty($contestLimits)) {
+            $detectedMarks = self::detectOvervotes($detectedMarks, $contestLimits);
+        }
         $imagick = new Imagick($basePath);
         $draw = new ImagickDraw();
         
-        // Green circles for detected marks
-        $draw->setStrokeColor(new ImagickPixel('lime'));
-        $draw->setStrokeWidth(3);
-        $draw->setFillOpacity(0);
-        
         $mmToPixels = $dpi / 25.4;
+        $stats = ['valid' => 0, 'overvote' => 0, 'ambiguous' => 0, 'unfilled' => 0];
         
         foreach ($detectedMarks as $mark) {
             $bubbleId = $mark['bubble_id'] ?? $mark['id'] ?? null;
             if (!$bubbleId) continue;
+            
+            // Skip unfilled marks unless explicitly requested
+            if (!($mark['filled'] ?? false) && !$showUnfilled) continue;
             
             $bubble = self::findBubbleInCoordinates($coordinates, $bubbleId);
             if (!$bubble) continue;
@@ -170,21 +179,41 @@ class OMRSimulator
             $y = $bubble['y_mm'] * $mmToPixels;
             $r = ($bubble['diameter_mm'] / 2) * $mmToPixels;
             
-            // Draw circle with some padding
+            // Determine mark color and style
+            $style = self::getMarkStyle($mark);
+            $stats[$style['category']]++;
+            
+            // Draw circle with color coding
+            $draw->setStrokeColor(new ImagickPixel($style['color']));
+            $draw->setStrokeWidth($style['thickness']);
+            $draw->setFillOpacity(0);
             $draw->ellipse($x, $y, $r + 5, $r + 5, 0, 360);
             
-            // Add confidence text if available
-            if (isset($mark['confidence'])) {
-                $confidence = round($mark['confidence'], 2);
-                // Use system font path for macOS/Linux compatibility
-                $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
-                if (file_exists($fontPath)) {
-                    $draw->setFont($fontPath);
-                }
-                $draw->setFontSize(12);
-                $draw->setFillColor(new ImagickPixel('lime'));
-                $draw->annotation($x + $r + 10, $y, sprintf('%.0f%%', $confidence * 100));
+            // Add confidence and status labels
+            $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
+            if (file_exists($fontPath)) {
+                $draw->setFont($fontPath);
             }
+            $draw->setFontSize(11);
+            $draw->setFillColor(new ImagickPixel($style['color']));
+            
+            // Confidence percentage
+            if (isset($mark['confidence']) || isset($mark['fill_ratio'])) {
+                $value = $mark['fill_ratio'] ?? $mark['confidence'];
+                $label = sprintf('%.0f%%', $value * 100);
+                $draw->annotation($x + $r + 10, $y, $label);
+            }
+            
+            // Status label (if applicable)
+            if (!empty($style['label'])) {
+                $draw->setFontSize(9);
+                $draw->annotation($x + $r + 10, $y + 12, $style['label']);
+            }
+        }
+        
+        // Draw legend
+        if ($showLegend) {
+            self::drawLegend($draw, $imagick, $stats, $scenario);
         }
         
         $imagick->drawImage($draw);
@@ -197,6 +226,159 @@ class OMRSimulator
         return $overlayPath;
     }
 
+    /**
+     * Determine visual style for a mark based on its properties
+     */
+    protected static function getMarkStyle(array $mark): array
+    {
+        // Red for overvotes
+        if ($mark['is_overvote'] ?? false) {
+            return [
+                'color' => 'red',
+                'thickness' => 4,
+                'category' => 'overvote',
+                'label' => 'OVERVOTE',
+            ];
+        }
+        
+        // Orange/Yellow for ambiguous marks
+        if (in_array('ambiguous', $mark['warnings'] ?? [])) {
+            return [
+                'color' => 'orange',
+                'thickness' => 3,
+                'category' => 'ambiguous',
+                'label' => '⚠ AMBIGUOUS',
+            ];
+        }
+        
+        // Green for valid filled marks
+        if (($mark['filled'] ?? false) && ($mark['fill_ratio'] ?? 0) >= 0.95) {
+            return [
+                'color' => 'lime',
+                'thickness' => 4,
+                'category' => 'valid',
+                'label' => '',
+            ];
+        }
+        
+        // Yellow for filled but lower confidence
+        if ($mark['filled'] ?? false) {
+            return [
+                'color' => 'yellow',
+                'thickness' => 3,
+                'category' => 'ambiguous',
+                'label' => 'LOW CONF',
+            ];
+        }
+        
+        // Gray for unfilled
+        return [
+            'color' => 'gray',
+            'thickness' => 2,
+            'category' => 'unfilled',
+            'label' => '',
+        ];
+    }
+    
+    /**
+     * Detect overvotes based on contest limits
+     */
+    protected static function detectOvervotes(array $marks, array $contestLimits): array
+    {
+        // Group marks by contest
+        $grouped = [];
+        foreach ($marks as $key => $mark) {
+            $bubbleId = $mark['id'] ?? '';
+            $parts = explode('_', $bubbleId);
+            $contest = $parts[0] ?? '';
+            
+            if (!isset($grouped[$contest])) {
+                $grouped[$contest] = [];
+            }
+            $grouped[$contest][] = $key;
+        }
+        
+        // Check each contest for overvotes
+        foreach ($grouped as $contest => $markKeys) {
+            $limit = $contestLimits[$contest] ?? 1;
+            $filledMarks = [];
+            
+            foreach ($markKeys as $key) {
+                if ($marks[$key]['filled'] ?? false) {
+                    $filledMarks[] = $key;
+                }
+            }
+            
+            // Mark all as overvotes if exceeds limit
+            if (count($filledMarks) > $limit) {
+                foreach ($filledMarks as $key) {
+                    $marks[$key]['is_overvote'] = true;
+                }
+            }
+        }
+        
+        return $marks;
+    }
+    
+    /**
+     * Draw legend box with color meanings and statistics
+     */
+    protected static function drawLegend(
+        ImagickDraw $draw,
+        Imagick $imagick,
+        array $stats,
+        string $scenario
+    ): void {
+        $width = $imagick->getImageWidth();
+        $height = $imagick->getImageHeight();
+        
+        // Legend position (top-right)
+        $legendX = $width - 280;
+        $legendY = 20;
+        $legendWidth = 260;
+        $legendHeight = 140;
+        
+        // Draw semi-transparent background
+        $draw->setFillColor(new ImagickPixel('rgba(255, 255, 255, 0.9)'));
+        $draw->setStrokeColor(new ImagickPixel('black'));
+        $draw->setStrokeWidth(2);
+        $draw->rectangle($legendX, $legendY, $legendX + $legendWidth, $legendY + $legendHeight);
+        
+        // Title
+        $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
+        if (file_exists($fontPath)) {
+            $draw->setFont($fontPath);
+        }
+        $draw->setFontSize(14);
+        $draw->setFillColor(new ImagickPixel('black'));
+        $draw->annotation($legendX + 10, $legendY + 25, 'Scenario: ' . ucfirst($scenario));
+        
+        // Color legend
+        $draw->setFontSize(11);
+        $yOffset = 50;
+        
+        $items = [
+            ['color' => 'lime', 'text' => "✓ Valid: {$stats['valid']}"],
+            ['color' => 'red', 'text' => "✗ Overvote: {$stats['overvote']}"],
+            ['color' => 'orange', 'text' => "⚠ Ambiguous: {$stats['ambiguous']}"],
+            ['color' => 'gray', 'text' => "○ Unfilled: {$stats['unfilled']}"],
+        ];
+        
+        foreach ($items as $item) {
+            // Draw color circle
+            $draw->setFillColor(new ImagickPixel($item['color']));
+            $draw->setStrokeColor(new ImagickPixel($item['color']));
+            $draw->setStrokeWidth(2);
+            $draw->ellipse($legendX + 20, $legendY + $yOffset, 8, 8, 0, 360);
+            
+            // Draw text
+            $draw->setFillColor(new ImagickPixel('black'));
+            $draw->annotation($legendX + 40, $legendY + $yOffset + 4, $item['text']);
+            
+            $yOffset += 20;
+        }
+    }
+    
     /**
      * Add noise to simulate real-world scanning conditions
      * 

@@ -157,11 +157,16 @@ it('appreciates simulated Philippine ballot correctly', function () {
         );
     }
     
-    // 8. Generate overlay
+    // 8. Generate overlay with enhanced visualization
     $overlayPath = OMRSimulator::createOverlay(
         $filledPng, 
         $appreciationResult['results'], 
-        $coordinates
+        $coordinates,
+        [
+            'scenario' => 'normal',
+            'show_legend' => true,
+            'show_unfilled' => false,
+        ]
     );
     copy($overlayPath, "{$scenarioDir}/overlay.png");
     
@@ -241,8 +246,17 @@ it('handles overvote scenario for President', function () {
     // Should detect 2 marks for President (overvote condition)
     expect($presidentMarks)->toHaveCount(2);
     
-    // Generate overlay
-    $overlayPath = OMRSimulator::createOverlay($filledPng, $appreciationResult['results'], $coordinates);
+    // Generate overlay with overvote highlighting
+    $overlayPath = OMRSimulator::createOverlay(
+        $filledPng, 
+        $appreciationResult['results'], 
+        $coordinates,
+        [
+            'scenario' => 'overvote',
+            'contest_limits' => ['PRESIDENT' => 1],
+            'show_legend' => true,
+        ]
+    );
     copy($overlayPath, "{$scenarioDir}/overlay.png");
     
     // Save report
@@ -328,8 +342,17 @@ it('handles faint marks with lower threshold', function () {
     // Note: This test demonstrates the challenge of faint mark detection
     // In production, you may need to tune thresholds based on scanner characteristics
     
-    // Generate overlay
-    $overlayPath = OMRSimulator::createOverlay($filledPng, $appreciationResult['results'], $coordinates);
+    // Generate overlay highlighting ambiguous marks
+    $overlayPath = OMRSimulator::createOverlay(
+        $filledPng, 
+        $appreciationResult['results'], 
+        $coordinates,
+        [
+            'scenario' => 'faint',
+            'show_legend' => true,
+            'highlight_ambiguous' => true,
+        ]
+    );
     copy($overlayPath, "{$scenarioDir}/overlay.png");
     
     // Save report
