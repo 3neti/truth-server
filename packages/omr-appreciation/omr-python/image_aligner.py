@@ -15,8 +15,21 @@ def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[i
     Returns:
         List of 4 (x, y) coordinates for fiducials, or None if detection fails
     """
-    # Get expected fiducial positions and sizes from template
+    # Handle both formats: 'fiducials' (array) or 'fiducial' (dict with tl/tr/bl/br)
     expected_fiducials = template.get('fiducials', [])
+    
+    # If not found, try singular 'fiducial' with our format
+    if not expected_fiducials:
+        fiducial_dict = template.get('fiducial', {})
+        if fiducial_dict:
+            # Convert our format to expected array format
+            expected_fiducials = [
+                fiducial_dict.get('tl', {}),
+                fiducial_dict.get('tr', {}),
+                fiducial_dict.get('bl', {}),
+                fiducial_dict.get('br', {}),
+            ]
+    
     if len(expected_fiducials) != 4:
         return None
     
@@ -38,7 +51,9 @@ def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[i
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Expected fiducial size from template (use average)
-    expected_size = expected_fiducials[0].get('width', 70)
+    # Convert from mm to pixels: assume 300 DPI (11.81 pixels per mm)
+    expected_size_mm = expected_fiducials[0].get('width', 14.17325)
+    expected_size = expected_size_mm * (300 / 25.4)  # Convert mm to pixels at 300 DPI
     min_area = (expected_size * 0.5) ** 2  # 50% smaller
     max_area = (expected_size * 2.0) ** 2  # 200% larger
     
@@ -116,6 +131,17 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
     # Get expected fiducial positions from template
     expected = template.get('fiducials', [])
     
+    # Try singular 'fiducial' format
+    if not expected:
+        fiducial_dict = template.get('fiducial', {})
+        if fiducial_dict:
+            expected = [
+                fiducial_dict.get('tl', {}),
+                fiducial_dict.get('tr', {}),
+                fiducial_dict.get('bl', {}),
+                fiducial_dict.get('br', {}),
+            ]
+    
     if len(expected) != 4:
         # Fallback: use image corners
         h, w = image.shape[:2]
@@ -127,12 +153,14 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
         ]
     
     # Convert to numpy arrays
+    # Convert mm to pixels for our format (300 DPI)
+    mm_to_pixels = 300 / 25.4
     src_points = np.float32(fiducials)
     dst_points = np.float32([
-        [expected[0]['x'], expected[0]['y']],
-        [expected[1]['x'], expected[1]['y']],
-        [expected[2]['x'], expected[2]['y']],
-        [expected[3]['x'], expected[3]['y']]
+        [expected[0].get('x', 0) * mm_to_pixels, expected[0].get('y', 0) * mm_to_pixels],
+        [expected[1].get('x', 0) * mm_to_pixels, expected[1].get('y', 0) * mm_to_pixels],
+        [expected[2].get('x', 0) * mm_to_pixels, expected[2].get('y', 0) * mm_to_pixels],
+        [expected[3].get('x', 0) * mm_to_pixels, expected[3].get('y', 0) * mm_to_pixels]
     ])
     
     # Compute perspective transform matrix

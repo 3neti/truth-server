@@ -1,0 +1,4262 @@
+{
+  "document_id": "",
+  "template_id": "",
+  "results": [
+    {
+      "id": "PRESIDENT_LD_001",
+      "contest": "PRESIDENT_LD",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.878,
+        "mean_darkness": 0.004,
+        "std_dev": 15.54
+      },
+      "warnings": null
+    },
+    {
+      "id": "PRESIDENT_SJ_002",
+      "contest": "PRESIDENT_SJ",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.976,
+      "quality": {
+        "uniformity": 0.882,
+        "mean_darkness": 0.004,
+        "std_dev": 15.02
+      },
+      "warnings": null
+    },
+    {
+      "id": "PRESIDENT_DW_003",
+      "contest": "PRESIDENT_DW",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.02,
+      "confidence": 0.907,
+      "quality": {
+        "uniformity": 0.721,
+        "mean_darkness": 0.021,
+        "std_dev": 35.49
+      },
+      "warnings": null
+    },
+    {
+      "id": "PRESIDENT_MS_004",
+      "contest": "PRESIDENT_MS",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.003,
+      "confidence": 0.984,
+      "quality": {
+        "uniformity": 0.928,
+        "mean_darkness": 0.002,
+        "std_dev": 9.14
+      },
+      "warnings": null
+    },
+    {
+      "id": "PRESIDENT_BP_005",
+      "contest": "PRESIDENT_BP",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.006,
+      "confidence": 0.971,
+      "quality": {
+        "uniformity": 0.892,
+        "mean_darkness": 0.004,
+        "std_dev": 13.68
+      },
+      "warnings": null
+    },
+    {
+      "id": "PRESIDENT_AJ_006",
+      "contest": "PRESIDENT_AJ",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.8,
+      "quality": {
+        "uniformity": 1.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_TH_001",
+      "contest": "VICE-PRESIDENT_TH",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.007,
+      "confidence": 0.963,
+      "quality": {
+        "uniformity": 0.87,
+        "mean_darkness": 0.005,
+        "std_dev": 16.52
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_VD_002",
+      "contest": "VICE-PRESIDENT_VD",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.007,
+      "confidence": 0.965,
+      "quality": {
+        "uniformity": 0.871,
+        "mean_darkness": 0.005,
+        "std_dev": 16.37
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_CH_003",
+      "contest": "VICE-PRESIDENT_CH",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.006,
+      "confidence": 0.967,
+      "quality": {
+        "uniformity": 0.852,
+        "mean_darkness": 0.006,
+        "std_dev": 18.79
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_NP_004",
+      "contest": "VICE-PRESIDENT_NP",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.003,
+      "confidence": 0.98,
+      "quality": {
+        "uniformity": 0.918,
+        "mean_darkness": 0.002,
+        "std_dev": 10.42
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_RDJ_005",
+      "contest": "VICE-PRESIDENT_RDJ",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.006,
+      "confidence": 0.969,
+      "quality": {
+        "uniformity": 0.874,
+        "mean_darkness": 0.005,
+        "std_dev": 15.98
+      },
+      "warnings": null
+    },
+    {
+      "id": "VICE-PRESIDENT_AH_006",
+      "contest": "VICE-PRESIDENT_AH",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.8,
+      "quality": {
+        "uniformity": 1.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JD_001",
+      "contest": "SENATOR_JD",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.008,
+      "confidence": 0.959,
+      "quality": {
+        "uniformity": 0.847,
+        "mean_darkness": 0.007,
+        "std_dev": 19.39
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_ES_002",
+      "contest": "SENATOR_ES",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.008,
+      "confidence": 0.96,
+      "quality": {
+        "uniformity": 0.848,
+        "mean_darkness": 0.007,
+        "std_dev": 19.27
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_MF_003",
+      "contest": "SENATOR_MF",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.005,
+      "confidence": 0.971,
+      "quality": {
+        "uniformity": 0.869,
+        "mean_darkness": 0.005,
+        "std_dev": 16.66
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JL_004",
+      "contest": "SENATOR_JL",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.007,
+      "confidence": 0.96,
+      "quality": {
+        "uniformity": 0.838,
+        "mean_darkness": 0.007,
+        "std_dev": 20.63
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_CB_005",
+      "contest": "SENATOR_CB",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.011,
+      "confidence": 0.944,
+      "quality": {
+        "uniformity": 0.797,
+        "mean_darkness": 0.011,
+        "std_dev": 25.83
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_SB_006",
+      "contest": "SENATOR_SB",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.002,
+      "confidence": 0.986,
+      "quality": {
+        "uniformity": 0.918,
+        "mean_darkness": 0.002,
+        "std_dev": 10.4
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_WS_007",
+      "contest": "SENATOR_WS",
+      "code": "007",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.01,
+      "confidence": 0.948,
+      "quality": {
+        "uniformity": 0.802,
+        "mean_darkness": 0.011,
+        "std_dev": 25.12
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JR_008",
+      "contest": "SENATOR_JR",
+      "code": "008",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.009,
+      "confidence": 0.951,
+      "quality": {
+        "uniformity": 0.807,
+        "mean_darkness": 0.011,
+        "std_dev": 24.57
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_MD_009",
+      "contest": "SENATOR_MD",
+      "code": "009",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.882,
+      "quality": {
+        "uniformity": 0.974,
+        "mean_darkness": 0.0,
+        "std_dev": 3.3
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_CT_010",
+      "contest": "SENATOR_CT",
+      "code": "010",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.9,
+      "quality": {
+        "uniformity": 0.968,
+        "mean_darkness": 0.0,
+        "std_dev": 4.03
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_KR_011",
+      "contest": "SENATOR_KR",
+      "code": "011",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.918,
+      "quality": {
+        "uniformity": 0.963,
+        "mean_darkness": 0.001,
+        "std_dev": 4.73
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_NK_012",
+      "contest": "SENATOR_NK",
+      "code": "012",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.93,
+      "quality": {
+        "uniformity": 0.959,
+        "mean_darkness": 0.001,
+        "std_dev": 5.15
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_HJ_013",
+      "contest": "SENATOR_HJ",
+      "code": "013",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.948,
+      "quality": {
+        "uniformity": 0.955,
+        "mean_darkness": 0.001,
+        "std_dev": 5.77
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_ZS_014",
+      "contest": "SENATOR_ZS",
+      "code": "014",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.967,
+      "quality": {
+        "uniformity": 0.95,
+        "mean_darkness": 0.001,
+        "std_dev": 6.36
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_BC_015",
+      "contest": "SENATOR_BC",
+      "code": "015",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.978,
+      "quality": {
+        "uniformity": 0.946,
+        "mean_darkness": 0.001,
+        "std_dev": 6.8
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_GG_016",
+      "contest": "SENATOR_GG",
+      "code": "016",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.99,
+      "quality": {
+        "uniformity": 0.943,
+        "mean_darkness": 0.001,
+        "std_dev": 7.27
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JG_017",
+      "contest": "SENATOR_JG",
+      "code": "017",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.991,
+      "quality": {
+        "uniformity": 0.942,
+        "mean_darkness": 0.001,
+        "std_dev": 7.38
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_AA_018",
+      "contest": "SENATOR_AA",
+      "code": "018",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.001,
+      "confidence": 0.991,
+      "quality": {
+        "uniformity": 0.94,
+        "mean_darkness": 0.001,
+        "std_dev": 7.61
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_DC_019",
+      "contest": "SENATOR_DC",
+      "code": "019",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.012,
+      "confidence": 0.937,
+      "quality": {
+        "uniformity": 0.777,
+        "mean_darkness": 0.014,
+        "std_dev": 28.36
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_KW_020",
+      "contest": "SENATOR_KW",
+      "code": "020",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.164,
+      "confidence": 0.408,
+      "quality": {
+        "uniformity": 0.261,
+        "mean_darkness": 0.166,
+        "std_dev": 93.84
+      },
+      "warnings": [
+        "ambiguous",
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_MR_021",
+      "contest": "SENATOR_MR",
+      "code": "021",
+      "candidate": "",
+      "filled": true,
+      "fill_ratio": 1.0,
+      "confidence": 0.8,
+      "quality": {
+        "uniformity": 1.0,
+        "mean_darkness": 1.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "overfilled"
+      ]
+    },
+    {
+      "id": "SENATOR_EB_022",
+      "contest": "SENATOR_EB",
+      "code": "022",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_CE_023",
+      "contest": "SENATOR_CE",
+      "code": "023",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_RM_024",
+      "contest": "SENATOR_RM",
+      "code": "024",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_CB_025",
+      "contest": "SENATOR_CB",
+      "code": "025",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_TS_026",
+      "contest": "SENATOR_TS",
+      "code": "026",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.976,
+      "quality": {
+        "uniformity": 0.886,
+        "mean_darkness": 0.004,
+        "std_dev": 14.51
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JM_027",
+      "contest": "SENATOR_JM",
+      "code": "027",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.882,
+        "mean_darkness": 0.004,
+        "std_dev": 14.92
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_OS_028",
+      "contest": "SENATOR_OS",
+      "code": "028",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.88,
+        "mean_darkness": 0.004,
+        "std_dev": 15.28
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_RG_029",
+      "contest": "SENATOR_RG",
+      "code": "029",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.976,
+      "quality": {
+        "uniformity": 0.883,
+        "mean_darkness": 0.004,
+        "std_dev": 14.8
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_SH_030",
+      "contest": "SENATOR_SH",
+      "code": "030",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.976,
+      "quality": {
+        "uniformity": 0.883,
+        "mean_darkness": 0.004,
+        "std_dev": 14.85
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JR_031",
+      "contest": "SENATOR_JR",
+      "code": "031",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.974,
+      "quality": {
+        "uniformity": 0.883,
+        "mean_darkness": 0.004,
+        "std_dev": 14.91
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_Z_032",
+      "contest": "SENATOR_Z",
+      "code": "032",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.974,
+      "quality": {
+        "uniformity": 0.882,
+        "mean_darkness": 0.004,
+        "std_dev": 14.97
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JB_033",
+      "contest": "SENATOR_JB",
+      "code": "033",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.974,
+      "quality": {
+        "uniformity": 0.882,
+        "mean_darkness": 0.004,
+        "std_dev": 15.04
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_MY_034",
+      "contest": "SENATOR_MY",
+      "code": "034",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.974,
+      "quality": {
+        "uniformity": 0.881,
+        "mean_darkness": 0.004,
+        "std_dev": 15.16
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_MA_035",
+      "contest": "SENATOR_MA",
+      "code": "035",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.879,
+        "mean_darkness": 0.005,
+        "std_dev": 15.36
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_EG_036",
+      "contest": "SENATOR_EG",
+      "code": "036",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.878,
+        "mean_darkness": 0.005,
+        "std_dev": 15.55
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_TC_037",
+      "contest": "SENATOR_TC",
+      "code": "037",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.975,
+      "quality": {
+        "uniformity": 0.876,
+        "mean_darkness": 0.005,
+        "std_dev": 15.76
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_FP_038",
+      "contest": "SENATOR_FP",
+      "code": "038",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.004,
+      "confidence": 0.974,
+      "quality": {
+        "uniformity": 0.874,
+        "mean_darkness": 0.005,
+        "std_dev": 16.05
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_PP_039",
+      "contest": "SENATOR_PP",
+      "code": "039",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.003,
+      "confidence": 0.979,
+      "quality": {
+        "uniformity": 0.886,
+        "mean_darkness": 0.004,
+        "std_dev": 14.45
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_RM_040",
+      "contest": "SENATOR_RM",
+      "code": "040",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.005,
+      "confidence": 0.972,
+      "quality": {
+        "uniformity": 0.884,
+        "mean_darkness": 0.004,
+        "std_dev": 14.79
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_ATJ_041",
+      "contest": "SENATOR_ATJ",
+      "code": "041",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.005,
+      "confidence": 0.972,
+      "quality": {
+        "uniformity": 0.884,
+        "mean_darkness": 0.004,
+        "std_dev": 14.74
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_IE_042",
+      "contest": "SENATOR_IE",
+      "code": "042",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.093,
+      "confidence": 0.633,
+      "quality": {
+        "uniformity": 0.444,
+        "mean_darkness": 0.093,
+        "std_dev": 70.62
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_PD_043",
+      "contest": "SENATOR_PD",
+      "code": "043",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.095,
+      "confidence": 0.627,
+      "quality": {
+        "uniformity": 0.438,
+        "mean_darkness": 0.095,
+        "std_dev": 71.4
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_A_044",
+      "contest": "SENATOR_A",
+      "code": "044",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.086,
+      "confidence": 0.661,
+      "quality": {
+        "uniformity": 0.466,
+        "mean_darkness": 0.085,
+        "std_dev": 67.85
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_JC_045",
+      "contest": "SENATOR_JC",
+      "code": "045",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.043,
+      "confidence": 0.816,
+      "quality": {
+        "uniformity": 0.595,
+        "mean_darkness": 0.045,
+        "std_dev": 51.46
+      },
+      "warnings": null
+    },
+    {
+      "id": "SENATOR_AG_046",
+      "contest": "SENATOR_AG",
+      "code": "046",
+      "candidate": "",
+      "filled": true,
+      "fill_ratio": 1.0,
+      "confidence": 0.8,
+      "quality": {
+        "uniformity": 1.0,
+        "mean_darkness": 1.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "overfilled"
+      ]
+    },
+    {
+      "id": "SENATOR_TH_047",
+      "contest": "SENATOR_TH",
+      "code": "047",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_LN_048",
+      "contest": "SENATOR_LN",
+      "code": "048",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_BC_049",
+      "contest": "SENATOR_BC",
+      "code": "049",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "SENATOR_HM_050",
+      "contest": "SENATOR_HM",
+      "code": "050",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_GODFATHER_001",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_GODFATHER",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TITANIC_002",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TITANIC",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_DARK_KNIGHT_003",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_DARK_KNIGHT",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_FORREST_GUMP_004",
+      "contest": "REPRESENTATIVE-PARTY-LIST_FORREST_GUMP",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_PULP_FICTION_005",
+      "contest": "REPRESENTATIVE-PARTY-LIST_PULP_FICTION",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_INCEPTION_006",
+      "contest": "REPRESENTATIVE-PARTY-LIST_INCEPTION",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_FIGHT_CLUB_007",
+      "contest": "REPRESENTATIVE-PARTY-LIST_FIGHT_CLUB",
+      "code": "007",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_MATRIX_008",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_MATRIX",
+      "code": "008",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_SHAWSHANK_REDEMPTION_009",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_SHAWSHANK_REDEMPTION",
+      "code": "009",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_GLADIATOR_010",
+      "contest": "REPRESENTATIVE-PARTY-LIST_GLADIATOR",
+      "code": "010",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_AVATAR_011",
+      "contest": "REPRESENTATIVE-PARTY-LIST_AVATAR",
+      "code": "011",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LA_LA_LAND_012",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LA_LA_LAND",
+      "code": "012",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_SOCIAL_NETWORK_013",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_SOCIAL_NETWORK",
+      "code": "013",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_INTERSTELLAR_014",
+      "contest": "REPRESENTATIVE-PARTY-LIST_INTERSTELLAR",
+      "code": "014",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MAD_MAX_FURY_ROAD_015",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MAD_MAX_FURY_ROAD",
+      "code": "015",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_AVENGERS_016",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_AVENGERS",
+      "code": "016",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_JOKER_017",
+      "contest": "REPRESENTATIVE-PARTY-LIST_JOKER",
+      "code": "017",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_FROZEN_018",
+      "contest": "REPRESENTATIVE-PARTY-LIST_FROZEN",
+      "code": "018",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_LORD_OF_THE_RINGS_019",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_LORD_OF_THE_RINGS",
+      "code": "019",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BLACK_PANTHER_020",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BLACK_PANTHER",
+      "code": "020",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_PARASITE_021",
+      "contest": "REPRESENTATIVE-PARTY-LIST_PARASITE",
+      "code": "021",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_REVENANT_022",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_REVENANT",
+      "code": "022",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DUNE_023",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DUNE",
+      "code": "023",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TOP_GUN_MAVERICK_024",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TOP_GUN_MAVERICK",
+      "code": "024",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_EVERYTHING_EVERYWHERE_ALL_AT_ONCE_025",
+      "contest": "REPRESENTATIVE-PARTY-LIST_EVERYTHING_EVERYWHERE_ALL_AT_ONCE",
+      "code": "025",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_NO_TIME_TO_DIE_026",
+      "contest": "REPRESENTATIVE-PARTY-LIST_NO_TIME_TO_DIE",
+      "code": "026",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_KNIVES_OUT_027",
+      "contest": "REPRESENTATIVE-PARTY-LIST_KNIVES_OUT",
+      "code": "027",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_COCO_028",
+      "contest": "REPRESENTATIVE-PARTY-LIST_COCO",
+      "code": "028",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_GRAND_BUDAPEST_HOTEL_029",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_GRAND_BUDAPEST_HOTEL",
+      "code": "029",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_GET_OUT_030",
+      "contest": "REPRESENTATIVE-PARTY-LIST_GET_OUT",
+      "code": "030",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BOHEMIAN_RHAPSODY_031",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BOHEMIAN_RHAPSODY",
+      "code": "031",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_OPPENHEIMER_032",
+      "contest": "REPRESENTATIVE-PARTY-LIST_OPPENHEIMER",
+      "code": "032",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BARBIE_033",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BARBIE",
+      "code": "033",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MISSION_IMPOSSIBLE_034",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MISSION_IMPOSSIBLE",
+      "code": "034",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_A_STAR_IS_BORN_035",
+      "contest": "REPRESENTATIVE-PARTY-LIST_A_STAR_IS_BORN",
+      "code": "035",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_WHALE_036",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_WHALE",
+      "code": "036",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SPIDER_MAN_NO_WAY_HOME_037",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SPIDER_MAN_NO_WAY_HOME",
+      "code": "037",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_GUARDIANS_OF_THE_GALAXY_038",
+      "contest": "REPRESENTATIVE-PARTY-LIST_GUARDIANS_OF_THE_GALAXY",
+      "code": "038",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_1917_039",
+      "contest": "REPRESENTATIVE-PARTY-LIST_1917",
+      "code": "039",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TENET_040",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TENET",
+      "code": "040",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_HER_041",
+      "contest": "REPRESENTATIVE-PARTY-LIST_HER",
+      "code": "041",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_WHIPLASH_042",
+      "contest": "REPRESENTATIVE-PARTY-LIST_WHIPLASH",
+      "code": "042",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_IRISHMAN_043",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_IRISHMAN",
+      "code": "043",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_MARTIAN_044",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_MARTIAN",
+      "code": "044",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_BIG_SHORT_045",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_BIG_SHORT",
+      "code": "045",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_CODA_046",
+      "contest": "REPRESENTATIVE-PARTY-LIST_CODA",
+      "code": "046",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SOUL_047",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SOUL",
+      "code": "047",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TOY_STORY_048",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TOY_STORY",
+      "code": "048",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_INSIDE_OUT_049",
+      "contest": "REPRESENTATIVE-PARTY-LIST_INSIDE_OUT",
+      "code": "049",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ENCANTO_050",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ENCANTO",
+      "code": "050",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_UP_051",
+      "contest": "REPRESENTATIVE-PARTY-LIST_UP",
+      "code": "051",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_LION_KING_052",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_LION_KING",
+      "code": "052",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_FINDING_NEMO_053",
+      "contest": "REPRESENTATIVE-PARTY-LIST_FINDING_NEMO",
+      "code": "053",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_WALL_E_054",
+      "contest": "REPRESENTATIVE-PARTY-LIST_WALL_E",
+      "code": "054",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MOANA_055",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MOANA",
+      "code": "055",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_INCREDIBLES_056",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_INCREDIBLES",
+      "code": "056",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_FROZEN_II_057",
+      "contest": "REPRESENTATIVE-PARTY-LIST_FROZEN_II",
+      "code": "057",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_AVENGERS_ENDGAME_058",
+      "contest": "REPRESENTATIVE-PARTY-LIST_AVENGERS_ENDGAME",
+      "code": "058",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DOCTOR_STRANGE_059",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DOCTOR_STRANGE",
+      "code": "059",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_IRON_MAN_060",
+      "contest": "REPRESENTATIVE-PARTY-LIST_IRON_MAN",
+      "code": "060",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_CAPTAIN_AMERICA_CIVIL_WAR_061",
+      "contest": "REPRESENTATIVE-PARTY-LIST_CAPTAIN_AMERICA_CIVIL_WAR",
+      "code": "061",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THOR_RAGNAROK_062",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THOR_RAGNAROK",
+      "code": "062",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ANT_MAN_063",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ANT_MAN",
+      "code": "063",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_PRESTIGE_064",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_PRESTIGE",
+      "code": "064",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_DEPARTED_065",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_DEPARTED",
+      "code": "065",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_CURIOUS_CASE_OF_BENJAMIN_BUTTON_066",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_CURIOUS_CASE_OF_BENJAMIN_BUTTON",
+      "code": "066",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_CAST_AWAY_067",
+      "contest": "REPRESENTATIVE-PARTY-LIST_CAST_AWAY",
+      "code": "067",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_CATCH_ME_IF_YOU_CAN_068",
+      "contest": "REPRESENTATIVE-PARTY-LIST_CATCH_ME_IF_YOU_CAN",
+      "code": "068",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_TRUMAN_SHOW_069",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_TRUMAN_SHOW",
+      "code": "069",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_IMITATION_GAME_070",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_IMITATION_GAME",
+      "code": "070",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_THEORY_OF_EVERYTHING_071",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_THEORY_OF_EVERYTHING",
+      "code": "071",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_KING_S_SPEECH_072",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_KING_S_SPEECH",
+      "code": "072",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_BLIND_SIDE_073",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_BLIND_SIDE",
+      "code": "073",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LINCOLN_074",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LINCOLN",
+      "code": "074",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LES_MISERABLES_075",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LES_MISERABLES",
+      "code": "075",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BIRDMAN_076",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BIRDMAN",
+      "code": "076",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_SHAPE_OF_WATER_077",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_SHAPE_OF_WATER",
+      "code": "077",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_AMERICAN_BEAUTY_078",
+      "contest": "REPRESENTATIVE-PARTY-LIST_AMERICAN_BEAUTY",
+      "code": "078",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_AMERICAN_HISTORY_X_079",
+      "contest": "REPRESENTATIVE-PARTY-LIST_AMERICAN_HISTORY_X",
+      "code": "079",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_A_BEAUTIFUL_MIND_080",
+      "contest": "REPRESENTATIVE-PARTY-LIST_A_BEAUTIFUL_MIND",
+      "code": "080",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_GREEN_MILE_081",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_GREEN_MILE",
+      "code": "081",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SHUTTER_ISLAND_082",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SHUTTER_ISLAND",
+      "code": "082",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_PIANIST_083",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_PIANIST",
+      "code": "083",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_REQUIEM_FOR_A_DREAM_084",
+      "contest": "REPRESENTATIVE-PARTY-LIST_REQUIEM_FOR_A_DREAM",
+      "code": "084",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_BIG_LEBOWSKI_085",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_BIG_LEBOWSKI",
+      "code": "085",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_NO_COUNTRY_FOR_OLD_MEN_086",
+      "contest": "REPRESENTATIVE-PARTY-LIST_NO_COUNTRY_FOR_OLD_MEN",
+      "code": "086",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THERE_WILL_BE_BLOOD_087",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THERE_WILL_BE_BLOOD",
+      "code": "087",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ARGO_088",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ARGO",
+      "code": "088",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ZERO_DARK_THIRTY_089",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ZERO_DARK_THIRTY",
+      "code": "089",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_HACKSAW_RIDGE_090",
+      "contest": "REPRESENTATIVE-PARTY-LIST_HACKSAW_RIDGE",
+      "code": "090",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_HURT_LOCKER_091",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_HURT_LOCKER",
+      "code": "091",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_FIGHTER_092",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_FIGHTER",
+      "code": "092",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MONEYBALL_093",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MONEYBALL",
+      "code": "093",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_STEVE_JOBS_094",
+      "contest": "REPRESENTATIVE-PARTY-LIST_STEVE_JOBS",
+      "code": "094",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_127_HOURS_095",
+      "contest": "REPRESENTATIVE-PARTY-LIST_127_HOURS",
+      "code": "095",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SLUMDOG_MILLIONAIRE_096",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SLUMDOG_MILLIONAIRE",
+      "code": "096",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DON_T_LOOK_UP_097",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DON_T_LOOK_UP",
+      "code": "097",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_BANSHEES_OF_INISHERIN_098",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_BANSHEES_OF_INISHERIN",
+      "code": "098",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_MENU_099",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_MENU",
+      "code": "099",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TAR_100",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TAR",
+      "code": "100",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ARRIVAL_101",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ARRIVAL",
+      "code": "101",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_EX_MACHINA_102",
+      "contest": "REPRESENTATIVE-PARTY-LIST_EX_MACHINA",
+      "code": "102",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LOOPER_103",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LOOPER",
+      "code": "103",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_HATEFUL_EIGHT_104",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_HATEFUL_EIGHT",
+      "code": "104",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DJANGO_UNCHAINED_105",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DJANGO_UNCHAINED",
+      "code": "105",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_INGLOURIOUS_BASTERDS_106",
+      "contest": "REPRESENTATIVE-PARTY-LIST_INGLOURIOUS_BASTERDS",
+      "code": "106",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ONCE_UPON_A_TIME_IN_HOLLYWOOD_107",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ONCE_UPON_A_TIME_IN_HOLLYWOOD",
+      "code": "107",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_KILL_BILL_108",
+      "contest": "REPRESENTATIVE-PARTY-LIST_KILL_BILL",
+      "code": "108",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_RESERVOIR_DOGS_109",
+      "contest": "REPRESENTATIVE-PARTY-LIST_RESERVOIR_DOGS",
+      "code": "109",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_NOTEBOOK_110",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_NOTEBOOK",
+      "code": "110",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_FAULT_IN_OUR_STARS_111",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_FAULT_IN_OUR_STARS",
+      "code": "111",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ME_BEFORE_YOU_112",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ME_BEFORE_YOU",
+      "code": "112",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_VOW_113",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_VOW",
+      "code": "113",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_PROPOSAL_114",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_PROPOSAL",
+      "code": "114",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_CRAZY_RICH_ASIANS_115",
+      "contest": "REPRESENTATIVE-PARTY-LIST_CRAZY_RICH_ASIANS",
+      "code": "115",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_500_DAYS_OF_SUMMER_116",
+      "contest": "REPRESENTATIVE-PARTY-LIST_500_DAYS_OF_SUMMER",
+      "code": "116",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SILVER_LININGS_PLAYBOOK_117",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SILVER_LININGS_PLAYBOOK",
+      "code": "117",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BROOKLYN_118",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BROOKLYN",
+      "code": "118",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LITTLE_WOMEN_119",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LITTLE_WOMEN",
+      "code": "119",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MARRIAGE_STORY_120",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MARRIAGE_STORY",
+      "code": "120",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LADY_BIRD_121",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LADY_BIRD",
+      "code": "121",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ROOM_122",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ROOM",
+      "code": "122",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_NOMADLAND_123",
+      "contest": "REPRESENTATIVE-PARTY-LIST_NOMADLAND",
+      "code": "123",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MINARI_124",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MINARI",
+      "code": "124",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_FAREWELL_125",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_FAREWELL",
+      "code": "125",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SPOTLIGHT_126",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SPOTLIGHT",
+      "code": "126",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_POST_127",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_POST",
+      "code": "127",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DARKEST_HOUR_128",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DARKEST_HOUR",
+      "code": "128",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_TWO_POPES_129",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_TWO_POPES",
+      "code": "129",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_MIDNIGHT_SKY_130",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_MIDNIGHT_SKY",
+      "code": "130",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_DON_T_WORRY_DARLING_131",
+      "contest": "REPRESENTATIVE-PARTY-LIST_DON_T_WORRY_DARLING",
+      "code": "131",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BULLET_TRAIN_132",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BULLET_TRAIN",
+      "code": "132",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_KNOCK_AT_THE_CABIN_133",
+      "contest": "REPRESENTATIVE-PARTY-LIST_KNOCK_AT_THE_CABIN",
+      "code": "133",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_GLASS_ONION_134",
+      "contest": "REPRESENTATIVE-PARTY-LIST_GLASS_ONION",
+      "code": "134",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_BATMAN_135",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_BATMAN",
+      "code": "135",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_FLASH_136",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_FLASH",
+      "code": "136",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_SHAZAM_137",
+      "contest": "REPRESENTATIVE-PARTY-LIST_SHAZAM",
+      "code": "137",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_AQUAMAN_138",
+      "contest": "REPRESENTATIVE-PARTY-LIST_AQUAMAN",
+      "code": "138",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_WONDER_WOMAN_139",
+      "contest": "REPRESENTATIVE-PARTY-LIST_WONDER_WOMAN",
+      "code": "139",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_MAN_OF_STEEL_140",
+      "contest": "REPRESENTATIVE-PARTY-LIST_MAN_OF_STEEL",
+      "code": "140",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_SUICIDE_SQUAD_141",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_SUICIDE_SQUAD",
+      "code": "141",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BIRDS_OF_PREY_142",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BIRDS_OF_PREY",
+      "code": "142",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_JUSTICE_LEAGUE_143",
+      "contest": "REPRESENTATIVE-PARTY-LIST_JUSTICE_LEAGUE",
+      "code": "143",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_THE_LEGO_MOVIE_144",
+      "contest": "REPRESENTATIVE-PARTY-LIST_THE_LEGO_MOVIE",
+      "code": "144",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_ZOOTOPIA_145",
+      "contest": "REPRESENTATIVE-PARTY-LIST_ZOOTOPIA",
+      "code": "145",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TANGLED_146",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TANGLED",
+      "code": "146",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_RAYA_AND_THE_LAST_DRAGON_147",
+      "contest": "REPRESENTATIVE-PARTY-LIST_RAYA_AND_THE_LAST_DRAGON",
+      "code": "147",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_LUCA_148",
+      "contest": "REPRESENTATIVE-PARTY-LIST_LUCA",
+      "code": "148",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_TURNING_RED_149",
+      "contest": "REPRESENTATIVE-PARTY-LIST_TURNING_RED",
+      "code": "149",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-PARTY-LIST_BRAVE_150",
+      "contest": "REPRESENTATIVE-PARTY-LIST_BRAVE",
+      "code": "150",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "GOVERNOR-ILN_EN_001",
+      "contest": "GOVERNOR-ILN_EN",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "GOVERNOR-ILN_JB_002",
+      "contest": "GOVERNOR-ILN_JB",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "GOVERNOR-ILN_RP_003",
+      "contest": "GOVERNOR-ILN_RP",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-GOVERNOR-ILN_NW_001",
+      "contest": "VICE-GOVERNOR-ILN_NW",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-GOVERNOR-ILN_MF_002",
+      "contest": "VICE-GOVERNOR-ILN_MF",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-GOVERNOR-ILN_DK_003",
+      "contest": "VICE-GOVERNOR-ILN_DK",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-GOVERNOR-ILN_JH_004",
+      "contest": "VICE-GOVERNOR-ILN_JH",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_RW_001",
+      "contest": "BOARD-MEMBER-ILN_RW",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_HB_002",
+      "contest": "BOARD-MEMBER-ILN_HB",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_RW_003",
+      "contest": "BOARD-MEMBER-ILN_RW",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_DP_004",
+      "contest": "BOARD-MEMBER-ILN_DP",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_BDT_005",
+      "contest": "BOARD-MEMBER-ILN_BDT",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_DJ_006",
+      "contest": "BOARD-MEMBER-ILN_DJ",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_AD_007",
+      "contest": "BOARD-MEMBER-ILN_AD",
+      "code": "007",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "BOARD-MEMBER-ILN_GR_008",
+      "contest": "BOARD-MEMBER-ILN_GR",
+      "code": "008",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-ILN-1_JF_001",
+      "contest": "REPRESENTATIVE-ILN-1_JF",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-ILN-1_RW_002",
+      "contest": "REPRESENTATIVE-ILN-1_RW",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-ILN-1_CF_003",
+      "contest": "REPRESENTATIVE-ILN-1_CF",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "REPRESENTATIVE-ILN-1_DC_004",
+      "contest": "REPRESENTATIVE-ILN-1_DC",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "MAYOR-ILN-CURRIMAO_BC_001",
+      "contest": "MAYOR-ILN-CURRIMAO_BC",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "MAYOR-ILN-CURRIMAO_LJ_002",
+      "contest": "MAYOR-ILN-CURRIMAO_LJ",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "MAYOR-ILN-CURRIMAO_EW_003",
+      "contest": "MAYOR-ILN-CURRIMAO_EW",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-MAYOR-ILN-CURRIMAO_JKS_001",
+      "contest": "VICE-MAYOR-ILN-CURRIMAO_JKS",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-MAYOR-ILN-CURRIMAO_JL_002",
+      "contest": "VICE-MAYOR-ILN-CURRIMAO_JL",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "VICE-MAYOR-ILN-CURRIMAO_JF_003",
+      "contest": "VICE-MAYOR-ILN-CURRIMAO_JF",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_ER_001",
+      "contest": "COUNCILOR-ILN-CURRIMAO_ER",
+      "code": "001",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_SG_002",
+      "contest": "COUNCILOR-ILN-CURRIMAO_SG",
+      "code": "002",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_SR_003",
+      "contest": "COUNCILOR-ILN-CURRIMAO_SR",
+      "code": "003",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_MC_004",
+      "contest": "COUNCILOR-ILN-CURRIMAO_MC",
+      "code": "004",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_MS_005",
+      "contest": "COUNCILOR-ILN-CURRIMAO_MS",
+      "code": "005",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_CE_006",
+      "contest": "COUNCILOR-ILN-CURRIMAO_CE",
+      "code": "006",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_GMR_007",
+      "contest": "COUNCILOR-ILN-CURRIMAO_GMR",
+      "code": "007",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    },
+    {
+      "id": "COUNCILOR-ILN-CURRIMAO_DO_008",
+      "contest": "COUNCILOR-ILN-CURRIMAO_DO",
+      "code": "008",
+      "candidate": "",
+      "filled": false,
+      "fill_ratio": 0.0,
+      "confidence": 0.0,
+      "quality": {
+        "uniformity": 0.0,
+        "mean_darkness": 0.0,
+        "std_dev": 0.0
+      },
+      "warnings": [
+        "low_confidence",
+        "non_uniform"
+      ]
+    }
+  ]
+}

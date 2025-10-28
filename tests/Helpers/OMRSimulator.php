@@ -23,11 +23,23 @@ class OMRSimulator
         $imagick->setImageFormat('png');
         
         $pngPath = str_replace('.pdf', '.png', $pdfPath);
+        // Force regeneration by deleting old file
+        if (file_exists($pngPath)) {
+            unlink($pngPath);
+        }
         $imagick->writeImage($pngPath);
         $imagick->clear();
         $imagick->destroy();
         
         return $pngPath;
+    }
+    
+    /**
+     * Alias for pdfToPng with named parameters
+     */
+    public static function convertPdfToPng(string $pdfPath, int $dpi = 300): string
+    {
+        return self::pdfToPng($pdfPath, $dpi);
     }
 
     /**
@@ -164,7 +176,11 @@ class OMRSimulator
             // Add confidence text if available
             if (isset($mark['confidence'])) {
                 $confidence = round($mark['confidence'], 2);
-                $draw->setFont('Arial');
+                // Use system font path for macOS/Linux compatibility
+                $fontPath = '/System/Library/Fonts/Supplemental/Arial.ttf';
+                if (file_exists($fontPath)) {
+                    $draw->setFont($fontPath);
+                }
                 $draw->setFontSize(12);
                 $draw->setFillColor(new ImagickPixel('lime'));
                 $draw->annotation($x + $r + 10, $y, sprintf('%.0f%%', $confidence * 100));

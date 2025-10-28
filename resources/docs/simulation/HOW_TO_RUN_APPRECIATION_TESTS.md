@@ -95,8 +95,8 @@ use App\Models\TemplateData;
 use App\Actions\TruthTemplates\Compilation\CompileHandlebarsTemplate;
 use App\Actions\TruthTemplates\Rendering\RenderTemplateSpec;
 
-\$template = Template::find(10);  // Answer sheet template
-\$data = TemplateData::find(22);  // Philippine ballot data
+\$template = Template::find(4);  // Answer sheet template
+\$data = TemplateData::find(4);  // Philippine ballot data
 
 \$spec = CompileHandlebarsTemplate::run(\$template->handlebars_template, \$data->json_data);
 \$result = RenderTemplateSpec::run(\$spec);
@@ -229,7 +229,7 @@ open storage/omr-output/CURRIMAO-001-ballot-2025-05-12_filled_overlay.png
 ### Test 1: Normal Voting (5 marks)
 
 ```bash
-php artisan test tests/Feature/OMRAppreciationTest.php --filter="appreciates_simulated_Philippine_ballot"
+php artisan test tests/Feature/OMRAppreciationTest.php --filter="appreciates simulated Philippine ballot correctly"
 ```
 
 ### Test 2: Overvote Scenario (2 marks for President)
