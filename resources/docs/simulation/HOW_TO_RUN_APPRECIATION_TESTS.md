@@ -50,13 +50,74 @@ php artisan db:seed --class=InstructionalDataSeeder
 
 ## ⚙️ Configuration
 
-The OMR tests can be customized via the `config/omr-testing.php` configuration file. This allows you to:
+### Test Profiles (Recommended)
 
-- Change which ballot template and document ID to test
-- Specify which questionnaire to use for candidate names
-- Set default bubbles to simulate for testing
+The OMR tests now support **test profiles** that bundle together all configuration for a specific ballot type. This is the recommended way to configure tests as it ensures consistency between ballot templates, bubbles, and ground truth files.
 
-### Configuration Options
+#### Available Profiles
+
+- **`philippine`** - Philippine National Elections 2025 (default)
+- **`barangay`** - Barangay Elections 2025 - Bokiawan
+
+#### Using Profiles
+
+**Option 1: Set in `.env` file** (persistent):
+```bash
+# In your .env file
+OMR_TEST_PROFILE=barangay
+```
+
+**Option 2: Set for single test run** (one-time):
+```bash
+OMR_TEST_PROFILE=barangay php artisan test tests/Feature/OMRAppreciationTest.php
+```
+
+**Option 3: Default behavior** (no configuration needed):
+If `OMR_TEST_PROFILE` is not set, the system defaults to the `philippine` profile.
+
+#### Profile Contents
+
+Each profile includes:
+- **Ballot document ID** - Which ballot template to test
+- **Questionnaire document ID** - For displaying candidate names in overlays
+- **Default bubbles** - Which bubbles to fill in simulation
+- **Ground truth file** - For validation in rotation tests
+
+#### Creating Custom Profiles
+
+To add a new profile, edit `config/omr-testing.php`:
+
+```php
+'profiles' => [
+    'my_custom_election' => [
+        'name' => 'My Custom Election 2025',
+        'ballot' => [
+            'template_variant' => 'answer-sheet',
+            'document_id' => 'MY-2025-BALLOT-CUSTOM-001',
+        ],
+        'questionnaire' => [
+            'template_variant' => 'questionnaire',
+            'document_id' => 'MY-2025-QUESTIONNAIRE-CUSTOM-001',
+        ],
+        'simulation' => [
+            'default_bubbles' => [
+                'MAYOR_001',
+                'COUNCIL_001',
+                'COUNCIL_002',
+            ],
+        ],
+        'ground_truth_file' => 'storage/app/tests/omr-appreciation/fixtures/my-custom-ground-truth.json',
+    ],
+],
+```
+
+Then use it: `OMR_TEST_PROFILE=my_custom_election php artisan test ...`
+
+### Legacy Configuration (Deprecated)
+
+The following direct configuration options are still supported but deprecated. Use test profiles instead.
+
+### Direct Configuration Options
 
 ```php
 return [

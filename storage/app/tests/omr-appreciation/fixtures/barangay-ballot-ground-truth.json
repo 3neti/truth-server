@@ -1,0 +1,23 @@
+{
+  "test_id": "barangay_ballot_validation",
+  "description": "Expected bubble states for barangay ballot (5 filled bubbles: 1 Punong Barangay + 4 Sangguniang Barangay Members)",
+  "source": "OMRAppreciationTest.php - barangay profile",
+  "expected_marks": {
+    "PUNONG_BARANGAY": [
+      "001"
+    ],
+    "MEMBER_SANGGUNIANG_BARANGAY": [
+      "001",
+      "002",
+      "003",
+      "004"
+    ]
+  },
+  "bubble_states": {
+    "PUNONG_BARANGAY_001": true,
+    "MEMBER_SANGGUNIANG_BARANGAY_001": true,
+    "MEMBER_SANGGUNIANG_BARANGAY_002": true,
+    "MEMBER_SANGGUNIANG_BARANGAY_003": true,
+    "MEMBER_SANGGUNIANG_BARANGAY_004": true
+  }
+}

@@ -43,11 +43,14 @@ it('appreciates simulated Philippine ballot correctly', function () {
     $scenarioDir = "{$this->runDir}/scenario-1-normal";
     mkdir($scenarioDir, 0755, true);
     
-    // 1. Load templates and data from configuration
-    $ballotVariant = config('omr-testing.ballot.template_variant');
-    $ballotDocId = config('omr-testing.ballot.document_id');
-    $questionnaireVariant = config('omr-testing.questionnaire.template_variant');
-    $questionnaireDocId = config('omr-testing.questionnaire.document_id');
+    // 1. Load templates and data from active profile
+    $activeProfile = config('omr-testing.active_profile');
+    $profile = config("omr-testing.profiles.{$activeProfile}");
+    
+    $ballotVariant = $profile['ballot']['template_variant'];
+    $ballotDocId = $profile['ballot']['document_id'];
+    $questionnaireVariant = $profile['questionnaire']['template_variant'];
+    $questionnaireDocId = $profile['questionnaire']['document_id'];
     
     $template = Template::where('layout_variant', $ballotVariant)->first();
     $data = TemplateData::where('document_id', $ballotDocId)->first();
@@ -106,14 +109,8 @@ it('appreciates simulated Philippine ballot correctly', function () {
     expect($testBlankPng)->toBeFile();
     // $this->info("Converted to PNG: $testBlankPng");
     
-    // 5. Simulate answers from configuration
-    $selectedBubbles = config('omr-testing.simulation.default_bubbles', [
-        'PRESIDENT_LD_001',      // President: Leonardo DiCaprio (#1)
-        'VICE-PRESIDENT_VD_002', // VP: Viola Davis (#2)
-        'SENATOR_JD_001',        // Senator: Johnny Depp (#1)
-        'SENATOR_ES_002',        // Senator: Emma Stone (#2)
-        'SENATOR_MF_003',        // Senator: Morgan Freeman (#3)
-    ]);
+    // 5. Simulate answers from active profile
+    $selectedBubbles = $profile['simulation']['default_bubbles'];
     
     // 5. Simulate filled bubbles directly on test artifact
     $filledPng = OMRSimulator::fillBubbles($testBlankPng, $selectedBubbles, $coordinates);
@@ -163,8 +160,10 @@ it('appreciates simulated Philippine ballot correctly', function () {
     
     $detectedBubbles = $filledMarks->pluck('id')->values()->toArray();
     
-    expect($filledMarks)->toHaveCount(5, sprintf(
-        'Expected 5 filled marks, got %d. Detected: %s', 
+    $expectedCount = count($selectedBubbles);
+    expect($filledMarks)->toHaveCount($expectedCount, sprintf(
+        'Expected %d filled marks, got %d. Detected: %s', 
+        $expectedCount,
         $filledMarks->count(),
         implode(', ', $detectedBubbles)
     ));

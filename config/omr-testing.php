@@ -11,6 +11,84 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Active Test Profile
+    |--------------------------------------------------------------------------
+    |
+    | Specify which test profile to use. Profiles bundle together ballot,
+    | questionnaire, simulation settings, and ground truth files.
+    |
+    | Available profiles: 'philippine', 'barangay'
+    |
+    */
+    'active_profile' => env('OMR_TEST_PROFILE', 'philippine'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Test Profiles
+    |--------------------------------------------------------------------------
+    |
+    | Define complete test configurations including ballot templates,
+    | default bubbles, and ground truth files for validation.
+    |
+    */
+    'profiles' => [
+        'philippine' => [
+            'name' => 'Philippine National Elections 2025',
+            'ballot' => [
+                'template_variant' => 'answer-sheet',
+                'document_id' => 'PH-2025-BALLOT-CURRIMAO-001',
+            ],
+            'questionnaire' => [
+                'template_variant' => 'questionnaire',
+                'document_id' => 'PH-2025-QUESTIONNAIRE-CURRIMAO-001',
+            ],
+            'simulation' => [
+                'default_bubbles' => [
+                    'PRESIDENT_SJ_002',
+                    'VICE-PRESIDENT_VD_002',
+                    'SENATOR_JD_001',
+                    'SENATOR_ES_002',
+                    'SENATOR_MF_003',
+                ],
+            ],
+            'ground_truth_file' => 'storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json',
+        ],
+        
+        'barangay' => [
+            'name' => 'Barangay Elections 2025 - Bokiawan',
+            'ballot' => [
+                'template_variant' => 'answer-sheet',
+                'document_id' => 'BRGY-2025-BALLOT-BOKIAWAN-001',
+            ],
+            'questionnaire' => [
+                'template_variant' => 'questionnaire',
+                'document_id' => 'BRGY-2025-QUESTIONNAIRE-BOKIAWAN-001',
+            ],
+            'simulation' => [
+                'default_bubbles' => [
+                    'PUNONG_BARANGAY_001',
+                    'MEMBER_SANGGUNIANG_BARANGAY_001',
+                    'MEMBER_SANGGUNIANG_BARANGAY_002',
+                    'MEMBER_SANGGUNIANG_BARANGAY_003',
+                    'MEMBER_SANGGUNIANG_BARANGAY_004',
+                ],
+            ],
+            'ground_truth_file' => 'storage/app/tests/omr-appreciation/fixtures/barangay-ballot-ground-truth.json',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Direct Configuration (Deprecated)
+    |--------------------------------------------------------------------------
+    |
+    | These settings are kept for backward compatibility but are overridden
+    | by the active profile when profiles are used.
+    |
+    */
+
     'ballot' => [
         /*
          * Template layout variant to use for ballot rendering
