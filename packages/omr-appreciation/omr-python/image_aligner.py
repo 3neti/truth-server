@@ -103,11 +103,19 @@ def detect_aruco_fiducials(image: np.ndarray, template: dict) -> Optional[List[T
         # Get ArUco dictionary
         aruco_dict_id = getattr(cv2.aruco, aruco_dict_name)
         aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_id)
-        aruco_params = cv2.aruco.DetectorParameters()
         
-        # Detect markers
+        # Detect markers - use new API for OpenCV 4.7+
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=aruco_params)
+        
+        # Try new API first (OpenCV 4.7+)
+        try:
+            aruco_params = cv2.aruco.DetectorParameters()
+            detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
+            corners, ids, _ = detector.detectMarkers(gray)
+        except AttributeError:
+            # Fall back to old API (OpenCV < 4.7)
+            aruco_params = cv2.aruco.DetectorParameters_create()
+            corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=aruco_params)
         
         if ids is None or len(ids) < 4:
             return None
