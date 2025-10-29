@@ -89,20 +89,13 @@ else
 fi
 echo ""
 
-# Generate quality gate fixtures if they don't exist
-FIXTURE_DIR="storage/app/tests/omr-appreciation/fixtures/skew-rotation"
-if [ ! -d "${FIXTURE_DIR}" ] || [ -z "$(ls -A "${FIXTURE_DIR}" 2>/dev/null | grep -v README.md)" ]; then
-    echo -e "${YELLOW}Generating quality gate fixtures...${NC}"
-    if python3 scripts/synthesize_ballot_variants.py \
-        --input packages/omr-appreciation/examples/test_ballot.png \
-        --output "${FIXTURE_DIR}" \
-        --quiet; then
-        echo -e "${GREEN}✓ Quality gate fixtures generated${NC}"
-    else
-        echo -e "${YELLOW}⚠ Failed to generate fixtures (continuing without scenario-5)${NC}"
-    fi
+# Generate all required fixtures
+echo -e "${YELLOW}Ensuring all test fixtures are available...${NC}"
+if bash scripts/generate-omr-fixtures.sh; then
+    echo -e "${GREEN}✓ All fixtures ready${NC}"
 else
-    echo -e "${GREEN}✓ Quality gate fixtures exist${NC}"
+    echo -e "${RED}✗ Fixture generation failed${NC}"
+    exit 1
 fi
 echo ""
 
@@ -201,7 +194,7 @@ QUALITYSUMMARY
 fi
 
 # Run scenario-6-distortion if filled ballot fixtures exist
-FILLED_FIXTURE_DIR="tests/fixtures/omr/filled-distorted"
+FILLED_FIXTURE_DIR="storage/app/tests/omr-appreciation/fixtures/filled-distorted"
 if [ -d "${FILLED_FIXTURE_DIR}" ] && [ -n "$(ls -A "${FILLED_FIXTURE_DIR}" 2>/dev/null | grep '.png$')" ]; then
     SCENARIO_6="${RUN_DIR}/scenario-6-distortion"
     mkdir -p "${SCENARIO_6}"
@@ -214,7 +207,7 @@ if [ -d "${FILLED_FIXTURE_DIR}" ] && [ -n "$(ls -A "${FILLED_FIXTURE_DIR}" 2>/de
   "scenario": "filled-ballot-distortion",
   "description": "Real-world ballot appreciation under geometric distortion",
   "fixtures_tested": $(ls "${FILLED_FIXTURE_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
-  "ground_truth": "tests/fixtures/omr/filled-ground-truth.json"
+  "ground_truth": "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
 }
 SCENARIO6META
     
