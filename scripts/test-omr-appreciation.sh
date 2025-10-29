@@ -99,6 +99,14 @@ else
 fi
 echo ""
 
+# Get active profile and ground truth file
+ACTIVE_PROFILE=$(php -r "echo config('omr-testing.active_profile');" 2>/dev/null || echo "philippine")
+GROUND_TRUTH_FILE=$(php -r "echo config('omr-testing.profiles.' . config('omr-testing.active_profile') . '.ground_truth_file');" 2>/dev/null || echo "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json")
+
+echo -e "${BLUE}Test Profile:${NC} ${ACTIVE_PROFILE}"
+echo -e "${BLUE}Ground Truth:${NC} ${GROUND_TRUTH_FILE}"
+echo ""
+
 # Run tests with timestamped directory
 echo -e "${YELLOW}Running OMR appreciation tests...${NC}"
 export OMR_TEST_RUN_ID="${RUN_TIMESTAMP}"
@@ -219,7 +227,7 @@ SCENARIO6META
     # Get paths for appreciation and comparison
     APPRECIATE_SCRIPT="packages/omr-appreciation/omr-python/appreciate.py"
     COORDS_FILE="${RUN_DIR}/template/coordinates.json"
-    GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+    GROUND_TRUTH="${GROUND_TRUTH_FILE}"
     
     # Verify required files exist
     if [ ! -f "${APPRECIATE_SCRIPT}" ]; then
@@ -315,7 +323,7 @@ SCENARIO7META
     # Get paths for appreciation and comparison
     APPRECIATE_SCRIPT="packages/omr-appreciation/omr-python/appreciate.py"
     COORDS_FILE="${RUN_DIR}/template/coordinates.json"
-    GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+    GROUND_TRUTH="${GROUND_TRUTH_FILE}"
     
     # Verify required files exist
     if [ ! -f "${APPRECIATE_SCRIPT}" ]; then
@@ -588,7 +596,8 @@ cat > "${SCENARIO_8}/metadata.json" <<SCENARIO8META
   "scenario": "cardinal-rotations",
   "description": "ArUco fiducial detection on all rotations: cardinal (0/90/180/270) and diagonal (45/135/225/315)",
   "rotations_tested": [0, 45, 90, 135, 180, 225, 270, 315],
-  "ground_truth": "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json",
+  "test_profile": "${ACTIVE_PROFILE}",
+  "ground_truth": "${GROUND_TRUTH_FILE}",
   "alignment_enabled": true,
   "fiducial_mode": "aruco",
   "rotation_method": "unified_canvas_based"
@@ -599,7 +608,7 @@ SCENARIO8META
 SOURCE_FILLED="${RUN_DIR}/scenario-1-normal/blank_filled.png"
 SOURCE_BLANK="${RUN_DIR}/scenario-1-normal/blank.png"
 COORDS_FILE="${RUN_DIR}/template/coordinates.json"
-GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+GROUND_TRUTH="${GROUND_TRUTH_FILE}"
 
 CARDINAL_PASSED=0
 CARDINAL_FAILED=0
