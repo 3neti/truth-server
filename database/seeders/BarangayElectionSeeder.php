@@ -50,7 +50,7 @@ class BarangayElectionSeeder extends Seeder
             }
             
             $positionMap[$position]['candidates'][] = [
-                'code' => $positionMap[$position]['code'] . '_' . str_pad($number, 3, '0', STR_PAD_LEFT),
+                'code' => str_pad($number, 3, '0', STR_PAD_LEFT),
                 'name' => $fullName,
                 'party' => $nickname,
                 'number' => $number,

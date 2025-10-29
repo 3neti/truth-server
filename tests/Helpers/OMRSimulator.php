@@ -110,14 +110,18 @@ class OMRSimulator
             return null;
         }
         
-        // Parse bubble ID: PRESIDENT_LD_001 -> position=PRESIDENT, code=LD_001
-        $parts = explode('_', $bubbleId, 2);
+        // Bubble IDs are constructed as: {position_code}_{candidate_code}
+        // where candidate_code is the last part (3-digit number like "001")
+        // e.g., PRESIDENT_001, MEMBER_SANGGUNIANG_BARANGAY_001
+        
+        // Extract candidate code (last segment after splitting by _)
+        $parts = explode('_', $bubbleId);
         if (count($parts) < 2) {
             return null;
         }
         
-        $positionCode = $parts[0];
-        $candidateCode = $parts[1];
+        $candidateCode = array_pop($parts); // Get last part (e.g., "001")
+        $positionCode = implode('_', $parts); // Rejoin remaining parts (e.g., "MEMBER_SANGGUNIANG_BARANGAY")
         
         // Find position in questionnaire data
         foreach ($questionnaireData['positions'] as $position) {
