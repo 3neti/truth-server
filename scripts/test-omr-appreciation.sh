@@ -144,7 +144,8 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
     $([ -d "${RUN_DIR}/scenario-2-overvote" ] && echo '{"id": "scenario-2-overvote", "name": "Overvote Detection", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"},' || echo '')
-    $([ -d "${RUN_DIR}/scenario-5-quality-gates" ] && echo '{"id": "scenario-5-quality-gates", "name": "Quality Gates (Skew/Rotation)", "status": "executed"}' || echo '')
+    $([ -d "${RUN_DIR}/scenario-5-quality-gates" ] && echo '{"id": "scenario-5-quality-gates", "name": "Quality Gates (Skew/Rotation)", "status": "executed"},' || echo '')
+    $([ -d "${RUN_DIR}/scenario-6-distortion" ] && echo '{"id": "scenario-6-distortion", "name": "Filled Ballot Distortion", "status": "pending"}' || echo '')
   ]
 }
 EOF
@@ -196,6 +197,56 @@ SCENARIO5META
 QUALITYSUMMARY
     
     echo -e "${GREEN}✓ Quality gate tests complete${NC} (${QUALITY_PASSED} passed, ${QUALITY_FAILED} failed)"
+    echo ""
+fi
+
+# Run scenario-6-distortion if filled ballot fixtures exist
+FILLED_FIXTURE_DIR="tests/fixtures/omr/filled-distorted"
+if [ -d "${FILLED_FIXTURE_DIR}" ] && [ -n "$(ls -A "${FILLED_FIXTURE_DIR}" 2>/dev/null | grep '.png$')" ]; then
+    SCENARIO_6="${RUN_DIR}/scenario-6-distortion"
+    mkdir -p "${SCENARIO_6}"
+    
+    echo -e "${YELLOW}Testing filled ballot distortion tolerance...${NC}"
+    
+    # Create metadata
+    cat > "${SCENARIO_6}/metadata.json" <<SCENARIO6META
+{
+  "scenario": "filled-ballot-distortion",
+  "description": "Real-world ballot appreciation under geometric distortion",
+  "fixtures_tested": $(ls "${FILLED_FIXTURE_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
+  "ground_truth": "tests/fixtures/omr/filled-ground-truth.json"
+}
+SCENARIO6META
+    
+    # Test each filled distorted fixture
+    DISTORTION_PASSED=0
+    DISTORTION_FAILED=0
+    
+    for fixture in "${FILLED_FIXTURE_DIR}"/*.png; do
+        [ -f "${fixture}" ] || continue
+        basename=$(basename "${fixture}" .png)
+        echo -e "  Testing ${BLUE}${basename}${NC}..."
+        
+        # TODO: When omr-appreciation integration is complete:
+        # 1. Run appreciation on distorted filled ballot
+        # 2. Compare results to ground truth
+        # 3. Log quality metrics + vote detection accuracy
+        
+        echo -e "    ${YELLOW}⊙ PENDING (awaiting appreciation integration)${NC}" | tee -a "${SCENARIO_6}/${basename}_results.log"
+    done
+    
+    # Generate summary
+    cat > "${SCENARIO_6}/summary.json" <<DISTORTIONSUMMARY
+{
+  "total_fixtures": $(ls "${FILLED_FIXTURE_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
+  "passed": 0,
+  "failed": 0,
+  "pending": true,
+  "note": "Awaiting omr-appreciation integration"
+}
+DISTORTIONSUMMARY
+    
+    echo -e "${YELLOW}⊙ Distortion tests logged (pending appreciation)${NC}"
     echo ""
 fi
 
@@ -281,6 +332,23 @@ Tests ballot alignment quality with synthetic geometric distortions:
 - Rotation θ: Green ≤3°, Amber 3-10°, Red >10°
 - Shear: Green ≤2°, Amber 2-6°, Red >6°
 - Aspect ratio: Green ≥0.95, Amber 0.90-0.95, Red <0.90
+
+### Scenario 6: Filled Ballot Distortion (PENDING)
+**Directory:** `scenario-6-distortion/`
+
+Tests ballot appreciation on filled ballots with geometric distortions:
+- Combines real vote marks with scenario-5 distortions
+- Validates vote detection accuracy under rotation/shear/perspective
+- Tests against ground truth from `tests/fixtures/omr/filled-ground-truth.json`
+
+**Test Matrix:** Same as Scenario 5 (U0, R1-R3, S1-S2, P1-P3)
+
+**Artifacts:**
+- `*_results.log` - Appreciation results for each distorted filled ballot
+- `metadata.json` - Test configuration
+- `summary.json` - Pass/fail summary comparing to ground truth
+
+**Status:** ⊙ PENDING - Awaiting omr-appreciation integration for filled ballot processing
 
 ## Template Files
 
