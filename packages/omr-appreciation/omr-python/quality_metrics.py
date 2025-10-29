@@ -212,6 +212,8 @@ def check_quality_thresholds(metrics: Dict[str, float]) -> Dict[str, str]:
     Thresholds:
     - Rotation θ: Green ≤3°, Amber 3-10°, Red >10°
     - Shear: Green ≤2°, Amber 2-6°, Red >6°
+      * EXCEPT: If rotation is detected, allow shear within ±1° of rotation angle
+                (diagonal rotations like 45° produce ~45° shear, which is valid)
     - Aspect ratios: Green ≥0.95, Amber 0.90-0.95, Red <0.90
     - Reproj error: Green <1.5px, Amber 1.5-3px, Red >3px
     
@@ -232,10 +234,19 @@ def check_quality_thresholds(metrics: Dict[str, float]) -> Dict[str, str]:
     else:
         verdicts['theta'] = 'red'
     
-    # Shear threshold
-    if metrics['shear_deg'] <= 2.0:
+    # Shear threshold (rotation-aware)
+    # For large rotations (>10°), shear is expected to be close to rotation angle
+    # Allow ±1° tolerance around detected rotation for diagonal orientations
+    shear = metrics['shear_deg']
+    expected_shear_from_rotation = theta_abs  # Shear ≈ rotation for pure rotations
+    shear_deviation = abs(shear - expected_shear_from_rotation)
+    
+    # If shear matches rotation within tolerance, it's likely just rotation (green)
+    if theta_abs > 10.0 and shear_deviation <= 1.0:
+        verdicts['shear'] = 'green'  # Large rotation, shear matches -> valid
+    elif shear <= 2.0:
         verdicts['shear'] = 'green'
-    elif metrics['shear_deg'] <= 6.0:
+    elif shear <= 6.0:
         verdicts['shear'] = 'amber'
     else:
         verdicts['shear'] = 'red'

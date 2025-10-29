@@ -396,10 +396,42 @@ run_rotation_test() {
     
     mkdir -p "${output_dir}"
     
-    # Generate rotated blank and filled images
+    # Generate rotated blank and filled images using unified canvas-based rotation
     python3 <<PYROT
 import cv2
+import numpy as np
 import sys
+
+def rotate_with_canvas(image, angle, bg_color=255):
+    """Rotate image at any angle with expanded canvas to prevent cropping."""
+    h, w = image.shape[:2]
+    
+    # For rotation with corner fiducials, use full diagonal as canvas size
+    # This ensures corners (where ArUco markers are) never get clipped
+    # Diagonal = sqrt(w² + h²) is the maximum extent from center to any corner
+    diagonal = int(np.ceil(np.sqrt(w**2 + h**2))) + 200  # +200px safety margin
+    
+    # Create canvas with white background (simulates camera capture)
+    if len(image.shape) == 3:
+        canvas = np.full((diagonal, diagonal, 3), bg_color, dtype=np.uint8)
+    else:
+        canvas = np.full((diagonal, diagonal), bg_color, dtype=np.uint8)
+    
+    # Center original image in canvas
+    y_offset = (diagonal - h) // 2
+    x_offset = (diagonal - w) // 2
+    canvas[y_offset:y_offset+h, x_offset:x_offset+w] = image
+    
+    # Rotate around canvas center
+    center = (diagonal // 2, diagonal // 2)
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    # borderValue needs to be tuple for color images (B, G, R)
+    border_val = (bg_color, bg_color, bg_color) if len(image.shape) == 3 else bg_color
+    rotated = cv2.warpAffine(canvas, rotation_matrix, (diagonal, diagonal),
+                             borderMode=cv2.BORDER_CONSTANT,
+                             borderValue=border_val)
+    
+    return rotated
 
 try:
     # Load source images
@@ -410,19 +442,10 @@ try:
         print("Error: Could not load source images", file=sys.stderr)
         sys.exit(1)
     
-    # Rotate based on degree
-    if ${degree} == 90:
-        filled_rot = cv2.rotate(filled, cv2.ROTATE_90_CLOCKWISE)
-        blank_rot = cv2.rotate(blank, cv2.ROTATE_90_CLOCKWISE)
-    elif ${degree} == 180:
-        filled_rot = cv2.rotate(filled, cv2.ROTATE_180)
-        blank_rot = cv2.rotate(blank, cv2.ROTATE_180)
-    elif ${degree} == 270:
-        filled_rot = cv2.rotate(filled, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        blank_rot = cv2.rotate(blank, cv2.ROTATE_90_COUNTERCLOCKWISE)
-    else:  # 0 degrees
-        filled_rot = filled
-        blank_rot = blank
+    # Apply unified rotation with canvas for all angles
+    angle = ${degree}
+    filled_rot = rotate_with_canvas(filled, angle)
+    blank_rot = rotate_with_canvas(blank, angle)
     
     # Save rotated images
     cv2.imwrite('${output_dir}/blank_filled.png', filled_rot)
@@ -468,10 +491,42 @@ PYROT
             "${coords_file}" \
             "${TEMP_OVERLAY}" 2>&1 | grep -v "^Overlay"
         
-        # Rotate the overlay to match the ballot rotation
+        # Rotate the overlay to match the ballot rotation using same unified approach
         python3 <<PYROTOVERLAY
 import cv2
+import numpy as np
 import sys
+
+def rotate_with_canvas(image, angle, bg_color=255):
+    """Rotate image at any angle with expanded canvas to prevent cropping."""
+    h, w = image.shape[:2]
+    
+    # For rotation with corner fiducials, use full diagonal as canvas size
+    # This ensures corners (where ArUco markers are) never get clipped
+    # Diagonal = sqrt(w² + h²) is the maximum extent from center to any corner
+    diagonal = int(np.ceil(np.sqrt(w**2 + h**2))) + 200  # +200px safety margin
+    
+    # Create canvas with white background
+    if len(image.shape) == 3:
+        canvas = np.full((diagonal, diagonal, 3), bg_color, dtype=np.uint8)
+    else:
+        canvas = np.full((diagonal, diagonal), bg_color, dtype=np.uint8)
+    
+    # Center original image in canvas
+    y_offset = (diagonal - h) // 2
+    x_offset = (diagonal - w) // 2
+    canvas[y_offset:y_offset+h, x_offset:x_offset+w] = image
+    
+    # Rotate around canvas center
+    center = (diagonal // 2, diagonal // 2)
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    # borderValue needs to be tuple for color images (B, G, R)
+    border_val = (bg_color, bg_color, bg_color) if len(image.shape) == 3 else bg_color
+    rotated = cv2.warpAffine(canvas, rotation_matrix, (diagonal, diagonal),
+                             borderMode=cv2.BORDER_CONSTANT,
+                             borderValue=border_val)
+    
+    return rotated
 
 try:
     overlay = cv2.imread('${TEMP_OVERLAY}')
@@ -479,15 +534,9 @@ try:
         print("Error: Could not load overlay", file=sys.stderr)
         sys.exit(1)
     
-    # Rotate to match ballot
-    if ${degree} == 90:
-        overlay_rot = cv2.rotate(overlay, cv2.ROTATE_90_CLOCKWISE)
-    elif ${degree} == 180:
-        overlay_rot = cv2.rotate(overlay, cv2.ROTATE_180)
-    elif ${degree} == 270:
-        overlay_rot = cv2.rotate(overlay, cv2.ROTATE_90_COUNTERCLOCKWISE)
-    else:
-        overlay_rot = overlay
+    # Apply same rotation as ballot
+    angle = ${degree}
+    overlay_rot = rotate_with_canvas(overlay, angle)
     
     cv2.imwrite('${output_dir}/overlay.png', overlay_rot)
     
@@ -527,21 +576,22 @@ ROTMETA
     return 0
 }
 
-# Run scenario-8-cardinal-rotations: Test 90°/180°/270° rotations
+# Run scenario-8-cardinal-rotations: Test all rotations (cardinal + diagonal)
 SCENARIO_8="${RUN_DIR}/scenario-8-cardinal-rotations"
 mkdir -p "${SCENARIO_8}"
 
-echo -e "${YELLOW}Testing cardinal rotations (90°/180°/270°)...${NC}"
+echo -e "${YELLOW}Testing all rotations (cardinal + diagonal)...${NC}"
 
 # Create scenario metadata
 cat > "${SCENARIO_8}/metadata.json" <<SCENARIO8META
 {
   "scenario": "cardinal-rotations",
-  "description": "ArUco fiducial detection on 90/180/270 degree rotations",
-  "rotations_tested": [0, 90, 180, 270],
+  "description": "ArUco fiducial detection on all rotations: cardinal (0/90/180/270) and diagonal (45/135/225/315)",
+  "rotations_tested": [0, 45, 90, 135, 180, 225, 270, 315],
   "ground_truth": "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json",
   "alignment_enabled": true,
-  "fiducial_mode": "aruco"
+  "fiducial_mode": "aruco",
+  "rotation_method": "unified_canvas_based"
 }
 SCENARIO8META
 
@@ -555,8 +605,8 @@ CARDINAL_PASSED=0
 CARDINAL_FAILED=0
 
 if [ -f "${SOURCE_FILLED}" ] && [ -f "${SOURCE_BLANK}" ] && [ -f "${COORDS_FILE}" ]; then
-    # Test each rotation
-    for deg in 0 90 180 270; do
+    # Test each rotation (cardinal + diagonal)
+    for deg in 0 45 90 135 180 225 270 315; do
         ROT_DIR="${SCENARIO_8}/rot_$(printf '%03d' $deg)"
         echo -e "  Testing ${BLUE}${deg}° rotation${NC}..."
         
@@ -590,7 +640,7 @@ if [ -f "${SOURCE_FILLED}" ] && [ -f "${SOURCE_BLANK}" ] && [ -f "${COORDS_FILE}
 }
 CARDINALSUMMARY
     
-    echo -e "${GREEN}✓ Cardinal rotation tests complete${NC} (${CARDINAL_PASSED}/$((CARDINAL_PASSED + CARDINAL_FAILED)) passed)"
+    echo -e "${GREEN}✓ Rotation tests complete${NC} (${CARDINAL_PASSED}/$((CARDINAL_PASSED + CARDINAL_FAILED)) passed)"
 else
     echo -e "${YELLOW}⊙ Cardinal rotation tests skipped (missing source files)${NC}"
 fi
