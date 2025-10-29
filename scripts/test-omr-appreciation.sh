@@ -454,12 +454,19 @@ PYROTATE
             --threshold 0.3 \
             > "${APPRECIATION_OUTPUT}" 2>"${COMBINED_LOG}"; then
             
+            # Create overlay visualization
+            OVERLAY_OUTPUT="${SCENARIO_8}/rot_$(printf '%03d' $deg)_overlay.png"
+            python3 packages/omr-appreciation/omr-python/create_overlay.py \
+                "${ROT_FILE}" \
+                "${APPRECIATION_OUTPUT}" \
+                "${OVERLAY_OUTPUT}" 2>&1 | grep -v "^Overlay saved"
+            
             # Validate results against ground truth
             if python3 scripts/compare_appreciation_results.py \
                 --result "${APPRECIATION_OUTPUT}" \
                 --truth "${GROUND_TRUTH}" \
                 --output "${VALIDATION_OUTPUT}" \
-                > "${COMBINED_LOG}" 2>&1; then
+                >> "${COMBINED_LOG}" 2>&1; then
                 
                 ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
                 echo -e "    ${GREEN}✓ PASS${NC} (accuracy: ${ACCURACY})"
@@ -634,6 +641,8 @@ Tests ArUco fiducial detection and coordinate transformation on cardinal rotatio
 - `rot_000.png` through `rot_270.png` - Rotated ballot images
 - `rot_*_appreciation.json` - Appreciation results for each rotation
 - `rot_*_validation.json` - Validation against ground truth
+- `rot_*_overlay.png` - Visual overlay showing detected marks with fill ratios
+- `rot_*_combined.log` - Combined stderr/debug output
 - `summary.json` - Pass/fail summary
 
 **Expected Results:**
