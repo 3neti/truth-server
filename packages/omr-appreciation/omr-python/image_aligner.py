@@ -1,5 +1,6 @@
 """Image alignment using fiducial markers."""
 
+import sys
 import cv2
 import numpy as np
 import os
@@ -338,14 +339,14 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
             verdicts = check_quality_thresholds(quality_metrics)
             
             if verbose or os.getenv('OMR_VERBOSE_QUALITY', 'false').lower() == 'true':
-                print(format_quality_report(quality_metrics, verdicts))
+                print(format_quality_report(quality_metrics, verdicts), file=sys.stderr)
             else:
                 # Print compact summary
                 print(f"Quality: θ={quality_metrics['theta_deg']:+.2f}° " 
                       f"shear={quality_metrics['shear_deg']:.2f}° "
                       f"ratio={min(quality_metrics['ratio_tb'], quality_metrics['ratio_lr']):.3f} "
                       f"reproj={quality_metrics['reproj_error_px']:.2f}px "
-                      f"[{verdicts['overall'].upper()}]")
+                      f"[{verdicts['overall'].upper()}]", file=sys.stderr)
         except Exception as e:
             print(f"Warning: Failed to compute quality metrics: {e}")
     

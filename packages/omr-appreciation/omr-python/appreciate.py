@@ -60,7 +60,7 @@ def main():
         
         # Align image
         try:
-            aligned_image = align_image(image, fiducials, template)
+            aligned_image, quality_metrics = align_image(image, fiducials, template)
         except Exception as e:
             print(f"Error aligning image: {e}", file=sys.stderr)
             sys.exit(1)
