@@ -48,6 +48,7 @@ def main():
         sys.exit(1)
     
     # Align image based on fiducials (unless disabled)
+    inv_matrix = None  # No transformation needed if alignment is skipped
     if args.no_align:
         # Skip alignment for perfect test images
         aligned_image = image
@@ -58,9 +59,9 @@ def main():
             print("Error: Could not detect 4 fiducial markers", file=sys.stderr)
             sys.exit(1)
         
-        # Align image
+        # Align image (returns original image + inverse matrix for coordinate transform)
         try:
-            aligned_image, quality_metrics = align_image(image, fiducials, template)
+            aligned_image, quality_metrics, inv_matrix = align_image(image, fiducials, template)
         except Exception as e:
             print(f"Error aligning image: {e}", file=sys.stderr)
             sys.exit(1)
@@ -107,7 +108,7 @@ def main():
                     'height': int(diameter_px)
                 })
         
-        results = detect_marks(aligned_image, zones, threshold=threshold)
+        results = detect_marks(aligned_image, zones, threshold=threshold, inv_matrix=inv_matrix)
     except Exception as e:
         print(f"Error detecting marks: {e}", file=sys.stderr)
         sys.exit(1)

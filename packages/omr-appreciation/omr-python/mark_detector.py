@@ -2,8 +2,50 @@
 
 import cv2
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Optional
 from utils import get_roi_coordinates
+
+
+def transform_zone_coordinates(zones: List[Dict], inv_matrix: np.ndarray) -> List[Dict]:
+    """Transform zone coordinates using inverse perspective matrix.
+    
+    Args:
+        zones: List of zone definitions with x, y, width, height
+        inv_matrix: 3x3 inverse perspective transform matrix
+        
+    Returns:
+        List of zones with transformed coordinates
+    """
+    transformed_zones = []
+    
+    for zone in zones:
+        # Get original zone coordinates
+        x, y, width, height = get_roi_coordinates(zone)
+        
+        # Transform center point
+        center_x = x + width / 2
+        center_y = y + height / 2
+        
+        # Create point array for transformation
+        point = np.array([[center_x, center_y]], dtype=np.float32).reshape(-1, 1, 2)
+        transformed_point = cv2.perspectiveTransform(point, inv_matrix)
+        
+        # Extract transformed coordinates
+        new_center_x = transformed_point[0][0][0]
+        new_center_y = transformed_point[0][0][1]
+        
+        # Calculate new top-left coordinates
+        new_x = int(new_center_x - width / 2)
+        new_y = int(new_center_y - height / 2)
+        
+        # Create transformed zone (preserve all original fields)
+        transformed_zone = zone.copy()
+        transformed_zone['x'] = new_x
+        transformed_zone['y'] = new_y
+        
+        transformed_zones.append(transformed_zone)
+    
+    return transformed_zones
 
 
 def calculate_mark_metrics(image: np.ndarray, x: int, y: int, width: int, height: int) -> dict:
@@ -93,17 +135,24 @@ def calculate_mark_metrics(image: np.ndarray, x: int, y: int, width: int, height
     }
 
 
-def detect_marks(image: np.ndarray, zones: List[Dict], threshold: float = 0.3) -> List[Dict]:
+def detect_marks(image: np.ndarray, zones: List[Dict], threshold: float = 0.3, 
+                inv_matrix: Optional[np.ndarray] = None) -> List[Dict]:
     """Detect filled marks in all zones with confidence metrics.
     
     Args:
-        image: Aligned image (BGR)
-        zones: List of zone definitions from template
+        image: Image to analyze (BGR)
+        zones: List of zone definitions from template (in template coordinate space)
         threshold: Fill ratio threshold to consider a mark as filled
+        inv_matrix: Optional inverse perspective transform matrix for coordinate alignment.
+                   If provided, zone coordinates will be transformed to match the distorted image.
         
     Returns:
         List of results with fill status, confidence, and quality metrics
     """
+    # Transform zone coordinates if inverse matrix is provided
+    if inv_matrix is not None:
+        zones = transform_zone_coordinates(zones, inv_matrix)
+    
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     

@@ -1,137 +1,156 @@
 # Distorted Ballot Appreciation Problem & Solutions
 
-**Date:** 2025-10-29  
-**Status:** Partially Working - Need Help with Fiducial Detection  
-**Priority:** High - Critical for real-world ballot scanning
+**Date:** 2025-10-29 (Updated after extensive testing)  
+**Status:** ⚠️ CRITICAL BUG FOUND - Perspective Transform Breaks Detection  
+**Priority:** 🔴 CRITICAL - Blocking all distortion testing
 
 ---
 
 ## 🎯 Problem Summary
 
-**We need to accurately detect votes on ballots that have geometric distortions** (rotation, skew, perspective warp) from real-world scanning conditions. Currently:
+**We need to accurately detect votes on ballots that have geometric distortions** (rotation, skew, perspective warp) from real-world scanning conditions.
 
-- ✅ **Perfect ballots work**: 100% accuracy when upright and aligned
-- ❌ **Distorted ballots fail**: 0% accuracy with even minor distortions (3° rotation)
-- ⚠️ **Fiducial alignment partially works**: Framework in place but detection fails
+### Current Status:
+
+- ✅ **Perfect ballots work**: 100% accuracy without alignment (`--no-align`)
+- ✅ **ArUco markers work**: Detected perfectly even on rotated ballots
+- ✅ **Quality metrics work**: Rotation/shear/ratio computed correctly
+- ❌ **Alignment BREAKS detection**: 100% → 0% accuracy when alignment enabled
+
+### Critical Discovery:
+**The `cv2.warpPerspective()` function transforms the image, but bubble coordinates still reference the original image positions. This causes ALL bubbles to be undetectable after alignment.**
 
 ---
 
-## 📊 Current Test Results
+## 📊 Test Results - What Actually Works and Doesn't
 
-### Scenario 6: No Fiducials (--no-align)
-| Fixture | Distortion | Accuracy | Status |
-|---------|------------|----------|--------|
-| U0 | None (upright) | 100% | ✅ PASS |
-| R1 | +3° rotation | 0% | ❌ FAIL |
-| R2 | +10° rotation | 0% | 0% | ❌ FAIL |
-| R3 | -20° rotation | 0% | ❌ FAIL |
-| S1 | 2° shear | 0% | ❌ FAIL |
-| S2 | 6° shear | 0% | ❌ FAIL |
-| P1-P3 | Perspective | 0% | ❌ FAIL |
+### PHP-Generated Ballots with ArUco Markers:
 
-**Finding:** Without alignment, even tiny distortions (3°) cause total failure because bubble coordinates don't match their physical positions.
+| Test Scenario | ArUco Detection | Alignment | Bubble Detection | Accuracy |
+|---------------|-----------------|-----------|------------------|----------|
+| Original ballot (--no-align) | N/A (skipped) | Disabled | ✅ Works | **100%** ✅ |
+| Original ballot (with align) | ✅ 4 markers found | Enabled | ❌ BROKEN | **0%** ❌ |
+| R1 +3° rotation | ✅ 4 markers found | Enabled | ❌ BROKEN | **0%** ❌ |
+| R2 +10° rotation | ✅ 4 markers found | Enabled | ❌ BROKEN | **0%** ❌ |
+| All distorted variants | ✅ Always works | Enabled | ❌ BROKEN | **0%** ❌ |
 
-### Scenario 7: With Fiducials (alignment enabled)
-| Fixture | Distortion | Fiducial Detection | Accuracy | Status |
-|---------|------------|-------------------|----------|--------|
-| U0 | None (upright) | ✅ Detected | Unknown | ⚠️ Runs but needs validation |
-| R1 | +3° rotation | ❌ **FAILS** | N/A | ❌ FAIL |
-| R2 | +10° rotation | ❌ **FAILS** | N/A | ❌ FAIL |
-| R3 | -20° rotation | ❌ **FAILS** | N/A | ❌ FAIL |
-| S1 | 2° shear | ❌ **FAILS** | N/A | ❌ FAIL |
-| S2 | 6° shear | ❌ **FAILS** | N/A | ❌ FAIL |
-| P1-P3 | Perspective | ❓ Unknown | N/A | ⚠️ Needs investigation |
+### Key Findings:
 
-**Critical Issue:** Black square fiducial detection fails when ballot is rotated/skewed.
+1. **ArUco markers work perfectly** - Even after rotation, all 4 corners detected with IDs 101-104
+2. **Quality metrics work** - Correctly reports θ=+3.01° for R1, θ=+0.00° for upright
+3. **Perspective transform calculated** - Matrix computed from detected fiducials
+4. **Bubble detection breaks** - After `cv2.warpPerspective()`, bubbles not found
+
+### The Bug:
+**Warping the image moves pixels, but bubble coordinates aren't updated to match the new positions.**
 
 ---
 
 ## 🔍 Root Cause Analysis
 
-### Problem 1: Black Square Detection is Not Rotation-Invariant
+### The Coordinate Mismatch Problem
 
-**Current Algorithm** (`image_aligner.py` lines 196-277):
+**What happens:**
+1. Original image has bubbles at known (x, y) coordinates from template
+2. `cv2.warpPerspective()` transforms the image pixels to correct distortion
+3. Bubbles have moved to NEW positions in the warped image
+4. Detector still looks at OLD coordinates → finds nothing
+
+**Example:**
+```
+Original Image:           Warped Image:
+Bubble at (100, 200)  →   Bubble now at (95, 198)
+                          But detector still checks (100, 200) ❌
+```
+
+### Why Black Square Detection Failed (Historical)
+
+Before we discovered the coordinate mismatch bug, we found that black square fiducial detection was rotation-sensitive:
+
+**Algorithm** (`image_aligner.py` lines 196-277):
 ```python
 # Uses contour detection with aspect ratio check
 aspect_ratio = float(w) / h
 if 0.7 <= aspect_ratio <= 1.4:  # Expects roughly square
 ```
 
-**Why It Fails:**
-- When ballot rotates 3°, black squares also rotate 3°
-- Rotated squares have tilted bounding boxes
-- Aspect ratio check fails: rotated square's bounding box is no longer square-shaped
-- Contour-based detection expects axis-aligned squares
-
-**Example:**
-```
-Upright Square:     Rotated 3° Square:
-┌─────┐            ◢─────◣
-│     │            │     │  ← Bounding box is now wider/taller
-│  ■  │            │  ■  │
-│     │            │     │
-└─────┘            ◥─────◤
-(1:1 ratio)        (1.2:1 ratio) ← REJECTED by algorithm
-```
-
-### Problem 2: Output Stream Pollution (FIXED ✅)
-
-Quality metrics were printing to stdout, breaking JSON parsing. **Fixed by redirecting to stderr.**
-
-### Problem 3: Tuple Unpacking Bug (FIXED ✅)
-
-`align_image()` returns `(image, metrics)` but was assigned to single variable. **Fixed with proper unpacking.**
+**Why It Failed:**
+- When ballot rotates, black squares also rotate
+- Rotated squares have tilted bounding boxes that fail aspect ratio check
+- ArUco markers solved this by being rotation-invariant by design
 
 ---
 
-## 💡 Proposed Solutions
+## 💡 Solution Options
 
-### Solution A: Switch to ArUco Markers (RECOMMENDED)
+### Option A: Transform Coordinates Instead of Image (RECOMMENDED)
 
-**Why ArUco is Better:**
-- ✅ **Rotation-invariant** - Designed for this exact use case
-- ✅ **Unique IDs** - Each corner has distinct marker (101-104)
-- ✅ **Robust** - Works under perspective distortion
-- ✅ **Mature** - Well-tested OpenCV implementation
+**Don't warp the image - transform the bubble coordinates to match the distorted ballot!**
 
-**Implementation Status:**
-- ✅ ArUco generation script exists: `scripts/generate_aruco_markers.py`
-- ✅ ArUco detection code exists: `image_aligner.py` lines 87-144
-- ✅ Fixture generation script ready: `scripts/add_fiducial_markers.py --mode aruco`
-- ❌ **Need to generate ArUco-marked fixtures and test**
+```python
+def align_image(image, fiducials, template, verbose=False):
+    # Calculate INVERSE transform (template → actual image)
+    inv_matrix = cv2.getPerspectiveTransform(dst_points, src_points)
+    
+    # Return original image + inverse matrix
+    # Bubble detector will transform each coordinate before checking
+    return image, quality_metrics, inv_matrix
 
-**Action Items:**
-1. Generate ArUco-marked filled ballots
-2. Generate distorted variants with ArUco markers
-3. Run scenario-7 tests with ArUco fixtures
-4. Validate ≥98% accuracy on distorted ballots
+# In mark_detector.py:
+def transform_bubble_coords(coords, inv_matrix):
+    points = np.array(coords, dtype=np.float32).reshape(-1, 1, 2)
+    transformed = cv2.perspectiveTransform(points, inv_matrix)
+    return transformed.reshape(-1, 2)
+```
 
-### Solution B: Improve Black Square Detection
+**Pros:**
+- ✅ No image quality loss from warping
+- ✅ Simpler approach - single coordinate transformation
+- ✅ Faster processing
 
-**Approaches:**
-1. **Rotation-invariant features:**
-   - Use Hu moments (rotation-invariant)
-   - Use circular Hough transform (detects circular/square patterns)
-   
-2. **Multi-angle detection:**
-   - Try detecting at 0°, 90°, 180°, 270°
-   - Rotate image before detection
-   
-3. **Template matching:**
-   - Use normalized cross-correlation
-   - Rotation-invariant template matching
+### Option B: Warp to Exact Template Dimensions
+
+**Warp the image to match the template's exact pixel dimensions:**
+
+```python
+def align_image(image, fiducials, template, verbose=False):
+    # Get template dimensions
+    template_w = int(template.get('width', 210) * 11.811)  # A4 in px
+    template_h = int(template.get('height', 297) * 11.811)
+    
+    # Warp to template size
+    aligned = cv2.warpPerspective(image, matrix, (template_w, template_h))
+    
+    # Now coordinates match perfectly!
+    return aligned, quality_metrics
+```
+
+**Pros:**
+- ✅ Coordinates match warped image directly
+- ✅ Standard approach in CV pipelines
 
 **Cons:**
-- More complex than ArUco
-- May still fail under combined distortions
-- Reinventing the wheel (ArUco solves this)
+- ⚠️ Image quality degradation from resampling
+- ⚠️ Requires exact template dimensions
 
-### Solution C: Hybrid Approach
+### Option C: Update Coordinates After Warping
 
-Use both black squares AND ArUco:
-- Black squares for simple cases (fast)
-- ArUco fallback for rotated cases (robust)
-- Already partially implemented in `detect_fiducials()`
+**Apply the perspective transform to every bubble coordinate:**
+
+```python
+# After warping image
+def update_bubble_coordinates(template_coords, matrix):
+    coords = np.array(template_coords, dtype=np.float32).reshape(-1, 1, 2)
+    new_coords = cv2.perspectiveTransform(coords, matrix)
+    return new_coords.reshape(-1, 2).tolist()
+```
+
+**Pros:**
+- ✅ Conceptually simple
+
+**Cons:**
+- ⚠️ Need to modify coordinate structure throughout codebase
+- ⚠️ More points of failure
 
 ---
 
@@ -142,7 +161,7 @@ Use both black squares AND ArUco:
 | Script | Purpose | Status |
 |--------|---------|--------|
 | `scripts/generate-omr-fixtures.sh` | Generate all test fixtures | ✅ Working |
-| `scripts/add_fiducial_markers.py` | Add fiducials to ballots | ✅ Working |
+| `scripts/add_fiducial_markers.py` | Add fiducials to ballots | ⚠️ Python ArUco generation broken |
 | `scripts/synthesize_ballot_variants.py` | Create distorted variants | ✅ Working |
 | `scripts/test-omr-appreciation.sh` | Run all test scenarios | ✅ Working |
 | `scripts/compare_appreciation_results.py` | Validate against ground truth | ✅ Working |
@@ -151,9 +170,9 @@ Use both black squares AND ArUco:
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `packages/omr-appreciation/omr-python/appreciate.py` | Main appreciation script | ✅ Fixed |
-| `packages/omr-appreciation/omr-python/image_aligner.py` | Fiducial detection & alignment | ⚠️ Needs work |
-| `packages/omr-appreciation/omr-python/mark_detector.py` | Bubble detection | ✅ Working |
+| `packages/omr-appreciation/omr-python/appreciate.py` | Main appreciation script | ⚠️ Needs coordinate fix |
+| `packages/omr-appreciation/omr-python/image_aligner.py` | Fiducial detection & alignment | ⚠️ **CRITICAL BUG HERE** |
+| `packages/omr-appreciation/omr-python/mark_detector.py` | Bubble detection | ⚠️ Needs coordinate transform |
 | `packages/omr-appreciation/omr-python/quality_metrics.py` | Alignment quality metrics | ✅ Working |
 
 ### Test Fixtures
@@ -161,11 +180,13 @@ Use both black squares AND ArUco:
 | Fixture Directory | Contents | Status |
 |-------------------|----------|--------|
 | `storage/app/tests/omr-appreciation/fixtures/filled-ballot-base.png` | Base filled ballot | ✅ Exists |
-| `storage/app/tests/omr-appreciation/fixtures/filled-ballot-with-fiducials.png` | With black squares | ✅ Exists |
+| `storage/app/tests/omr-appreciation/fixtures/filled-ballot-with-fiducials.png` | With black squares | ✅ Exists (but detection fails on rotation) |
 | `storage/app/tests/omr-appreciation/fixtures/filled-distorted/` | 9 distorted (no fiducials) | ✅ Exists |
-| `storage/app/tests/omr-appreciation/fixtures/filled-distorted-fiducial/` | 9 distorted (black squares) | ✅ Exists |
-| `storage/app/tests/omr-appreciation/fixtures/filled-distorted-aruco/` | 9 distorted (ArUco) | ❌ **NEED TO CREATE** |
+| `storage/app/tests/omr-appreciation/fixtures/filled-distorted-fiducial/` | 9 distorted (black squares) | ✅ Exists (detection fails) |
+| PHP-generated ballots with ArUco | From Laravel ballot generation | ✅ Working (use these!) |
 | `storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json` | Expected marks | ✅ Exists |
+
+**Note:** PHP-generated ballots include ArUco markers by default. Use these instead of Python-generated ArUco ballots which have detection issues.
 
 ---
 
@@ -184,279 +205,41 @@ cat scenario-6-distortion/summary.json
 cat scenario-7-fiducial-alignment/summary.json
 ```
 
-### To Generate ArUco Fixtures (RECOMMENDED NEXT STEP):
+### To Reproduce the Bug:
 
 ```bash
-# 1. Generate ArUco-marked filled ballot base
-python3 scripts/add_fiducial_markers.py \
-  storage/app/tests/omr-appreciation/fixtures/filled-ballot-base.png \
-  storage/app/tests/omr-appreciation/fixtures/filled-ballot-aruco.png \
-  --mode aruco \
-  --aruco-ids 101,102,103,104
+# Get PHP-generated ballot with ArUco markers
+bash scripts/test-omr-appreciation.sh
+BALLOT="storage/app/tests/omr-appreciation/latest/scenario-1-normal/blank_filled.png"
+COORDS="storage/app/tests/omr-appreciation/latest/template/coordinates.json"
 
-# 2. Generate 9 distorted variants with ArUco markers
-python3 scripts/synthesize_ballot_variants.py \
-  --input storage/app/tests/omr-appreciation/fixtures/filled-ballot-aruco.png \
-  --output storage/app/tests/omr-appreciation/fixtures/filled-distorted-aruco
+# Test WITHOUT alignment (works perfectly)
+cd packages/omr-appreciation/omr-python
+python3 appreciate.py "$BALLOT" "$COORDS" --threshold 0.3 --no-align
+# Result: 100% accuracy ✅
 
-# 3. Run tests (need to create scenario-8 or modify scenario-7)
-# See "Implementation Tasks" below
+# Test WITH alignment (totally broken)
+OMR_FIDUCIAL_MODE=aruco python3 appreciate.py "$BALLOT" "$COORDS" --threshold 0.3
+# Result: 0% accuracy ❌ - ArUco detected but bubbles not found
 ```
 
-### To Debug Fiducial Detection:
+### To Test Fix (Once Implemented):
 
 ```bash
-# Test black square detection on rotated ballot
-python3 packages/omr-appreciation/omr-python/appreciate.py \
-  storage/app/tests/omr-appreciation/fixtures/filled-distorted-fiducial/R1_rotation_+3deg.png \
-  storage/app/tests/omr-appreciation/latest/template/coordinates.json \
-  --threshold 0.3
+# After implementing coordinate transformation fix:
 
-# Expected: "Error: Could not detect 4 fiducial markers"
-```
+# 1. Test upright ballot with alignment
+OMR_FIDUCIAL_MODE=aruco python3 appreciate.py upright.png coords.json --threshold 0.3
+# Expected: 100% accuracy (same as --no-align)
 
----
+# 2. Test rotated ballot
+python3 synthesize_ballot_variants.py --input upright.png --output distorted/
+OMR_FIDUCIAL_MODE=aruco python3 appreciate.py distorted/R1_rotation_+3deg.png coords.json --threshold 0.3
+# Expected: ≥98% accuracy
 
-## 📋 Implementation Tasks
-
-### Phase 1: ArUco Marker Testing (HIGH PRIORITY)
-
-- [ ] Generate ArUco-marked filled ballot base
-- [ ] Generate 9 distorted ArUco variants
-- [ ] Add scenario-8 to `test-omr-appreciation.sh` for ArUco testing
-- [ ] Update fixture generation script to include ArUco variants
-- [ ] Run tests and validate ≥98% accuracy
-
-### Phase 2: Investigation (IF ARUCO FAILS)
-
-- [ ] Debug why U0 (upright) doesn't show 100% accuracy with fiducials
-- [ ] Check if fiducial markers overlap with corner bubbles
-- [ ] Investigate perspective distortion cases (P1-P3)
-- [ ] Measure actual vs expected fiducial coordinates
-
-### Phase 3: Algorithm Improvements (IF NEEDED)
-
-- [ ] Implement rotation-invariant black square detection
-- [ ] Add multi-angle detection fallback
-- [ ] Optimize ArUco detection parameters
-- [ ] Add hybrid detection mode
-
----
-
-## 🔧 Code Changes Needed
-
-### 1. Add ArUco Fixture Generation to `generate-omr-fixtures.sh`
-
-```bash
-# After line 154 (filled-distorted-fiducial section)
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 8. Generate ArUco-marked filled ballot (for scenario-8)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FILLED_WITH_ARUCO="${FIXTURE_BASE}/filled-ballot-aruco.png"
-
-if [ ! -f "${FILLED_WITH_ARUCO}" ]; then
-    echo -e "${YELLOW}Adding ArUco markers to filled ballot...${NC}"
-    
-    if python3 scripts/add_fiducial_markers.py \
-        "${FILLED_BALLOT_BASE}" \
-        "${FILLED_WITH_ARUCO}" \
-        --mode aruco \
-        --aruco-ids 101,102,103,104 \
-        --size 10 \
-        --margin 5; then
-        echo -e "${GREEN}✓ Filled ballot with ArUco created${NC}"
-    else
-        echo -e "${RED}✗ Failed to add ArUco markers${NC}"
-        exit 1
-    fi
-else
-    echo -e "${GREEN}✓ Filled ballot with ArUco exists${NC}"
-fi
-
-# Generate distorted variants
-FILLED_DISTORTED_ARUCO_DIR="${FIXTURE_BASE}/filled-distorted-aruco"
-
-if [ ! -d "${FILLED_DISTORTED_ARUCO_DIR}" ] || [ -z "$(ls -A "${FILLED_DISTORTED_ARUCO_DIR}" 2>/dev/null)" ]; then
-    echo -e "${YELLOW}Generating filled-distorted-aruco fixtures...${NC}"
-    
-    if python3 scripts/synthesize_ballot_variants.py \
-        --input "${FILLED_WITH_ARUCO}" \
-        --output "${FILLED_DISTORTED_ARUCO_DIR}" \
-        --quiet; then
-        echo -e "${GREEN}✓ Filled-distorted-aruco fixtures generated${NC}"
-    else
-        echo -e "${RED}✗ Failed to generate filled-distorted-aruco fixtures${NC}"
-        exit 1
-    fi
-else
-    echo -e "${GREEN}✓ Filled-distorted-aruco fixtures exist${NC}"
-fi
-```
-
-### 2. Add Scenario-8 to `test-omr-appreciation.sh`
-
-Copy scenario-7 section and modify:
-- Change `SCENARIO_7` to `SCENARIO_8`
-- Change directory to `filled-distorted-aruco`
-- Update metadata to indicate ArUco markers
-- Set environment variable: `export OMR_FIDUCIAL_MODE=aruco`
-
-### 3. Enable ArUco Detection
-
-```bash
-# In test-omr-appreciation.sh, before scenario-8
-export OMR_FIDUCIAL_MODE=aruco
-```
-
----
-
-## 📈 Success Criteria
-
-### Minimum Viable Solution:
-- ✅ U0 (upright): 100% accuracy
-- ✅ R1 (+3° rotation): ≥98% accuracy
-- ✅ S1 (2° shear): ≥98% accuracy
-- ⚠️ R2 (+10° rotation): ≥95% accuracy (acceptable with warning)
-
-### Ideal Solution:
-- All 9 distorted fixtures: ≥98% accuracy
-- Consistent fiducial detection across all distortion types
-- Fast processing (<2 seconds per ballot)
-
----
-
-## 🆘 How You Can Help
-
-### Option 1: Test ArUco Markers (FASTEST)
-1. Generate ArUco fixtures using commands above
-2. Run tests and report results
-3. If successful, we just need to integrate into main test flow
-
-### Option 2: Debug Black Square Detection
-1. Investigate why rotated squares aren't detected
-2. Possibly implement rotation-invariant detection
-3. Test on R1 fixture and measure improvement
-
-### Option 3: Investigate Bubble Detection
-1. Check why U0 with fiducials might not achieve 100%
-2. Verify fiducial markers don't overlap corner bubbles
-3. Validate ground truth matches actual filled marks
-
----
-
-## 📞 Questions?
-
-**Key Files to Review:**
-- This document: You are here
-- Test results: `storage/app/tests/omr-appreciation/latest/README.md`
-- Fiducial code: `packages/omr-appreciation/omr-python/image_aligner.py`
-- Test script: `scripts/test-omr-appreciation.sh`
-
-**Quick Commands:**
-```bash
-# See latest test results
-cat storage/app/tests/omr-appreciation/latest/README.md
-
-# Check fixture status
-ls -lh storage/app/tests/omr-appreciation/fixtures/
-
-# View specific test output
-cat storage/app/tests/omr-appreciation/latest/scenario-7-fiducial-alignment/summary.json
-```
-
----
-
-**Last Updated:** 2025-10-29 (Updated after extensive testing)  
-**Status:** CRITICAL BUG FOUND - Perspective transform breaks bubble detection
-
----
-
-## 🚨 CRITICAL DISCOVERY (Latest)
-
-### ArUco Detection Works, But Alignment Breaks Detection
-
-**Test Results with PHP-Generated Ballots:**
-
-| Test | ArUco Mode | Alignment | Accuracy | Finding |
-|------|-----------|-----------|----------|----------|
-| Original PHP ballot | ✅ Yes | ❌ Disabled (`--no-align`) | 100% | ✅ **WORKS PERFECTLY** |
-| Original PHP ballot | ✅ Yes | ✅ Enabled | 0% | ❌ **TOTAL FAILURE** |
-| R1 (+3° rotation) | ✅ Yes | ✅ Enabled | 0% | ❌ **TOTAL FAILURE** |
-| U0 (upright distorted) | ✅ Yes | ✅ Enabled | 0% | ❌ **TOTAL FAILURE** |
-
-**Conclusion:**
-- ✅ ArUco markers ARE present in PHP-generated ballots
-- ✅ ArUco detection works (all 4 markers detected, even after rotation)
-- ✅ Quality metrics computed correctly (θ angle, shear, ratio)
-- ✅ Perspective transform matrix calculated
-- ❌ **cv2.warpPerspective() breaks bubble detection completely**
-
-### Root Cause
-
-**The perspective transform is applied, but the warped image loses bubble marks or coordinates don't match the warped image.**
-
-Possible issues:
-1. **Transform applies to wrong dimensions** - warped image size doesn't match original
-2. **Bubble coordinates not transformed** - coordinates reference original image, not warped
-3. **Image quality degradation** - warping introduces artifacts that prevent detection
-4. **Wrong transform direction** - should transform coordinates, not image
-
-### Code Location
-
-**File:** `packages/omr-appreciation/omr-python/image_aligner.py`  
-**Function:** `align_image()` (lines 280-357)
-**Problem Line:** `aligned = cv2.warpPerspective(image, matrix, (w, h))`
-
-```python
-# Current code (BROKEN):
-def align_image(image, fiducials, template, verbose=False):
-    # ... compute matrix ...
-    h, w = image.shape[:2]
-    aligned = cv2.warpPerspective(image, matrix, (w, h))  # ❌ This breaks detection
-    return aligned, quality_metrics
-```
-
-**The issue:** After warping, bubble coordinates from template still reference the ORIGINAL image dimensions, but the bubbles have moved in the warped image.
-
-### Solution Options
-
-**Option A: Transform Coordinates Instead of Image (RECOMMENDED)**
-```python
-# Don't warp the image - transform the coordinates instead!
-def align_image(image, fiducials, template, verbose=False):
-    # ... compute matrix ...
-    
-    # Calculate INVERSE transform to map template coords to actual image
-    inv_matrix = cv2.getPerspectiveTransform(dst_points, src_points)
-    
-    # Return original image + inverse matrix
-    # Bubble detection will apply inv_matrix to each coordinate
-    return image, quality_metrics, inv_matrix
-```
-
-**Option B: Warp to Template Space**
-```python
-# Warp image to match template dimensions exactly
-def align_image(image, fiducials, template, verbose=False):
-    # ... compute matrix ...
-    
-    # Get template dimensions from config
-    template_w = int(template.get('width', 210) * 11.811)  # A4 width in px
-    template_h = int(template.get('height', 297) * 11.811) # A4 height in px
-    
-    aligned = cv2.warpPerspective(image, matrix, (template_w, template_h))
-    return aligned, quality_metrics
-```
-
-**Option C: Update Coordinates After Warping**
-```python
-# Apply inverse transform to all bubble coordinates
-def transform_coordinates(coords, matrix):
-    # Transform each (x,y) coordinate through the perspective matrix
-    points = np.array([[x, y] for x, y in coords], dtype=np.float32)
-    transformed = cv2.perspectiveTransform(points.reshape(-1, 1, 2), matrix)
-    return transformed.reshape(-1, 2)
+# 3. Test all 9 distortions
+bash scripts/test-omr-appreciation.sh
+# Expected: All distorted ballots ≥95% accuracy
 ```
 
 ---
@@ -477,6 +260,7 @@ OMR_FIDUCIAL_MODE=aruco python3 appreciate.py blank_filled.png coordinates.json 
 ```
 Quality: θ=+0.00° shear=0.02° ratio=1.000 reproj=1274.01px [RED]
 ```
+**ArUco Detection:** ✅ 4 markers found (IDs: 101, 102, 103, 104)  
 **Result:** ❌ 0% accuracy (0/5 marks detected, all false negatives)
 
 ### Test 3: Rotated Ballot (+3°) WITH ArUco Alignment
@@ -486,23 +270,12 @@ OMR_FIDUCIAL_MODE=aruco python3 appreciate.py R1_rotation_+3deg.png coordinates.
 **Output:**
 ```
 Quality: θ=+3.01° shear=3.01° ratio=1.000 reproj=1274.01px [RED]
-```
-**ArUco Detection:**
-```python
 Detected: 4 markers
 IDs: [103 101 102 104]  # ✅ All corners detected despite rotation!
 ```
 **Result:** ❌ 0% accuracy (0/5 marks detected, all false negatives)
 
-### Test 4: Python-Generated ArUco Markers
-```bash
-python3 add_fiducial_markers.py --mode aruco input.png output.png
-```
-**ArUco Detection:**
-```
-Detected: 0 markers  # ❌ Python script generates undetectable markers
-```
-**Conclusion:** Python script's ArUco generation is broken - use PHP ballots only
+**Conclusion:** ArUco works perfectly, quality metrics correct, but warped image loses all bubbles.
 
 ---
 
@@ -526,7 +299,7 @@ Detected: 0 markers  # ❌ Python script generates undetectable markers
 **Solution:** Print to stderr: `print(..., file=sys.stderr)`  
 **Status:** ✅ Fixed and tested
 
-### ❌ Fix 4: Perspective Transform (NEEDS FIXING)
+### ❌ Fix 4: Perspective Transform Coordinate Mismatch
 **File:** `image_aligner.py` lines 352-355  
 **Problem:** Warped image breaks bubble coordinate alignment  
 **Solution:** See "Solution Options" above  
@@ -534,39 +307,42 @@ Detected: 0 markers  # ❌ Python script generates undetectable markers
 
 ---
 
-## 📋 Implementation Tasks (UPDATED)
+## 📋 Implementation Tasks
 
-### Phase 1: Fix Perspective Transform (HIGH PRIORITY - BLOCKING)
+### Phase 1: Fix Coordinate Mismatch (CRITICAL - BLOCKING)
 
-- [ ] **Option A: Implement coordinate transformation approach**
-  - Modify `align_image()` to return inverse matrix
-  - Update `detect_marks()` to transform coordinates before detection
-  - Test on upright ballot first (should still get 100%)
-  - Test on R1 rotated ballot (target: ≥98%)
+**Choose ONE solution path:**
 
-- [ ] **Option B: Implement template-space warping**
-  - Get template dimensions from config
-  - Warp to exact template size
-  - Verify coordinates now match warped image
+#### Path A: Coordinate Transformation (Recommended)
+- [ ] Modify `align_image()` to return inverse matrix instead of warped image
+- [ ] Update `appreciate.py` to pass inverse matrix to mark detector
+- [ ] Modify `mark_detector.py` to transform coordinates before detection
+- [ ] Test on upright ballot → expect 100%
+- [ ] Test on R1 rotated ballot → expect ≥98%
 
-- [ ] **Option C: Transform coordinates after warping**
-  - Apply inverse perspective transform to bubble coordinates
-  - Update coordinate array before detection
+#### Path B: Template-Space Warping
+- [ ] Get template dimensions from config
+- [ ] Modify `align_image()` to warp to exact template size
+- [ ] Verify coordinates match warped image
+- [ ] Test on all distortions
+
+#### Path C: Post-Warp Coordinate Update
+- [ ] Compute forward transform of all bubble coordinates
+- [ ] Update coordinate array throughout detection pipeline
+- [ ] Test on all fixtures
 
 ### Phase 2: Validation
-
 - [ ] Test upright PHP ballot with alignment → expect 100%
 - [ ] Test R1 (+3°) with alignment → expect ≥98%
 - [ ] Test R2 (+10°) with alignment → expect ≥95%
 - [ ] Test all 9 distorted variants
-- [ ] Compare vs --no-align results
+- [ ] Compare vs `--no-align` baseline
 
 ### Phase 3: Integration
-
-- [ ] Update generate-omr-fixtures.sh to use PHP ballots
-- [ ] Remove Python add_fiducial_markers.py approach
-- [ ] Update test scenarios to use PHP-generated ballots
-- [ ] Document why Python ArUco generation doesn't work
+- [ ] Update test scenarios to validate alignment on all distortions
+- [ ] Document the fix in code comments
+- [ ] Add regression tests for coordinate transformation
+- [ ] Update this document with final results
 
 ---
 
@@ -598,41 +374,61 @@ OMR_FIDUCIAL_MODE=aruco python3 appreciate.py ballot.png coords.json --threshold
 python3 compare_appreciation_results.py --result with_align.json --truth ground_truth.json --output report2.json --verbose
 ```
 
-### Get PHP-Generated Ballots
+### Create Distorted Test Ballots
 ```bash
-# Run test to generate fresh PHP ballots with ArUco
+# Get PHP-generated ballot with ArUco
 bash scripts/test-omr-appreciation.sh
-
-# Use the generated ballot
 cp storage/app/tests/omr-appreciation/latest/scenario-1-normal/blank_filled.png test_ballot.png
 
 # Create distorted versions
 python3 scripts/synthesize_ballot_variants.py --input test_ballot.png --output distorted/
+
+# Test each variant
+for f in distorted/*.png; do
+  echo "Testing: $f"
+  OMR_FIDUCIAL_MODE=aruco python3 appreciate.py "$f" coords.json --threshold 0.3
+done
 ```
+
+---
+
+## 📈 Success Criteria
+
+### Minimum Viable Solution:
+- ✅ U0 (upright): 100% accuracy
+- ✅ R1 (+3° rotation): ≥98% accuracy
+- ✅ S1 (2° shear): ≥98% accuracy
+- ⚠️ R2 (+10° rotation): ≥95% accuracy (acceptable with warning)
+
+### Ideal Solution:
+- All 9 distorted fixtures: ≥98% accuracy
+- Consistent ArUco detection across all distortion types
+- Fast processing (<2 seconds per ballot)
+- No image quality degradation
 
 ---
 
 ## 🆘 HELP NEEDED
 
-### Critical Bug: Perspective Transform Breaks Detection
+### Critical Bug: Coordinate Mismatch After Perspective Transform
 
 **Symptom:** Bubble detection works perfectly without alignment (100%), but fails completely with alignment (0%).
 
 **Evidence:**
 - ArUco markers detected ✅
-- Quality metrics computed ✅  
+- Quality metrics computed correctly ✅  
 - Perspective transform applied ✅
 - Bubble detection fails ❌
 
-**Root Cause:** The `cv2.warpPerspective()` call transforms the image but bubble coordinates still reference the original image positions.
+**Root Cause:** The `cv2.warpPerspective()` call transforms the image pixels but bubble coordinates still reference the original image positions.
 
 **Where to Fix:**
-- File: `packages/omr-appreciation/omr-python/image_aligner.py`
-- Function: `align_image()` (lines 280-357)
-- Also needs changes in: `appreciate.py` and possibly `mark_detector.py`
+- **Primary:** `packages/omr-appreciation/omr-python/image_aligner.py` - Function `align_image()` (lines 280-357)
+- **Also needs:** `packages/omr-appreciation/omr-python/appreciate.py` - Coordinate passing
+- **Possibly:** `packages/omr-appreciation/omr-python/mark_detector.py` - Coordinate usage
 
 **Recommended Approach:** 
-Transform bubble coordinates instead of the image (see "Solution Options" above).
+Transform bubble coordinates instead of the image (see "Solution Options" section for detailed implementations).
 
 **Test Cases:**
 ```bash
@@ -646,14 +442,8 @@ OMR_FIDUCIAL_MODE=aruco python3 appreciate.py ballot.png coords.json  # 0% ❌
 OMR_FIDUCIAL_MODE=aruco python3 appreciate.py rotated.png coords.json  # 98%+ ✅
 ```
 
-**Files to Review:**
-1. `packages/omr-appreciation/omr-python/image_aligner.py` - Where transform happens
-2. `packages/omr-appreciation/omr-python/appreciate.py` - Calls align_image()
-3. `packages/omr-appreciation/omr-python/mark_detector.py` - Uses coordinates for detection
-4. This document - Complete problem analysis
-
 ---
 
-**Last Updated:** 2025-10-29 23:46 UTC  
-**Next Action:** Fix perspective transform to work with bubble coordinates  
+**Last Updated:** 2025-10-29  
+**Next Action:** Implement coordinate transformation fix (Solution Option A recommended)  
 **Priority:** CRITICAL - Blocking all distortion testing

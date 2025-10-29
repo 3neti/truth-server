@@ -287,18 +287,23 @@ def detect_fiducials(image: np.ndarray, template: dict) -> Optional[List[Tuple[i
 
 
 def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: dict, 
-               verbose: bool = False) -> Tuple[np.ndarray, Optional[Dict[str, float]]]:
-    """Apply perspective transform to align image based on fiducials.
+               verbose: bool = False) -> Tuple[np.ndarray, Optional[Dict[str, float]], np.ndarray]:
+    """Calculate inverse perspective transform for coordinate alignment.
+    
+    Instead of warping the image, we compute an inverse matrix that transforms
+    template coordinates to match the distorted ballot's actual positions.
     
     Args:
-        image: Input image
+        image: Input image (returned unmodified)
         fiducials: List of 4 detected fiducial coordinates [TL, TR, BL, BR]
         template: Template dictionary with expected fiducial positions
         verbose: If True, print quality metrics report
         
     Returns:
-        Tuple of (aligned_image, quality_metrics_dict)
-        quality_metrics_dict is None if quality metrics not available
+        Tuple of (original_image, quality_metrics_dict, inv_matrix)
+        - original_image: Unwarped input image
+        - quality_metrics_dict: Quality metrics (None if not available)
+        - inv_matrix: 3x3 inverse perspective transform matrix
     """
     # Get expected fiducial positions from template
     expected = template.get('fiducials', [])
@@ -328,14 +333,39 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
     # Convert mm to pixels for our format (300 DPI)
     mm_to_pixels = 300 / 25.4
     src_points = np.float32(fiducials)
-    dst_points = np.float32([
-        [expected[0].get('x', 0) * mm_to_pixels, expected[0].get('y', 0) * mm_to_pixels],
-        [expected[1].get('x', 0) * mm_to_pixels, expected[1].get('y', 0) * mm_to_pixels],
-        [expected[2].get('x', 0) * mm_to_pixels, expected[2].get('y', 0) * mm_to_pixels],
-        [expected[3].get('x', 0) * mm_to_pixels, expected[3].get('y', 0) * mm_to_pixels]
-    ])
+    
+    # Calculate center positions of expected fiducials
+    # For ArUco markers: template provides corner positions (x, y) with width/height
+    #                    detection returns center, so we add half width/height
+    # For black squares: template may provide corners or centers directly
+    dst_points_list = []
+    for fid in expected:
+        x_mm = fid.get('x', 0)
+        y_mm = fid.get('y', 0)
+        w_mm = fid.get('width', 0)
+        h_mm = fid.get('height', 0)
+        
+        # If width/height are provided, assume x,y is top-left corner
+        # and we need to calculate center (ArUco case)
+        if w_mm > 0 and h_mm > 0:
+            center_x_px = (x_mm + w_mm / 2) * mm_to_pixels
+            center_y_px = (y_mm + h_mm / 2) * mm_to_pixels
+        else:
+            # No width/height provided, assume x,y is already center (black square case)
+            center_x_px = x_mm * mm_to_pixels
+            center_y_px = y_mm * mm_to_pixels
+        
+        dst_points_list.append([center_x_px, center_y_px])
+    
+    dst_points = np.float32(dst_points_list)
     
     # Compute perspective transform matrix
+    # This transforms FROM detected fiducials (src) TO template positions (dst)
+    if verbose or os.getenv('OMR_DEBUG_ALIGNMENT', 'false').lower() == 'true':
+        print(f"\nFiducial alignment:", file=sys.stderr)
+        print(f"Detected (src): {src_points.tolist()}", file=sys.stderr)
+        print(f"Expected (dst): {dst_points.tolist()}", file=sys.stderr)
+    
     matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     
     # Compute quality metrics if available
@@ -358,8 +388,10 @@ def align_image(image: np.ndarray, fiducials: List[Tuple[int, int]], template: d
         except Exception as e:
             print(f"Warning: Failed to compute quality metrics: {e}")
     
-    # Apply transform
-    h, w = image.shape[:2]
-    aligned = cv2.warpPerspective(image, matrix, (w, h))
+    # Return original image (unwarped) with inverse transform matrix
+    # 'matrix' transforms FROM detected image TO template (for warping image)
+    # We need the INVERSE: FROM template TO detected image (for transforming coordinates)
+    # Compute this by swapping the point sets in getPerspectiveTransform
+    inv_matrix = cv2.getPerspectiveTransform(dst_points, src_points)
     
-    return aligned, quality_metrics
+    return image, quality_metrics, inv_matrix
