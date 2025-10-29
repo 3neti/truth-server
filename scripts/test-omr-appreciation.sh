@@ -384,6 +384,113 @@ FIDUCIALSUMMARY
     echo ""
 fi
 
+# Run scenario-8-cardinal-rotations: Test 90°/180°/270° rotations
+SCENARIO_8="${RUN_DIR}/scenario-8-cardinal-rotations"
+mkdir -p "${SCENARIO_8}"
+
+echo -e "${YELLOW}Testing cardinal rotations (90°/180°/270°)...${NC}"
+
+# Create metadata
+cat > "${SCENARIO_8}/metadata.json" <<SCENARIO8META
+{
+  "scenario": "cardinal-rotations",
+  "description": "ArUco fiducial detection and coordinate transformation on 90/180/270 degree rotations",
+  "rotations_tested": [0, 90, 180, 270],
+  "ground_truth": "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json",
+  "alignment_enabled": true,
+  "fiducial_mode": "aruco"
+}
+SCENARIO8META
+
+# Test each cardinal rotation
+CARDINAL_PASSED=0
+CARDINAL_FAILED=0
+CARDINAL_TOTAL=0
+
+# Get source ballot (from scenario-1)
+SOURCE_BALLOT="${RUN_DIR}/scenario-1-normal/blank_filled.png"
+APPRECIATE_SCRIPT="packages/omr-appreciation/omr-python/appreciate.py"
+COORDS_FILE="${RUN_DIR}/template/coordinates.json"
+GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+
+if [ -f "${SOURCE_BALLOT}" ] && [ -f "${APPRECIATE_SCRIPT}" ] && [ -f "${COORDS_FILE}" ]; then
+    # Generate rotated versions
+    python3 <<PYROTATE
+import cv2
+import sys
+
+try:
+    ballot = cv2.imread('${SOURCE_BALLOT}')
+    if ballot is None:
+        print("Error: Could not load source ballot", file=sys.stderr)
+        sys.exit(1)
+    
+    # Create rotations
+    cv2.imwrite('${SCENARIO_8}/rot_000.png', ballot)
+    cv2.imwrite('${SCENARIO_8}/rot_090.png', cv2.rotate(ballot, cv2.ROTATE_90_CLOCKWISE))
+    cv2.imwrite('${SCENARIO_8}/rot_180.png', cv2.rotate(ballot, cv2.ROTATE_180))
+    cv2.imwrite('${SCENARIO_8}/rot_270.png', cv2.rotate(ballot, cv2.ROTATE_90_COUNTERCLOCKWISE))
+    print("Generated rotation test ballots")
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+PYROTATE
+    
+    # Test each rotation
+    for deg in 0 90 180 270; do
+        ROT_FILE="${SCENARIO_8}/rot_$(printf '%03d' $deg).png"
+        APPRECIATION_OUTPUT="${SCENARIO_8}/rot_$(printf '%03d' $deg)_appreciation.json"
+        VALIDATION_OUTPUT="${SCENARIO_8}/rot_$(printf '%03d' $deg)_validation.json"
+        COMBINED_LOG="${SCENARIO_8}/rot_$(printf '%03d' $deg)_combined.log"
+        
+        CARDINAL_TOTAL=$((CARDINAL_TOTAL + 1))
+        echo -e "  Testing ${BLUE}${deg}° rotation${NC}..."
+        
+        # Run appreciation WITH ArUco alignment
+        # Redirect stderr to a separate log file to keep JSON clean
+        if OMR_FIDUCIAL_MODE=aruco python3 "${APPRECIATE_SCRIPT}" \
+            "${ROT_FILE}" \
+            "${COORDS_FILE}" \
+            --threshold 0.3 \
+            > "${APPRECIATION_OUTPUT}" 2>"${COMBINED_LOG}"; then
+            
+            # Validate results against ground truth
+            if python3 scripts/compare_appreciation_results.py \
+                --result "${APPRECIATION_OUTPUT}" \
+                --truth "${GROUND_TRUTH}" \
+                --output "${VALIDATION_OUTPUT}" \
+                > "${COMBINED_LOG}" 2>&1; then
+                
+                ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                echo -e "    ${GREEN}✓ PASS${NC} (accuracy: ${ACCURACY})"
+                CARDINAL_PASSED=$((CARDINAL_PASSED + 1))
+            else
+                ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                echo -e "    ${RED}✗ FAIL${NC} (accuracy: ${ACCURACY})"
+                CARDINAL_FAILED=$((CARDINAL_FAILED + 1))
+            fi
+        else
+            echo -e "    ${RED}✗ FAIL${NC} (appreciation error)"
+            echo "Appreciation failed" > "${COMBINED_LOG}"
+            CARDINAL_FAILED=$((CARDINAL_FAILED + 1))
+        fi
+    done
+    
+    # Generate summary
+    cat > "${SCENARIO_8}/summary.json" <<CARDINALSUMMARY
+{
+  "total_rotations": ${CARDINAL_TOTAL},
+  "passed": ${CARDINAL_PASSED},
+  "failed": ${CARDINAL_FAILED}
+}
+CARDINALSUMMARY
+    
+    echo -e "${GREEN}✓ Cardinal rotation tests complete${NC} (${CARDINAL_PASSED}/${CARDINAL_TOTAL} passed)"
+else
+    echo -e "${YELLOW}⊙ Cardinal rotation tests skipped (missing required files)${NC}"
+fi
+echo ""
+
 # Generate README documentation
 echo -e "${YELLOW}Generating documentation...${NC}"
 cat > "${RUN_DIR}/README.md" <<'EOFREADME'
@@ -497,6 +604,45 @@ Tests ballot appreciation on filled ballots with geometric distortions:
 - P1-P3 (perspective): ❌ 0% accuracy (coordinates don't match perspective-warped positions)
 
 **Key Finding:** This validates that **fiducial marker alignment is essential** for handling real-world ballot distortions. Without alignment correction, even minor geometric distortions (3° rotation) result in complete detection failure.
+
+### Scenario 7: Fiducial-Based Alignment
+**Directory:** `scenario-7-fiducial-alignment/`
+
+Tests ballot appreciation with ArUco fiducial-based alignment enabled:
+- Tests same distorted ballots as Scenario 6 but WITH alignment correction
+- Compares detected votes against ground truth
+- Validates coordinate transformation fix
+
+**Expected Results (with coordinate transformation fix):**
+- U0 (upright): ✅ 100% accuracy
+- R1 (+3° rotation): ✅ ~100% accuracy (small distortions corrected)
+- R2/R3 (larger rotations): ⚠️ ArUco detection may fail
+- S1/S2/P1-P3: Results depend on fiducial detection success
+
+### Scenario 8: Cardinal Rotations
+**Directory:** `scenario-8-cardinal-rotations/`
+
+Tests ArUco fiducial detection and coordinate transformation on cardinal rotations:
+- **0°**: Baseline upright ballot
+- **90°**: Clockwise rotation (portrait → landscape)
+- **180°**: Upside-down
+- **270°**: Counter-clockwise rotation (landscape → portrait)
+
+**Test Mode:** ArUco fiducials with coordinate transformation
+
+**Artifacts:**
+- `rot_000.png` through `rot_270.png` - Rotated ballot images
+- `rot_*_appreciation.json` - Appreciation results for each rotation
+- `rot_*_validation.json` - Validation against ground truth
+- `summary.json` - Pass/fail summary
+
+**Expected Results:**
+- 0°: ✅ 100% accuracy (reference)
+- 90°: ⚠️ ArUco detected, but dimension swap causes false positives
+- 180°: ⚠️ Similar dimension issue  
+- 270°: ✅ ~100% accuracy (works correctly)
+
+**Key Finding:** ArUco markers are **rotation-invariant** and detect successfully at all angles. Coordinate transformation works mathematically, but 90°/180° rotations require additional bounds checking due to portrait/landscape dimension swaps.
 
 ## Template Files
 
