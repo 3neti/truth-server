@@ -483,13 +483,247 @@ echo '✓ 50% filled: ' . \$filled50 . PHP_EOL;
 
 ---
 
+## 🔄 Modifying Positions and Candidates
+
+### Understanding the Data Structure
+
+The ballot content (positions and candidates) is stored in the database as `TemplateData` with JSON content. To modify what appears on the ballot:
+
+### Step 1: Find the Template Data
+
+```bash
+php artisan tinker --execute="
+use App\Models\TemplateData;
+
+\$data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+
+if (\$data) {
+    echo 'Found ballot data ID: ' . \$data->id . PHP_EOL;
+    echo 'Current positions:' . PHP_EOL;
+    \$positions = \$data->json_data['positions'] ?? [];
+    foreach (\$positions as \$pos) {
+        echo '  - ' . \$pos['title'] . ' (' . count(\$pos['candidates']) . ' candidates)' . PHP_EOL;
+    }
+} else {
+    echo 'Ballot data not found!' . PHP_EOL;
+}
+"
+```
+
+### Step 2: View Current Structure
+
+```bash
+php artisan tinker --execute="
+use App\Models\TemplateData;
+
+\$data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+echo json_encode(\$data->json_data, JSON_PRETTY_PRINT);
+" | less
+```
+
+### Step 3: Modify Positions and Candidates
+
+```bash
+php artisan tinker
+```
+
+Then in the Tinker console:
+
+```php
+use App\Models\TemplateData;
+
+$data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+
+// Get current JSON
+$ballot = $data->json_data;
+
+// Example 1: Add a new candidate to President position
+$ballot['positions'][0]['candidates'][] = [
+    'code' => 'NEW_001',
+    'name' => 'New Candidate',
+    'party' => 'Independent',
+    'number' => 7,
+];
+
+// Example 2: Change a candidate name
+$ballot['positions'][0]['candidates'][0]['name'] = 'Updated Name';
+
+// Example 3: Add a new position
+$ballot['positions'][] = [
+    'code' => 'GOVERNOR',
+    'title' => 'Governor',
+    'description' => 'Vote for ONE (1)',
+    'max_selections' => 1,
+    'candidates' => [
+        ['code' => 'GOV_001', 'name' => 'Candidate A', 'party' => 'Party A', 'number' => 1],
+        ['code' => 'GOV_002', 'name' => 'Candidate B', 'party' => 'Party B', 'number' => 2],
+    ],
+];
+
+// Save changes
+$data->json_data = $ballot;
+$data->save();
+
+echo "✓ Ballot data updated!\n";
+```
+
+### Step 4: Regenerate Ballot
+
+After modifying the data, regenerate the ballot:
+
+```bash
+php artisan tinker --execute="
+use App\Models\Template;
+use App\Models\TemplateData;
+use App\Actions\TruthTemplates\Compilation\CompileHandlebarsTemplate;
+use App\Actions\TruthTemplates\Rendering\RenderTemplateSpec;
+
+\$template = Template::where('layout_variant', 'answer-sheet')->first();
+\$data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+
+\$spec = CompileHandlebarsTemplate::run(\$template->handlebars_template, \$data->json_data);
+\$result = RenderTemplateSpec::run(\$spec);
+
+echo '✓ Updated PDF: ' . \$result['pdf'] . PHP_EOL;
+echo '✓ Updated Coords: ' . \$result['coords'] . PHP_EOL;
+"
+```
+
+### Step 5: Update Questionnaire Data (for Overlays)
+
+If you want candidate names to appear in overlays, also update the questionnaire data:
+
+```bash
+php artisan tinker
+```
+
+```php
+use App\Models\TemplateData;
+
+$questionnaire = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
+
+// Modify questionnaire data to match ballot changes
+$questionnaire->json_data['positions'][0]['candidates'][] = [
+    'code' => 'NEW_001',
+    'name' => 'New Candidate',
+];
+
+$questionnaire->save();
+
+echo "✓ Questionnaire updated!\n";
+```
+
+### JSON Structure Reference
+
+```json
+{
+  "document_id": "CURRIMAO-001-ballot-2025-05-12",
+  "positions": [
+    {
+      "code": "PRESIDENT",
+      "title": "President of the Philippines",
+      "description": "Vote for ONE (1)",
+      "max_selections": 1,
+      "candidates": [
+        {
+          "code": "LD_001",
+          "name": "Leonardo DiCaprio",
+          "party": "Action Party",
+          "number": 1
+        },
+        {
+          "code": "SJ_002",
+          "name": "Scarlett Johansson",
+          "party": "Drama Alliance",
+          "number": 2
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 🔄 Recent Updates (2025-10-29)
+
+### Rotation Testing Enhancements
+
+The test suite now includes comprehensive rotation testing:
+
+#### Run Complete Test Suite with Rotations
+
+```bash
+bash scripts/test-omr-appreciation.sh
+```
+
+This runs:
+- **Scenario 1-7**: Original test scenarios
+- **Scenario 8**: Cardinal rotation tests (0°, 90°, 180°, 270°, plus diagonal 45°, 135°, 225°, 315°)
+
+#### View Rotation Test Results
+
+```bash
+cd storage/app/tests/omr-appreciation/latest/scenario-8-cardinal-rotations
+ls -la  # Shows rot_000, rot_045, rot_090, etc.
+
+# View specific rotation overlay
+open rot_090/overlay.png
+
+# Check accuracy
+cat rot_090/validation.json | jq '.accuracy'
+```
+
+#### Current Rotation Support
+
+✅ **Cardinal Rotations (100% pass rate)**:
+- 0° (upright)
+- 90° (clockwise)
+- 180° (inverted)
+- 270° (counter-clockwise)
+
+⚠️ **Diagonal Rotations (future work)**:
+- 45°, 135°, 225°, 315° detect correctly but fail appreciation
+- See `docs/ROTATION_TESTING.md` for details
+
+#### New Features
+
+1. **Unified Canvas-Based Rotation**
+   - All rotations use consistent `rotate_with_canvas()` approach
+   - Canvas size: `sqrt(w² + h²) + 200px` safety margin
+   - White background for proper fiducial visibility
+
+2. **Rotation-Aware Quality Checks**
+   - Smart shear tolerance (±1° from rotation angle)
+   - Prevents false distortion flags for legitimate rotations
+
+3. **Candidate Names in Overlays**
+   - Overlays now show candidate names (e.g., "Leonardo DiCaprio")
+   - Generated using `scripts/generate-overlay.php`
+   - Consistent with scenario-1-normal overlay style
+
+#### Generate Custom Overlays with Candidate Names
+
+```bash
+# For a filled ballot with appreciation results
+php scripts/generate-overlay.php \
+  storage/omr-output/CURRIMAO-001-ballot-2025-05-12_filled.png \
+  path/to/results.json \
+  storage/app/omr/coords/CURRIMAO-001-ballot-2025-05-12.json \
+  output/overlay.png
+```
+
+---
+
 ## 📚 Related Documentation
 
 - [OMR Appreciation Test Plan (Original)](./OMR_APPREICATION_TEST_PLAN.md)
 - [OMR Appreciation Test Plan (Revised)](./OMR_APPRECIATION_TEST_PLAN_REVISED.md)
+- [Rotation Testing Guide](../../../docs/ROTATION_TESTING.md) ⭐ **NEW**
 - Python Script: `packages/omr-appreciation/omr-python/appreciate.py`
 - Test File: `tests/Feature/OMRAppreciationTest.php`
 - Helper Class: `tests/Helpers/OMRSimulator.php`
+- Overlay Generator: `scripts/generate-overlay.php` ⭐ **NEW**
 
 ---
 
