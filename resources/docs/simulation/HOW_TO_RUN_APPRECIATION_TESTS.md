@@ -94,8 +94,17 @@ To change the positions and candidates being tested:
 ],
 ```
 
-**2. Update Default Bubbles**: Modify the `default_bubbles` array to match bubble IDs from your ballot:
+**2. Update Default Bubbles**: You can configure default bubbles in two ways:
+
+*Option A: Via `.env` file (recommended for quick changes):*
+```bash
+# In your .env file
+OMR_DEFAULT_BUBBLES="PRESIDENT_LD_001,VICE-PRESIDENT_VD_002,SENATOR_JD_001,SENATOR_ES_002,SENATOR_MF_003"
+```
+
+*Option B: Via config file (for persistent project defaults):*
 ```php
+// In config/omr-testing.php
 'simulation' => [
     'default_bubbles' => [
         'POSITION_CANDIDATE_001',

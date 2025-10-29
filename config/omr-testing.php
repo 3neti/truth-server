@@ -70,13 +70,18 @@ return [
         /*
          * Default selected bubbles for normal scenario test
          * These should be valid bubble IDs from your ballot
+         * 
+         * Can be set via OMR_DEFAULT_BUBBLES env variable as comma-delimited string:
+         * OMR_DEFAULT_BUBBLES="PRESIDENT_LD_001,VICE-PRESIDENT_VD_002,SENATOR_JD_001"
          */
-        'default_bubbles' => [
-            'PRESIDENT_LD_001',      // President: Leonardo DiCaprio
-            'VICE-PRESIDENT_VD_002', // VP: Viola Davis
-            'SENATOR_JD_001',        // Senator: Johnny Depp
-            'SENATOR_ES_002',        // Senator: Emma Stone
-            'SENATOR_MF_003',        // Senator: Morgan Freeman
-        ],
+        'default_bubbles' => env('OMR_DEFAULT_BUBBLES') 
+            ? array_map('trim', explode(',', env('OMR_DEFAULT_BUBBLES')))
+            : [
+                'PRESIDENT_LD_001',      // President: Leonardo DiCaprio
+                'VICE-PRESIDENT_VD_002', // VP: Viola Davis
+                'SENATOR_JD_001',        // Senator: Johnny Depp
+                'SENATOR_ES_002',        // Senator: Emma Stone
+                'SENATOR_MF_003',        // Senator: Morgan Freeman
+            ],
     ],
 ];
