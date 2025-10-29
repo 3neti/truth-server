@@ -48,6 +48,69 @@ php artisan db:seed --class=InstructionalDataSeeder
 
 ---
 
+## ⚙️ Configuration
+
+The OMR tests can be customized via the `config/omr-testing.php` configuration file. This allows you to:
+
+- Change which ballot template and document ID to test
+- Specify which questionnaire to use for candidate names
+- Set default bubbles to simulate for testing
+
+### Configuration Options
+
+```php
+return [
+    'ballot' => [
+        'template_variant' => 'answer-sheet',
+        'document_id' => 'PH-2025-BALLOT-CURRIMAO-001',
+    ],
+    'questionnaire' => [
+        'template_variant' => 'questionnaire',
+        'document_id' => 'PH-2025-QUESTIONNAIRE-CURRIMAO-001',
+    ],
+    'simulation' => [
+        'default_bubbles' => [
+            'PRESIDENT_LD_001',
+            'VICE-PRESIDENT_VD_002',
+            'SENATOR_JD_001',
+            'SENATOR_ES_002',
+            'SENATOR_MF_003',
+        ],
+    ],
+];
+```
+
+### Customizing Positions and Candidates
+
+To change the positions and candidates being tested:
+
+**1. Update the Configuration**: Edit `config/omr-testing.php` to point to your ballot data:
+```php
+'ballot' => [
+    'document_id' => 'YOUR-CUSTOM-BALLOT-ID',
+],
+'questionnaire' => [
+    'document_id' => 'YOUR-CUSTOM-QUESTIONNAIRE-ID',
+],
+```
+
+**2. Update Default Bubbles**: Modify the `default_bubbles` array to match bubble IDs from your ballot:
+```php
+'simulation' => [
+    'default_bubbles' => [
+        'POSITION_CANDIDATE_001',
+        'POSITION_CANDIDATE_002',
+        // Add more as needed
+    ],
+],
+```
+
+Bubble IDs follow the format: `{POSITION}_{CANDIDATE_CODE}` (e.g., `PRESIDENT_LD_001`, `SENATOR_ES_002`).
+
+**3. Create or Modify Template Data**: See the section "🔄 Modifying Positions and Candidates" below for detailed instructions on creating new ballot configurations.
+
+---
+
 ## 🚀 Quick Start (Full Pipeline)
 
 Run all tests in one command:

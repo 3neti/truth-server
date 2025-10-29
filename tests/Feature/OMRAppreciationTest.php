@@ -43,18 +43,23 @@ it('appreciates simulated Philippine ballot correctly', function () {
     $scenarioDir = "{$this->runDir}/scenario-1-normal";
     mkdir($scenarioDir, 0755, true);
     
-    // 1. Load templates and data
-    $template = Template::where('layout_variant', 'answer-sheet')->first();
-    $data = TemplateData::where('document_id', 'PH-2025-BALLOT-CURRIMAO-001')->first();
+    // 1. Load templates and data from configuration
+    $ballotVariant = config('omr-testing.ballot.template_variant');
+    $ballotDocId = config('omr-testing.ballot.document_id');
+    $questionnaireVariant = config('omr-testing.questionnaire.template_variant');
+    $questionnaireDocId = config('omr-testing.questionnaire.document_id');
+    
+    $template = Template::where('layout_variant', $ballotVariant)->first();
+    $data = TemplateData::where('document_id', $ballotDocId)->first();
     
     // Load questionnaire template and data for candidate names
-    $questionnaireTemplate = Template::where('layout_variant', 'questionnaire')->first();
-    $questionnaireData = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
+    $questionnaireTemplate = Template::where('layout_variant', $questionnaireVariant)->first();
+    $questionnaireData = TemplateData::where('document_id', $questionnaireDocId)->first();
     
-    expect($template)->not->toBeNull('Template with layout_variant "answer-sheet" not found');
-    expect($data)->not->toBeNull('Template data with document_id "PH-2025-BALLOT-CURRIMAO-001" not found');
-    expect($questionnaireTemplate)->not->toBeNull('Questionnaire template not found');
-    expect($questionnaireData)->not->toBeNull('Questionnaire data not found');
+    expect($template)->not->toBeNull("Template with layout_variant '{$ballotVariant}' not found");
+    expect($data)->not->toBeNull("Template data with document_id '{$ballotDocId}' not found");
+    expect($questionnaireTemplate)->not->toBeNull("Questionnaire template with layout_variant '{$questionnaireVariant}' not found");
+    expect($questionnaireData)->not->toBeNull("Questionnaire data with document_id '{$questionnaireDocId}' not found");
     
     // 2. Compile and render ballot
     $spec = CompileHandlebarsTemplate::run(
@@ -101,14 +106,14 @@ it('appreciates simulated Philippine ballot correctly', function () {
     expect($testBlankPng)->toBeFile();
     // $this->info("Converted to PNG: $testBlankPng");
     
-    // 5. Simulate answers (vote for President #1, Vice President #2, Senator #1,2,3)
-    $selectedBubbles = [
+    // 5. Simulate answers from configuration
+    $selectedBubbles = config('omr-testing.simulation.default_bubbles', [
         'PRESIDENT_LD_001',      // President: Leonardo DiCaprio (#1)
         'VICE-PRESIDENT_VD_002', // VP: Viola Davis (#2)
         'SENATOR_JD_001',        // Senator: Johnny Depp (#1)
         'SENATOR_ES_002',        // Senator: Emma Stone (#2)
         'SENATOR_MF_003',        // Senator: Morgan Freeman (#3)
-    ];
+    ]);
     
     // 5. Simulate filled bubbles directly on test artifact
     $filledPng = OMRSimulator::fillBubbles($testBlankPng, $selectedBubbles, $coordinates);
