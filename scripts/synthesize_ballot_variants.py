@@ -30,20 +30,34 @@ def apply_rotation(image: np.ndarray, angle_deg: float) -> np.ndarray:
         angle_deg: Rotation angle in degrees (positive = counterclockwise)
         
     Returns:
-        Rotated image
+        Rotated image (same size as input, preserving corner markers)
     """
     h, w = image.shape[:2]
-    center = (w // 2, h // 2)
     
-    # Compute rotation matrix
+    # Calculate expanded canvas size to preserve corners during rotation
+    angle_rad = np.radians(abs(angle_deg))
+    new_w = int(abs(w * np.cos(angle_rad)) + abs(h * np.sin(angle_rad)))
+    new_h = int(abs(h * np.cos(angle_rad)) + abs(w * np.sin(angle_rad)))
+    
+    # Pad image to expanded size
+    pad_w = (new_w - w) // 2
+    pad_h = (new_h - h) // 2
+    padded = cv2.copyMakeBorder(image, pad_h, pad_h, pad_w, pad_w,
+                                cv2.BORDER_CONSTANT, value=(255, 255, 255))
+    
+    # Rotate around new center
+    center = (new_w // 2, new_h // 2)
     M = cv2.getRotationMatrix2D(center, angle_deg, 1.0)
-    
-    # Apply rotation
-    rotated = cv2.warpAffine(image, M, (w, h), 
+    rotated = cv2.warpAffine(padded, M, (new_w, new_h),
                             borderMode=cv2.BORDER_CONSTANT,
                             borderValue=(255, 255, 255))
     
-    return rotated
+    # Crop back to original size (centered)
+    y_start = (new_h - h) // 2
+    x_start = (new_w - w) // 2
+    cropped = rotated[y_start:y_start+h, x_start:x_start+w]
+    
+    return cropped
 
 
 def apply_shear(image: np.ndarray, shear_angle_deg: float, axis: str = 'x') -> np.ndarray:

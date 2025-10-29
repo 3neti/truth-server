@@ -89,6 +89,23 @@ else
 fi
 echo ""
 
+# Generate quality gate fixtures if they don't exist
+FIXTURE_DIR="storage/app/tests/omr-appreciation/fixtures/skew-rotation"
+if [ ! -d "${FIXTURE_DIR}" ] || [ -z "$(ls -A "${FIXTURE_DIR}" 2>/dev/null | grep -v README.md)" ]; then
+    echo -e "${YELLOW}Generating quality gate fixtures...${NC}"
+    if python3 scripts/synthesize_ballot_variants.py \
+        --input packages/omr-appreciation/examples/test_ballot.png \
+        --output "${FIXTURE_DIR}" \
+        --quiet; then
+        echo -e "${GREEN}✓ Quality gate fixtures generated${NC}"
+    else
+        echo -e "${YELLOW}⚠ Failed to generate fixtures (continuing without scenario-5)${NC}"
+    fi
+else
+    echo -e "${GREEN}✓ Quality gate fixtures exist${NC}"
+fi
+echo ""
+
 # Run tests with timestamped directory
 echo -e "${YELLOW}Running OMR appreciation tests...${NC}"
 export OMR_TEST_RUN_ID="${RUN_TIMESTAMP}"
@@ -126,10 +143,61 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
     $([ -d "${RUN_DIR}/scenario-1-normal" ] && echo '{"id": "scenario-1-normal", "name": "Normal Ballot", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-2-overvote" ] && echo '{"id": "scenario-2-overvote", "name": "Overvote Detection", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"},' || echo '')
-    $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"}' || echo '')
+    $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"},' || echo '')
+    $([ -d "${RUN_DIR}/scenario-5-quality-gates" ] && echo '{"id": "scenario-5-quality-gates", "name": "Quality Gates (Skew/Rotation)", "status": "executed"}' || echo '')
   ]
 }
 EOF
+
+# Run scenario-5-quality-gates if fixtures exist
+if [ -d "${FIXTURE_DIR}" ] && [ -n "$(ls -A "${FIXTURE_DIR}" 2>/dev/null | grep '.png$')" ]; then
+    SCENARIO_5="${RUN_DIR}/scenario-5-quality-gates"
+    mkdir -p "${SCENARIO_5}"
+    
+    echo -e "${YELLOW}Testing quality gates (skew/rotation)...${NC}"
+    
+    # Create metadata
+    cat > "${SCENARIO_5}/metadata.json" <<SCENARIO5META
+{
+  "scenario": "quality-gates",
+  "description": "Ballot alignment quality validation with synthetic distortions",
+  "fixtures_tested": $(ls "${FIXTURE_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
+  "test_matrix": "SKEW_ROTATION_TEST_SCENARIO.md"
+}
+SCENARIO5META
+    
+    # Test each fixture
+    QUALITY_PASSED=0
+    QUALITY_FAILED=0
+    
+    for fixture in "${FIXTURE_DIR}"/*.png; do
+        [ -f "${fixture}" ] || continue
+        basename=$(basename "${fixture}" .png)
+        echo -e "  Testing ${BLUE}${basename}${NC}..."
+        
+        if python3 packages/omr-appreciation/omr-python/test_quality_on_fixture.py \
+            "${fixture}" \
+            > "${SCENARIO_5}/${basename}_metrics.log" 2>&1; then
+            echo -e "    ${GREEN}✓ PASS${NC}"
+            QUALITY_PASSED=$((QUALITY_PASSED + 1))
+        else
+            echo -e "    ${RED}✗ FAIL${NC}"
+            QUALITY_FAILED=$((QUALITY_FAILED + 1))
+        fi
+    done
+    
+    # Generate summary
+    cat > "${SCENARIO_5}/summary.json" <<QUALITYSUMMARY
+{
+  "total_fixtures": $((QUALITY_PASSED + QUALITY_FAILED)),
+  "passed": ${QUALITY_PASSED},
+  "failed": ${QUALITY_FAILED}
+}
+QUALITYSUMMARY
+    
+    echo -e "${GREEN}✓ Quality gate tests complete${NC} (${QUALITY_PASSED} passed, ${QUALITY_FAILED} failed)"
+    echo ""
+fi
 
 # Generate README documentation
 echo -e "${YELLOW}Generating documentation...${NC}"
@@ -188,6 +256,31 @@ Tests fiducial marker detection and alignment:
 - Tests fiducial detection WITHOUT `--no-align` flag
 - Validates perspective correction and corner detection
 - Compares detection across available modes
+
+### Scenario 5: Quality Gates (Skew/Rotation)
+**Directory:** `scenario-5-quality-gates/`
+
+Tests ballot alignment quality with synthetic geometric distortions:
+- Tests rotation detection (θ angle measurement)
+- Tests shear detection (horizontal/vertical skew)
+- Tests perspective distortion (aspect ratio validation)
+- Validates quality thresholds per SKEW_ROTATION_TEST_SCENARIO.md
+
+**Test Matrix:**
+- **U0**: Reference upright (baseline - no distortion)
+- **R1-R3**: Rotation tests (+3°, +10°, -20°)
+- **S1-S2**: Shear tests (2°, 6°)
+- **P1-P3**: Perspective tests (ratio 0.98, 0.95, 0.90)
+
+**Artifacts:**
+- `*_metrics.log` - Quality metrics report for each fixture
+- `metadata.json` - Test configuration
+- `summary.json` - Pass/fail summary
+
+**Quality Thresholds:**
+- Rotation θ: Green ≤3°, Amber 3-10°, Red >10°
+- Shear: Green ≤2°, Amber 2-6°, Red >6°
+- Aspect ratio: Green ≥0.95, Amber 0.90-0.95, Red <0.90
 
 ## Template Files
 
@@ -329,6 +422,9 @@ echo -e "${BLUE}Quick commands:${NC}"
 echo -e "  ${YELLOW}cd ${RUN_DIR}${NC}"
 echo -e "  ${YELLOW}cat README.md${NC}"
 echo -e "  ${YELLOW}open scenario-1-normal/overlay.png${NC}"
+if [ -d "${RUN_DIR}/scenario-5-quality-gates" ]; then
+    echo -e "  ${YELLOW}cat scenario-5-quality-gates/summary.json${NC}"
+fi
 echo ""
 
 # Create symlink to latest run
