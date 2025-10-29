@@ -138,7 +138,8 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
     $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-5-quality-gates" ] && echo '{"id": "scenario-5-quality-gates", "name": "Quality Gates (Skew/Rotation)", "status": "executed"},' || echo '')
-    $([ -d "${RUN_DIR}/scenario-6-distortion" ] && echo '{"id": "scenario-6-distortion", "name": "Filled Ballot Distortion", "status": "executed"}' || echo '')
+    $([ -d "${RUN_DIR}/scenario-6-distortion" ] && echo '{"id": "scenario-6-distortion", "name": "Filled Ballot Distortion", "status": "executed"},' || echo '')
+    $([ -d "${RUN_DIR}/scenario-7-fiducial-alignment" ] && echo '{"id": "scenario-7-fiducial-alignment", "name": "Fiducial Alignment", "status": "executed"}' || echo '')
   ]
 }
 EOF
@@ -284,6 +285,101 @@ DISTORTIONSUMMARY
         echo -e "${GREEN}✓ Filled ballot distortion tests complete${NC} (${DISTORTION_PASSED} passed, ${DISTORTION_FAILED} failed)"
     else
         echo -e "${YELLOW}⊙ Distortion tests skipped (missing required files)${NC}"
+    fi
+    echo ""
+fi
+
+# Run scenario-7-fiducial-alignment if fiducial-marked fixtures exist
+FILLED_FIDUCIAL_DIR="storage/app/tests/omr-appreciation/fixtures/filled-distorted-fiducial"
+if [ -d "${FILLED_FIDUCIAL_DIR}" ] && [ -n "$(ls -A "${FILLED_FIDUCIAL_DIR}" 2>/dev/null | grep '.png$')" ]; then
+    SCENARIO_7="${RUN_DIR}/scenario-7-fiducial-alignment"
+    mkdir -p "${SCENARIO_7}"
+    
+    echo -e "${YELLOW}Testing fiducial-based alignment on distorted ballots...${NC}"
+    
+    # Create metadata
+    cat > "${SCENARIO_7}/metadata.json" <<SCENARIO7META
+{
+  "scenario": "fiducial-alignment",
+  "description": "Ballot appreciation with fiducial-based alignment correction",
+  "fixtures_tested": $(ls "${FILLED_FIDUCIAL_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
+  "ground_truth": "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json",
+  "alignment_enabled": true
+}
+SCENARIO7META
+    
+    # Test each fiducial-marked distorted fixture
+    FIDUCIAL_PASSED=0
+    FIDUCIAL_FAILED=0
+    
+    # Get paths for appreciation and comparison
+    APPRECIATE_SCRIPT="packages/omr-appreciation/omr-python/appreciate.py"
+    COORDS_FILE="${RUN_DIR}/template/coordinates.json"
+    GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+    
+    # Verify required files exist
+    if [ ! -f "${APPRECIATE_SCRIPT}" ]; then
+        echo -e "${RED}✗ Appreciation script not found: ${APPRECIATE_SCRIPT}${NC}"
+    elif [ ! -f "${COORDS_FILE}" ]; then
+        echo -e "${RED}✗ Coordinates file not found: ${COORDS_FILE}${NC}"
+    elif [ ! -f "${GROUND_TRUTH}" ]; then
+        echo -e "${RED}✗ Ground truth not found: ${GROUND_TRUTH}${NC}"
+    else
+        for fixture in "${FILLED_FIDUCIAL_DIR}"/*.png; do
+            [ -f "${fixture}" ] || continue
+            basename=$(basename "${fixture}" .png)
+            echo -e "  Testing ${BLUE}${basename}${NC}..."
+            
+            # Run appreciation on fiducial-marked distorted ballot
+            APPRECIATION_OUTPUT="${SCENARIO_7}/${basename}_appreciation.json"
+            VALIDATION_OUTPUT="${SCENARIO_7}/${basename}_validation.json"
+            COMBINED_LOG="${SCENARIO_7}/${basename}_combined.log"
+            
+            # Run appreciation WITH alignment enabled (fiducials present)
+            if python3 "${APPRECIATE_SCRIPT}" \
+                "${fixture}" \
+                "${COORDS_FILE}" \
+                --threshold 0.3 \
+                > "${APPRECIATION_OUTPUT}" 2>&1; then
+                
+                # Validate results against ground truth
+                if python3 scripts/compare_appreciation_results.py \
+                    --result "${APPRECIATION_OUTPUT}" \
+                    --truth "${GROUND_TRUTH}" \
+                    --output "${VALIDATION_OUTPUT}" \
+                    > "${COMBINED_LOG}" 2>&1; then
+                    
+                    # Extract accuracy from validation output
+                    ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                    echo -e "    ${GREEN}✓ PASS${NC} (accuracy: ${ACCURACY})"
+                    FIDUCIAL_PASSED=$((FIDUCIAL_PASSED + 1))
+                else
+                    # Extract accuracy even on failure
+                    ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                    echo -e "    ${RED}✗ FAIL${NC} (accuracy: ${ACCURACY})"
+                    FIDUCIAL_FAILED=$((FIDUCIAL_FAILED + 1))
+                fi
+            else
+                echo -e "    ${RED}✗ FAIL${NC} (appreciation error)"
+                echo "Appreciation failed" > "${COMBINED_LOG}"
+                FIDUCIAL_FAILED=$((FIDUCIAL_FAILED + 1))
+            fi
+        done
+    fi
+    
+    # Generate summary
+    cat > "${SCENARIO_7}/summary.json" <<FIDUCIALSUMMARY
+{
+  "total_fixtures": $((FIDUCIAL_PASSED + FIDUCIAL_FAILED)),
+  "passed": ${FIDUCIAL_PASSED},
+  "failed": ${FIDUCIAL_FAILED}
+}
+FIDUCIALSUMMARY
+    
+    if [ $((FIDUCIAL_PASSED + FIDUCIAL_FAILED)) -gt 0 ]; then
+        echo -e "${GREEN}✓ Fiducial alignment tests complete${NC} (${FIDUCIAL_PASSED} passed, ${FIDUCIAL_FAILED} failed)"
+    else
+        echo -e "${YELLOW}⊙ Fiducial tests skipped (missing required files)${NC}"
     fi
     echo ""
 fi

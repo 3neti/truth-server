@@ -89,7 +89,30 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 4. Generate filled-distorted fixtures (for scenario-6)
+# 4. Add fiducial markers to filled ballot (for scenario-7 with alignment)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILLED_WITH_FIDUCIALS="${FIXTURE_BASE}/filled-ballot-with-fiducials.png"
+
+if [ ! -f "${FILLED_WITH_FIDUCIALS}" ]; then
+    echo -e "${YELLOW}Adding fiducial markers to filled ballot...${NC}"
+    
+    if python3 scripts/add_fiducial_markers.py \
+        "${FILLED_BALLOT_BASE}" \
+        "${FILLED_WITH_FIDUCIALS}" \
+        --mode black_square \
+        --size 10 \
+        --margin 5; then
+        echo -e "${GREEN}✓ Filled ballot with fiducials created${NC}"
+    else
+        echo -e "${RED}✗ Failed to add fiducial markers${NC}"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓ Filled ballot with fiducials exists${NC}"
+fi
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 5. Generate filled-distorted fixtures (for scenario-6 without alignment)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FILLED_DISTORTED_DIR="${FIXTURE_BASE}/filled-distorted"
 
@@ -110,7 +133,28 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 5. Generate ground truth JSON (for scenario-6 validation)
+# 6. Generate filled-distorted-with-fiducials (for scenario-7 with alignment)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILLED_DISTORTED_FIDUCIAL_DIR="${FIXTURE_BASE}/filled-distorted-fiducial"
+
+if [ ! -d "${FILLED_DISTORTED_FIDUCIAL_DIR}" ] || [ -z "$(ls -A "${FILLED_DISTORTED_FIDUCIAL_DIR}" 2>/dev/null)" ]; then
+    echo -e "${YELLOW}Generating filled-distorted-fiducial fixtures...${NC}"
+    
+    if python3 scripts/synthesize_ballot_variants.py \
+        --input "${FILLED_WITH_FIDUCIALS}" \
+        --output "${FILLED_DISTORTED_FIDUCIAL_DIR}" \
+        --quiet; then
+        echo -e "${GREEN}✓ Filled-distorted-fiducial fixtures generated ($(ls -1 "${FILLED_DISTORTED_FIDUCIAL_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ') files)${NC}"
+    else
+        echo -e "${RED}✗ Failed to generate filled-distorted-fiducial fixtures${NC}"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓ Filled-distorted-fiducial fixtures exist ($(ls -1 "${FILLED_DISTORTED_FIDUCIAL_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ') files)${NC}"
+fi
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 7. Generate ground truth JSON (for scenario-6/7 validation)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 GROUND_TRUTH="${FIXTURE_BASE}/filled-ballot-ground-truth.json"
 
@@ -157,7 +201,8 @@ echo -e "${GREEN}✓ All fixtures generated successfully${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${BLUE}Fixture Summary:${NC}"
-echo -e "  • Skew-rotation:    ${GREEN}$(ls -1 "${SKEW_ROTATION_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ')${NC} files"
-echo -e "  • Filled-distorted: ${GREEN}$(ls -1 "${FILLED_DISTORTED_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ')${NC} files"
-echo -e "  • Ground truth:     ${GREEN}✓${NC}"
+echo -e "  • Skew-rotation:              ${GREEN}$(ls -1 "${SKEW_ROTATION_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ')${NC} files (blank ballot)"
+echo -e "  • Filled-distorted:           ${GREEN}$(ls -1 "${FILLED_DISTORTED_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ')${NC} files (no fiducials)"
+echo -e "  • Filled-distorted-fiducial:  ${GREEN}$(ls -1 "${FILLED_DISTORTED_FIDUCIAL_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' ')${NC} files (with fiducials)"
+echo -e "  • Ground truth:                ${GREEN}✓${NC}"
 echo ""
