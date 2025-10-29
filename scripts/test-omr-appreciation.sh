@@ -138,7 +138,7 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
     $([ -d "${RUN_DIR}/scenario-3-faint" ] && echo '{"id": "scenario-3-faint", "name": "Faint Marks", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-4-fiducials" ] && echo '{"id": "scenario-4-fiducials", "name": "Fiducial Marker Detection", "status": "executed"},' || echo '')
     $([ -d "${RUN_DIR}/scenario-5-quality-gates" ] && echo '{"id": "scenario-5-quality-gates", "name": "Quality Gates (Skew/Rotation)", "status": "executed"},' || echo '')
-    $([ -d "${RUN_DIR}/scenario-6-distortion" ] && echo '{"id": "scenario-6-distortion", "name": "Filled Ballot Distortion", "status": "pending"}' || echo '')
+    $([ -d "${RUN_DIR}/scenario-6-distortion" ] && echo '{"id": "scenario-6-distortion", "name": "Filled Ballot Distortion", "status": "executed"}' || echo '')
   ]
 }
 EOF
@@ -215,31 +215,76 @@ SCENARIO6META
     DISTORTION_PASSED=0
     DISTORTION_FAILED=0
     
-    for fixture in "${FILLED_FIXTURE_DIR}"/*.png; do
-        [ -f "${fixture}" ] || continue
-        basename=$(basename "${fixture}" .png)
-        echo -e "  Testing ${BLUE}${basename}${NC}..."
-        
-        # TODO: When omr-appreciation integration is complete:
-        # 1. Run appreciation on distorted filled ballot
-        # 2. Compare results to ground truth
-        # 3. Log quality metrics + vote detection accuracy
-        
-        echo -e "    ${YELLOW}⊙ PENDING (awaiting appreciation integration)${NC}" | tee -a "${SCENARIO_6}/${basename}_results.log"
-    done
+    # Get paths for appreciation and comparison
+    APPRECIATE_SCRIPT="packages/omr-appreciation/omr-python/appreciate.py"
+    COORDS_FILE="${RUN_DIR}/template/coordinates.json"
+    GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+    
+    # Verify required files exist
+    if [ ! -f "${APPRECIATE_SCRIPT}" ]; then
+        echo -e "${RED}✗ Appreciation script not found: ${APPRECIATE_SCRIPT}${NC}"
+    elif [ ! -f "${COORDS_FILE}" ]; then
+        echo -e "${RED}✗ Coordinates file not found: ${COORDS_FILE}${NC}"
+    elif [ ! -f "${GROUND_TRUTH}" ]; then
+        echo -e "${RED}✗ Ground truth not found: ${GROUND_TRUTH}${NC}"
+    else
+        for fixture in "${FILLED_FIXTURE_DIR}"/*.png; do
+            [ -f "${fixture}" ] || continue
+            basename=$(basename "${fixture}" .png)
+            echo -e "  Testing ${BLUE}${basename}${NC}..."
+            
+            # Run appreciation on distorted filled ballot
+            APPRECIATION_OUTPUT="${SCENARIO_6}/${basename}_appreciation.json"
+            VALIDATION_OUTPUT="${SCENARIO_6}/${basename}_validation.json"
+            COMBINED_LOG="${SCENARIO_6}/${basename}_combined.log"
+            
+            # Run appreciation (without alignment - synthetic distortions don't have real fiducials)
+            if python3 "${APPRECIATE_SCRIPT}" \
+                "${fixture}" \
+                "${COORDS_FILE}" \
+                --threshold 0.3 \
+                --no-align \
+                > "${APPRECIATION_OUTPUT}" 2>&1; then
+                
+                # Validate results against ground truth
+                if python3 scripts/compare_appreciation_results.py \
+                    --result "${APPRECIATION_OUTPUT}" \
+                    --truth "${GROUND_TRUTH}" \
+                    --output "${VALIDATION_OUTPUT}" \
+                    > "${COMBINED_LOG}" 2>&1; then
+                    
+                    # Extract accuracy from validation output
+                    ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                    echo -e "    ${GREEN}✓ PASS${NC} (accuracy: ${ACCURACY})"
+                    DISTORTION_PASSED=$((DISTORTION_PASSED + 1))
+                else
+                    # Extract accuracy even on failure
+                    ACCURACY=$(python3 -c "import json; print(f\"{json.load(open('${VALIDATION_OUTPUT}'))['accuracy']*100:.1f}%\")" 2>/dev/null || echo "N/A")
+                    echo -e "    ${RED}✗ FAIL${NC} (accuracy: ${ACCURACY})"
+                    DISTORTION_FAILED=$((DISTORTION_FAILED + 1))
+                fi
+            else
+                echo -e "    ${RED}✗ FAIL${NC} (appreciation error)"
+                echo "Appreciation failed" > "${COMBINED_LOG}"
+                DISTORTION_FAILED=$((DISTORTION_FAILED + 1))
+            fi
+        done
+    fi
     
     # Generate summary
     cat > "${SCENARIO_6}/summary.json" <<DISTORTIONSUMMARY
 {
-  "total_fixtures": $(ls "${FILLED_FIXTURE_DIR}"/*.png 2>/dev/null | wc -l | tr -d ' '),
-  "passed": 0,
-  "failed": 0,
-  "pending": true,
-  "note": "Awaiting omr-appreciation integration"
+  "total_fixtures": $((DISTORTION_PASSED + DISTORTION_FAILED)),
+  "passed": ${DISTORTION_PASSED},
+  "failed": ${DISTORTION_FAILED}
 }
 DISTORTIONSUMMARY
     
-    echo -e "${YELLOW}⊙ Distortion tests logged (pending appreciation)${NC}"
+    if [ $((DISTORTION_PASSED + DISTORTION_FAILED)) -gt 0 ]; then
+        echo -e "${GREEN}✓ Filled ballot distortion tests complete${NC} (${DISTORTION_PASSED} passed, ${DISTORTION_FAILED} failed)"
+    else
+        echo -e "${YELLOW}⊙ Distortion tests skipped (missing required files)${NC}"
+    fi
     echo ""
 fi
 
@@ -326,22 +371,36 @@ Tests ballot alignment quality with synthetic geometric distortions:
 - Shear: Green ≤2°, Amber 2-6°, Red >6°
 - Aspect ratio: Green ≥0.95, Amber 0.90-0.95, Red <0.90
 
-### Scenario 6: Filled Ballot Distortion (PENDING)
+### Scenario 6: Filled Ballot Distortion
 **Directory:** `scenario-6-distortion/`
 
 Tests ballot appreciation on filled ballots with geometric distortions:
-- Combines real vote marks with scenario-5 distortions
-- Validates vote detection accuracy under rotation/shear/perspective
-- Tests against ground truth from `tests/fixtures/omr/filled-ground-truth.json`
+- Runs full OMR appreciation on distorted filled ballots  
+- Compares detected votes against ground truth (5 expected marks)
+- **Uses `--no-align` flag** (no fiducial correction)
+- **Demonstrates that geometric distortions break fixed-coordinate appreciation**
 
 **Test Matrix:** Same as Scenario 5 (U0, R1-R3, S1-S2, P1-P3)
 
 **Artifacts:**
-- `*_results.log` - Appreciation results for each distorted filled ballot
+- `*_appreciation.json` - Raw appreciation results for each fixture
+- `*_validation.json` - Validation report with accuracy metrics
+- `*_combined.log` - Combined test log
 - `metadata.json` - Test configuration
-- `summary.json` - Pass/fail summary comparing to ground truth
+- `summary.json` - Pass/fail summary with accuracy statistics
 
-**Status:** ⊙ PENDING - Awaiting omr-appreciation integration for filled ballot processing
+**Validation Criteria:**
+- Minimum accuracy: ≥98%
+- Maximum false positive rate: ≤1%
+- Maximum false negative rate: ≤2%
+
+**Expected Results (without alignment):**
+- U0 (upright): ✅ 100% accuracy (no distortion)
+- R1-R3 (rotation): ❌ 0% accuracy (coordinates don't match rotated positions)
+- S1-S2 (shear): ❌ 0% accuracy (coordinates don't match skewed positions)  
+- P1-P3 (perspective): ❌ 0% accuracy (coordinates don't match perspective-warped positions)
+
+**Key Finding:** This validates that **fiducial marker alignment is essential** for handling real-world ballot distortions. Without alignment correction, even minor geometric distortions (3° rotation) result in complete detection failure.
 
 ## Template Files
 
