@@ -100,8 +100,8 @@ fi
 echo ""
 
 # Get active profile and ground truth file
-ACTIVE_PROFILE=$(php -r "echo config('omr-testing.active_profile');" 2>/dev/null || echo "philippine")
-GROUND_TRUTH_FILE=$(php -r "echo config('omr-testing.profiles.' . config('omr-testing.active_profile') . '.ground_truth_file');" 2>/dev/null || echo "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json")
+ACTIVE_PROFILE=$(php artisan tinker --execute="echo config('omr-testing.active_profile');" 2>/dev/null | tail -1 || echo "philippine")
+GROUND_TRUTH_FILE=$(php artisan tinker --execute="echo config('omr-testing.profiles.' . config('omr-testing.active_profile') . '.ground_truth_file');" 2>/dev/null | tail -1 || echo "storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json")
 
 echo -e "${BLUE}Test Profile:${NC} ${ACTIVE_PROFILE}"
 echo -e "${BLUE}Ground Truth:${NC} ${GROUND_TRUTH_FILE}"
