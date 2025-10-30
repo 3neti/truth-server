@@ -50,3 +50,4 @@ yarn-error.log
 # OMR Test artifacts from test scripts
 /storage/omr-test/
 /storage/omr-calibration/
+packages/omr-appreciation/omr-python/__pycache__/
