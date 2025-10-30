@@ -181,7 +181,7 @@ class OMRSimulator
      * @param string $basePath Path to base image
      * @param array $detectedMarks Array of detected marks from appreciation
      * @param array $coordinates Coordinates JSON
-     * @param array $options Display options (output_path, dpi, scenario, etc.)
+     * @param array $options Display options (output_path, dpi, scenario, barcode_info, etc.)
      * @return string Path to overlay image
      */
     public static function createOverlay(
@@ -281,6 +281,11 @@ class OMRSimulator
                 $offsetY = $config['layout']['text_offset_y'] ?? 5;
                 $draw->annotation($x + $r + $offsetX, $y + $offsetY, $text);
             }
+        }
+        
+        // Draw barcode region if provided
+        if (isset($options['barcode_info'])) {
+            self::drawBarcodeRegion($draw, $options['barcode_info'], $coordinates, $mmToPixels);
         }
         
         // Draw legend
@@ -408,6 +413,77 @@ class OMRSimulator
         }
         
         return $marks;
+    }
+    
+    /**
+     * Draw barcode region visualization with decode status
+     */
+    protected static function drawBarcodeRegion(
+        ImagickDraw $draw,
+        array $barcodeInfo,
+        array $coordinates,
+        float $mmToPixels
+    ): void {
+        // Get barcode coordinates
+        $barcodeCoords = $coordinates['barcode']['document_barcode'] ?? null;
+        if (!$barcodeCoords) {
+            return;
+        }
+        
+        // Calculate barcode region in pixels
+        $x = $barcodeCoords['x'] * $mmToPixels;
+        $y = $barcodeCoords['y'] * $mmToPixels;
+        
+        // Determine ROI size based on barcode type
+        $type = strtoupper($barcodeCoords['type'] ?? 'QRCODE');
+        if (strpos($type, 'QR') !== false) {
+            $width = 40 * $mmToPixels;  // 40mm for QR codes
+            $height = 40 * $mmToPixels;
+        } elseif (strpos($type, 'CODE128') !== false) {
+            $width = 60 * $mmToPixels;
+            $height = 20 * $mmToPixels;
+        } else {
+            $width = 100 * $mmToPixels;  // PDF417
+            $height = 30 * $mmToPixels;
+        }
+        
+        // Determine color based on decode status
+        if ($barcodeInfo['decoded'] ?? false) {
+            if ($barcodeInfo['source'] === 'visual') {
+                $color = 'lime';  // Green for successful visual decode
+                $label = '✓ QR DECODED';
+            } else {
+                $color = 'yellow';  // Yellow for metadata fallback
+                $label = '⚠ METADATA';
+            }
+        } else {
+            $color = 'red';  // Red for failed decode
+            $label = '✗ NO DECODE';
+        }
+        
+        // Draw rectangle around barcode region
+        $draw->setStrokeColor(new ImagickPixel($color));
+        $draw->setStrokeWidth(4);
+        $draw->setFillOpacity(0);
+        $draw->rectangle($x - 25, $y - 25, $x + $width + 25, $y + $height + 25);
+        
+        // Draw label with document ID
+        $fontPath = config('omr-template.overlay.font_path', '/System/Library/Fonts/Supplemental/Arial.ttf');
+        if (file_exists($fontPath)) {
+            $draw->setFont($fontPath);
+        }
+        $draw->setFontSize(32);
+        $draw->setFillColor(new ImagickPixel($color));
+        
+        $documentId = $barcodeInfo['document_id'] ?? 'UNKNOWN';
+        $decoder = $barcodeInfo['decoder'] ?? 'none';
+        $confidence = isset($barcodeInfo['confidence']) ? sprintf('%.0f%%', $barcodeInfo['confidence'] * 100) : 'N/A';
+        
+        $text = sprintf("%s\n%s (%s) %s", $label, $documentId, $decoder, $confidence);
+        
+        // Position text below barcode region
+        $textY = $y + $height + 60;
+        $draw->annotation($x, $textY, $text);
     }
     
     /**

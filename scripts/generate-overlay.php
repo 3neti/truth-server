@@ -71,6 +71,18 @@ try {
 
 // Generate overlay
 try {
+    // Extract barcode info if available
+    $barcodeInfo = null;
+    if (isset($results['barcode'])) {
+        $barcodeInfo = [
+            'document_id' => $results['document_id'] ?? 'UNKNOWN',
+            'decoded' => $results['barcode']['decoded'] ?? false,
+            'decoder' => $results['barcode']['decoder'] ?? 'none',
+            'confidence' => $results['barcode']['confidence'] ?? 0,
+            'source' => $results['barcode']['source'] ?? 'none',
+        ];
+    }
+    
     $overlayPath = OMRSimulator::createOverlay(
         $imagePath,
         $results['results'],
@@ -81,6 +93,7 @@ try {
             'show_unfilled' => false,
             'output_path' => $outputPath,
             'questionnaire' => $questionnaireData,
+            'barcode_info' => $barcodeInfo,
         ]
     );
     
