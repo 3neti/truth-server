@@ -170,8 +170,10 @@ class SmartLayoutRenderer
     {
         $uniqueId = $document['unique_id'] ?? 'UNKNOWN';
         
-        // Position footer at bottom center
-        $footerY = $this->context->getPageHeight() - $this->context->getMarginBottom() - 15;
+        // Position footer at bottom center (configurable offset from bottom)
+        $barcodeConfig = $this->config['omr']['barcode'] ?? [];
+        $bottomOffset = $barcodeConfig['bottom_offset_mm'] ?? 15; // Default 15mm from bottom
+        $footerY = $this->context->getPageHeight() - $this->context->getMarginBottom() - $bottomOffset;
         
         // Draw barcode if enabled
         $barcodeConfig = $this->config['omr']['barcode'] ?? [];

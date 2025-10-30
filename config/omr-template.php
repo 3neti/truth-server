@@ -84,9 +84,10 @@ return [
         'quiet_zone_mm' => 6.0,
         'barcode' => [
             'enable' => true,
-            'type' => 'PDF417',
-            'height_mm' => 8.0,   // Smaller height
-            'width_mm' => 60.0,   // Wider estimate shifts it left when centering
+            'type' => 'QRCODE',
+            'height_mm' => 12.0,  // QR code size (square) - adjust size here
+            'width_mm' => 12.0,   // QR code size (square) - adjust size here
+            'bottom_offset_mm' => 25.0,  // Distance from bottom edge - increase to move up
             'region' => 'footer',
         ],
     ],
@@ -139,19 +140,19 @@ return [
     | Barcode Settings
     |--------------------------------------------------------------------------
     |
-    | Configuration for barcode generation (Code 128 by default).
-    | Supported types: C128 (Code 128), C39 (Code 39), PDF417
+    | Configuration for barcode generation.
+    | Supported types: C128 (Code 128), C39 (Code 39), PDF417, QRCODE
     |
     | Note: For 1D barcodes (C128, C39), width_scale and height control
-    |       the bar width and total height. For 2D barcodes (PDF417),
+    |       the bar width and total height. For 2D barcodes (PDF417, QRCODE),
     |       these represent the size of each individual cell/module.
     |
     */
     'barcode' => [
         'enabled' => true,
-        'type' => 'PDF417', // C128 (Code 128), C39 (Code 39), or PDF417 (2D barcode)
-        'width_scale' => 2,  // For 1D: bar width; For 2D: cell width
-        'height' => 2,       // For 1D: total height (40px recommended); For 2D: cell height (2-3px recommended)
+        'type' => 'QRCODE', // C128 (Code 128), C39 (Code 39), PDF417, or QRCODE (QR Code)
+        'width_scale' => 3,  // For 1D: bar width; For 2D: cell/module size
+        'height' => 3,       // For 1D: total height (40px recommended); For 2D: cell/module size
     ],
 
     /*

@@ -11,6 +11,7 @@ import cv2
 from utils import load_template, output_json
 from image_aligner import detect_fiducials, align_image
 from mark_detector import detect_marks
+from barcode_decoder import decode_barcode
 
 
 def main():
@@ -66,6 +67,23 @@ def main():
             print(f"Error aligning image: {e}", file=sys.stderr)
             sys.exit(1)
     
+    # Decode barcode (QR code, Code128, etc.) from ballot footer
+    barcode_result = None
+    barcode_coords = template.get('barcode', {}).get('document_barcode', {})
+    if barcode_coords:
+        try:
+            mm_to_pixels = 300 / 25.4  # 11.811 pixels per mm
+            metadata_fallback = template.get('barcode', {}).get('document_barcode', {}).get('data')
+            barcode_result = decode_barcode(
+                image,  # Use original image (barcode is not affected by alignment)
+                barcode_coords,
+                mm_to_px_ratio=mm_to_pixels,
+                metadata_fallback=metadata_fallback
+            )
+        except Exception as e:
+            print(f"Warning: Barcode decode failed: {e}", file=sys.stderr)
+            # Continue without barcode - not critical for mark detection
+    
     # Detect marks
     try:
         # Handle both 'zones' (array) and 'bubble' (dict) formats
@@ -115,10 +133,19 @@ def main():
     
     # Prepare output
     output = {
-        'document_id': template.get('document_id', ''),
+        'document_id': barcode_result['document_id'] if barcode_result and barcode_result['decoded'] else template.get('document_id', ''),
         'template_id': template.get('template_id', ''),
         'results': results
     }
+    
+    # Include barcode metadata if available
+    if barcode_result:
+        output['barcode'] = {
+            'decoded': barcode_result['decoded'],
+            'decoder': barcode_result['decoder'],
+            'confidence': barcode_result['confidence'],
+            'source': barcode_result['source']
+        }
     
     # Output JSON
     output_json(output)
