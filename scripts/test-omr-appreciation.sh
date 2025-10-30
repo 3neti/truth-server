@@ -58,7 +58,7 @@ cat > "${RUN_DIR}/environment.json" <<EOF
   "user": "$(whoami)",
   "php_version": "$(php -r 'echo PHP_VERSION;')",
   "python_version": "$(python3 --version 2>&1 | cut -d' ' -f2)",
-  "imagick_version": "$(php -r 'echo (new Imagick())->getVersion()[\"versionString\"];' 2>/dev/null || echo 'not available')",
+  "imagick_version": "$(php -r 'extension_loaded("imagick") ? print("available") : print("not available");' 2>/dev/null || echo 'not available')",
   "opencv_version": "$(python3 -c 'import cv2; print(cv2.__version__)' 2>/dev/null || echo 'not available')",
   "fiducial_support": {
     "black_square": true,
@@ -957,6 +957,16 @@ sed -i '' "s/\${TOTAL_TESTS}/${TOTAL_TESTS}/g" "${RUN_DIR}/README.md" 2>/dev/nul
 sed -i '' "s/\${TESTS_PASSED}/${TESTS_PASSED}/g" "${RUN_DIR}/README.md" 2>/dev/null || sed -i "s/\${TESTS_PASSED}/${TESTS_PASSED}/g" "${RUN_DIR}/README.md"
 sed -i '' "s/\${TESTS_FAILED}/${TESTS_FAILED}/g" "${RUN_DIR}/README.md" 2>/dev/null || sed -i "s/\${TESTS_FAILED}/${TESTS_FAILED}/g" "${RUN_DIR}/README.md"
 
+# Phase 4: Run unit tests (standalone runner)
+echo -e "${YELLOW}Running Phase 4 unit tests...${NC}"
+PHASE4_DIR="${RUN_DIR}/phase4-unit"
+mkdir -p "${PHASE4_DIR}"
+if python3 packages/omr-appreciation/tests/test_phase4_features.py > "${PHASE4_DIR}/output.txt" 2>&1; then
+    echo -e "${GREEN}✓ Phase 4 unit tests passed${NC}"
+else
+    echo -e "${RED}✗ Phase 4 unit tests failed${NC}"
+fi
+
 # Display results
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -975,7 +985,7 @@ echo -e "  ${YELLOW}cd ${RUN_DIR}${NC}"
 echo -e "  ${YELLOW}cat README.md${NC}"
 echo -e "  ${YELLOW}open scenario-1-normal/overlay.png${NC}"
 if [ -d "${RUN_DIR}/scenario-5-quality-gates" ]; then
-    echo -e "  ${YELLOW}cat scenario-5-quality-gates/summary.json${NC}"
+echo -e "  ${YELLOW}cat scenario-5-quality-gates/summary.json${NC}"
 fi
 echo ""
 
