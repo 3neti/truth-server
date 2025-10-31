@@ -9,6 +9,7 @@ LIB_DIR="$SCRIPT_DIR/../lib"
 # Source libraries
 source "$LIB_DIR/common.sh"
 source "$LIB_DIR/ballot-renderer.sh"
+source "$LIB_DIR/overlay-generator.sh"
 
 # Fill bubbles with faint intensity
 # Args: blank_ballot, bubble_ids (comma-separated), coords_file, output_file, intensity (0-255)
@@ -119,6 +120,15 @@ print(len(filled))
         # Accept 4+ detections as pass (faint marks are harder to detect)
         if [ "$filled_count" -ge 4 ]; then
             log_success "PASS - Detected $filled_count/6 faint marks (threshold: 4+)"
+            
+            # Generate overlay
+            echo -n "  Creating overlay..."
+            if create_overlay "$scenario_dir/filled_ballot.png" "$scenario_dir/appreciation.json" "$coords_file" "$scenario_dir/overlay.png" 2>&1 | grep -q "Overlay created"; then
+                echo " done"
+            else
+                echo " skipped"
+            fi
+            
             increment_passed
             return 0
         else

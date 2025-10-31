@@ -9,6 +9,7 @@ LIB_DIR="$SCRIPT_DIR/../lib"
 # Source libraries
 source "$LIB_DIR/common.sh"
 source "$LIB_DIR/ballot-renderer.sh"
+source "$LIB_DIR/overlay-generator.sh"
 
 # Main scenario function
 # Args: run_dir, coords_file, config_dir, blank_ballot
@@ -64,6 +65,15 @@ print(len(filled))
         
         if [ "$filled_count" = "8" ]; then
             log_success "PASS - Detected 8/8 filled bubbles"
+            
+            # Generate overlay
+            echo -n "  Creating overlay..."
+            if create_overlay "$scenario_dir/filled_ballot.png" "$scenario_dir/appreciation.json" "$coords_file" "$scenario_dir/overlay.png" 2>&1 | grep -q "Overlay created"; then
+                echo " done"
+            else
+                echo " skipped"
+            fi
+            
             increment_passed
             return 0
         else

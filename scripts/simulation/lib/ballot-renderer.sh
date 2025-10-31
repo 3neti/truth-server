@@ -38,15 +38,39 @@ try:
     # Create white canvas
     ballot = np.ones((height_px, width_px, 3), dtype=np.uint8) * 255
     
-    # Draw fiducial markers (placeholder boxes)
+    # Draw ArUco fiducial markers
+    # Check if ArUco is available
+    aruco_available = hasattr(cv2, 'aruco')
+    
     for fid_id, fid in coords['fiducial'].items():
         x = int(fid['x'] * mm_to_px)
         y = int(fid['y'] * mm_to_px)
         size = int(10 * mm_to_px)  # 10mm marker
-        cv2.rectangle(ballot, (x, y), (x + size, y + size), (0, 0, 0), 3)
-        # Add marker ID
-        cv2.putText(ballot, str(fid.get('marker_id', fid_id)), (x + 5, y + 25), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+        
+        if aruco_available:
+            # Generate real ArUco marker
+            try:
+                marker_id = fid.get('marker_id', 101)
+                aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
+                marker_img = cv2.aruco.generateImageMarker(aruco_dict, marker_id, 200)
+                
+                # Resize and convert to BGR
+                marker_resized = cv2.resize(marker_img, (size, size))
+                if len(marker_resized.shape) == 2:
+                    marker_resized = cv2.cvtColor(marker_resized, cv2.COLOR_GRAY2BGR)
+                
+                # Place ArUco marker on ballot
+                ballot[y:y+size, x:x+size] = marker_resized
+            except Exception as e:
+                # Fallback to placeholder if ArUco fails
+                cv2.rectangle(ballot, (x, y), (x + size, y + size), (0, 0, 0), 3)
+                cv2.putText(ballot, str(fid.get('marker_id', fid_id)), (x + 5, y + 25), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+        else:
+            # Placeholder box if ArUco not available
+            cv2.rectangle(ballot, (x, y), (x + size, y + size), (0, 0, 0), 3)
+            cv2.putText(ballot, str(fid.get('marker_id', fid_id)), (x + 5, y + 25), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
     
     # Draw bubbles
     for bubble_id, bubble in coords['bubble'].items():
