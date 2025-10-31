@@ -15,6 +15,85 @@ NC='\033[0m' # No Color
 RUN_TIMESTAMP=$(date '+%Y-%m-%d_%H%M%S')
 RUN_DIR="storage/app/tests/omr-appreciation/runs/${RUN_TIMESTAMP}"
 
+# Generate human-readable config summary
+generate_config_summary() {
+    local config_dir=$1
+    local summary_file="${config_dir}/summary.txt"
+    
+    {
+        echo "ELECTION CONFIGURATION SUMMARY"
+        echo "=============================="
+        echo ""
+        echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo ""
+        
+        # Parse election.json if available
+        if [ -f "${config_dir}/election.json" ]; then
+            echo "POSITIONS:"
+            echo "----------"
+            python3 -c "
+import json
+with open('${config_dir}/election.json') as f:
+    data = json.load(f)
+    for pos in data.get('positions', []):
+        print(f\"  • {pos['name']} ({pos['code']})\")
+        print(f\"    Max selections: {pos.get('count', 1)}\")
+"
+            echo ""
+            
+            echo "CANDIDATES:"
+            echo "-----------"
+            python3 -c "
+import json
+with open('${config_dir}/election.json') as f:
+    data = json.load(f)
+    for pos_code, candidates in data.get('candidates', {}).items():
+        print(f\"  {pos_code}: {len(candidates)} candidates\")
+"
+            echo ""
+        fi
+        
+        # Parse precinct.yaml if available
+        if [ -f "${config_dir}/precinct.yaml" ]; then
+            echo "PRECINCT:"
+            echo "---------"
+            python3 -c "
+import yaml
+with open('${config_dir}/precinct.yaml') as f:
+    data = yaml.safe_load(f)
+    print(f\"  Code: {data.get('code', 'N/A')}\")
+    print(f\"  Name: {data.get('name', 'N/A')}\")
+    print(f\"  Location: {data.get('location_name', 'N/A')}\")
+"
+            echo ""
+        fi
+        
+        # Parse mapping.yaml if available
+        if [ -f "${config_dir}/mapping.yaml" ]; then
+            echo "BALLOT MAPPING:"
+            echo "---------------"
+            python3 -c "
+import yaml
+with open('${config_dir}/mapping.yaml') as f:
+    data = yaml.safe_load(f)
+    marks = data.get('marks', [])
+    print(f\"  Total marks: {len(marks)}\")
+    if marks:
+        print(f\"  First mark: {marks[0]['key']} → {marks[0]['value']}\")
+        print(f\"  Last mark: {marks[-1]['key']} → {marks[-1]['value']}\")
+"
+            echo ""
+        fi
+        
+        echo "FILES:"
+        echo "------"
+        ls -lh "${config_dir}" | tail -n +2
+        
+    } > "${summary_file}"
+    
+    echo -e "  ${GREEN}✓${NC} summary.txt"
+}
+
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}  OMR Appreciation Test Suite${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -24,6 +103,54 @@ echo ""
 
 # Create run directory
 mkdir -p "${RUN_DIR}"
+
+# Detect election configuration
+CONFIG_PATH=""
+ELECTION_CONFIG=""
+PRECINCT_CONFIG=""
+MAPPING_CONFIG=""
+
+# Try simulation config first
+if [ -f "resources/docs/simulation/config/election.json" ]; then
+    CONFIG_PATH="resources/docs/simulation/config"
+    ELECTION_CONFIG="${CONFIG_PATH}/election.json"
+    PRECINCT_CONFIG="${CONFIG_PATH}/precinct.yaml"
+    MAPPING_CONFIG="${CONFIG_PATH}/mapping.yaml"
+# Fall back to default config
+elif [ -f "config/election.json" ]; then
+    CONFIG_PATH="config"
+    ELECTION_CONFIG="${CONFIG_PATH}/election.json"
+    PRECINCT_CONFIG="${CONFIG_PATH}/precinct.yaml"
+    MAPPING_CONFIG="${CONFIG_PATH}/mapping.yaml"
+fi
+
+# Copy election configs to artifacts (if available)
+if [ -n "${CONFIG_PATH}" ]; then
+    CONFIG_ARTIFACT_DIR="${RUN_DIR}/config"
+    mkdir -p "${CONFIG_ARTIFACT_DIR}"
+    
+    echo -e "${YELLOW}Copying election configuration to artifacts...${NC}"
+    
+    if [ -f "${ELECTION_CONFIG}" ]; then
+        cp "${ELECTION_CONFIG}" "${CONFIG_ARTIFACT_DIR}/election.json"
+        echo -e "  ${GREEN}✓${NC} election.json"
+    fi
+    
+    if [ -f "${PRECINCT_CONFIG}" ]; then
+        cp "${PRECINCT_CONFIG}" "${CONFIG_ARTIFACT_DIR}/precinct.yaml"
+        echo -e "  ${GREEN}✓${NC} precinct.yaml"
+    fi
+    
+    if [ -f "${MAPPING_CONFIG}" ]; then
+        cp "${MAPPING_CONFIG}" "${CONFIG_ARTIFACT_DIR}/mapping.yaml"
+        echo -e "  ${GREEN}✓${NC} mapping.yaml"
+    fi
+    
+    # Generate config summary
+    generate_config_summary "${CONFIG_ARTIFACT_DIR}"
+    
+    echo ""
+fi
 
 # Capture environment info
 echo -e "${YELLOW}Capturing environment info...${NC}"
@@ -58,14 +185,19 @@ cat > "${RUN_DIR}/environment.json" <<EOF
   "user": "$(whoami)",
   "php_version": "$(php -r 'echo PHP_VERSION;')",
   "python_version": "$(python3 --version 2>&1 | cut -d' ' -f2)",
-  "imagick_version": "$(php -r 'extension_loaded("imagick") ? print("available") : print("not available");' 2>/dev/null || echo 'not available')",
+  "imagick_version": "$(php -r 'extension_loaded(\"imagick\") ? print(\"available\") : print(\"not available\");' 2>/dev/null || echo 'not available')",
   "opencv_version": "$(python3 -c 'import cv2; print(cv2.__version__)' 2>/dev/null || echo 'not available')",
   "fiducial_support": {
     "black_square": true,
     "aruco": ${ARUCO_AVAILABLE},
     "apriltag": ${APRILTAG_AVAILABLE}
   },
-  "omr_fiducial_mode": "${OMR_FIDUCIAL_MODE:-black_square}"
+  "omr_fiducial_mode": "${OMR_FIDUCIAL_MODE:-black_square}",
+  "election_config": {
+    "available": $([ -n "${CONFIG_PATH}" ] && echo "true" || echo "false"),
+    "path": "${CONFIG_PATH:-null}",
+    "type": "$([ "${CONFIG_PATH}" = "resources/docs/simulation/config" ] && echo "simulation" || echo "default")"
+  }
 }
 EOF
 
@@ -86,6 +218,17 @@ if [ "${APRILTAG_AVAILABLE}" = "true" ]; then
     echo -e "${GREEN}✓ AprilTag detection available${NC}"
 else
     echo -e "${YELLOW}⚠ AprilTag detection unavailable${NC}"
+fi
+
+# Display election config status
+if [ -n "${CONFIG_PATH}" ]; then
+    if [ "${CONFIG_PATH}" = "resources/docs/simulation/config" ]; then
+        echo -e "${BLUE}Election Config:${NC} simulation (Barangay)"
+    else
+        echo -e "${BLUE}Election Config:${NC} default (Philippine)"
+    fi
+else
+    echo -e "${YELLOW}⚠ No election config found${NC}"
 fi
 echo ""
 
@@ -248,11 +391,19 @@ SCENARIO6META
             COMBINED_LOG="${SCENARIO_6}/${basename}_combined.log"
             
             # Run appreciation (without alignment - synthetic distortions don't have real fiducials)
-            if python3 "${APPRECIATE_SCRIPT}" \
-                "${fixture}" \
-                "${COORDS_FILE}" \
-                --threshold 0.3 \
-                --no-align \
+            APPRECIATE_ARGS=(
+                "${fixture}"
+                "${COORDS_FILE}"
+                --threshold 0.3
+                --no-align
+            )
+            
+            # Add config path if available
+            if [ -n "${CONFIG_PATH}" ]; then
+                APPRECIATE_ARGS+=(--config-path "${CONFIG_PATH}")
+            fi
+            
+            if python3 "${APPRECIATE_SCRIPT}" "${APPRECIATE_ARGS[@]}" \
                 > "${APPRECIATION_OUTPUT}" 2>&1; then
                 
                 # Validate results against ground truth
@@ -344,10 +495,18 @@ SCENARIO7META
             COMBINED_LOG="${SCENARIO_7}/${basename}_combined.log"
             
             # Run appreciation WITH alignment enabled (fiducials present)
-            if python3 "${APPRECIATE_SCRIPT}" \
-                "${fixture}" \
-                "${COORDS_FILE}" \
-                --threshold 0.3 \
+            APPRECIATE_ARGS=(
+                "${fixture}"
+                "${COORDS_FILE}"
+                --threshold 0.3
+            )
+            
+            # Add config path if available
+            if [ -n "${CONFIG_PATH}" ]; then
+                APPRECIATE_ARGS+=(--config-path "${CONFIG_PATH}")
+            fi
+            
+            if python3 "${APPRECIATE_SCRIPT}" "${APPRECIATE_ARGS[@]}" \
                 > "${APPRECIATION_OUTPUT}" 2>&1; then
                 
                 # Validate results against ground truth
@@ -469,10 +628,19 @@ PYROT
     fi
     
     # Run appreciation
+    APPRECIATE_ARGS=(
+        "${output_dir}/blank_filled.png"
+        "${coords_file}"
+        --threshold 0.3
+    )
+    
+    # Add config path if available
+    if [ -n "${CONFIG_PATH}" ]; then
+        APPRECIATE_ARGS+=(--config-path "${CONFIG_PATH}")
+    fi
+    
     if ! OMR_FIDUCIAL_MODE=aruco python3 packages/omr-appreciation/omr-python/appreciate.py \
-        "${output_dir}/blank_filled.png" \
-        "${coords_file}" \
-        --threshold 0.3 \
+        "${APPRECIATE_ARGS[@]}" \
         > "${output_dir}/results.json" 2>"${output_dir}/stderr.log"; then
         return 1
     fi
