@@ -2,23 +2,29 @@
 # Scenario Generator Library
 # Creates diverse test scenarios for ballot appreciation testing
 
-set -euo pipefail
+set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
-# Scenario types
-declare -A SCENARIO_TYPES=(
-    ["normal"]="Clean ballot with clear marks"
-    ["overvote"]="Ballot with overvoted positions"
-    ["undervote"]="Ballot with some positions unmarked"
-    ["faint"]="Ballot with faint/light marks"
-    ["stray"]="Ballot with stray marks and noise"
-    ["damaged"]="Ballot with torn edges or damage"
-    ["rotated"]="Ballot scanned at slight rotation"
-    ["skewed"]="Ballot with perspective distortion"
-    ["mixed"]="Combination of various issues"
-)
+# Get scenario description by type
+# Usage: get_scenario_description SCENARIO_TYPE
+get_scenario_description() {
+    local scenario_type="$1"
+    
+    case "$scenario_type" in
+        normal) echo "Clean ballot with clear marks" ;;
+        overvote) echo "Ballot with overvoted positions" ;;
+        undervote) echo "Ballot with some positions unmarked" ;;
+        faint) echo "Ballot with faint/light marks" ;;
+        stray) echo "Ballot with stray marks and noise" ;;
+        damaged) echo "Ballot with torn edges or damage" ;;
+        rotated) echo "Ballot scanned at slight rotation" ;;
+        skewed) echo "Ballot with perspective distortion" ;;
+        mixed) echo "Combination of various issues" ;;
+        *) echo "Unknown scenario type" ;;
+    esac
+}
 
 # Generate scenario metadata
 # Usage: generate_scenario_metadata SCENARIO_NAME SCENARIO_TYPE OUTPUT_DIR
@@ -32,11 +38,12 @@ generate_scenario_metadata() {
     local metadata_file="${output_dir}/scenario.json"
     
     # Create metadata JSON
+    local description=$(get_scenario_description "$scenario_type")
     cat > "$metadata_file" << EOF
 {
   "scenario_name": "$scenario_name",
   "scenario_type": "$scenario_type",
-  "description": "${SCENARIO_TYPES[$scenario_type]:-Unknown scenario type}",
+  "description": "$description",
   "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "expected_issues": $(get_expected_issues "$scenario_type"),
   "test_parameters": $(get_test_parameters "$scenario_type")
@@ -321,9 +328,10 @@ create_scenario() {
     log_info "Creating scenario: $scenario_name ($scenario_type)"
     
     # Validate scenario type
-    if [[ ! -v "SCENARIO_TYPES[$scenario_type]" ]]; then
+    local valid_types="normal overvote undervote faint stray damaged rotated skewed mixed"
+    if ! echo "$valid_types" | grep -qw "$scenario_type"; then
         log_error "Unknown scenario type: $scenario_type"
-        log_info "Available types: ${!SCENARIO_TYPES[*]}"
+        log_info "Available types: $valid_types"
         return 1
     fi
     
@@ -375,8 +383,10 @@ generate_scenario_suite() {
 # Usage: list_scenario_types
 list_scenario_types() {
     echo "Available scenario types:"
-    for type in "${!SCENARIO_TYPES[@]}"; do
-        echo "  - $type: ${SCENARIO_TYPES[$type]}"
+    local types="normal overvote undervote faint stray damaged rotated skewed mixed"
+    for type in $types; do
+        local desc=$(get_scenario_description "$type")
+        echo "  - $type: $desc"
     done
 }
 
