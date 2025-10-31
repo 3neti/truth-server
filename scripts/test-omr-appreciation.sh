@@ -57,7 +57,8 @@ with open('${config_dir}/election.json') as f:
         if [ -f "${config_dir}/precinct.yaml" ]; then
             echo "PRECINCT:"
             echo "---------"
-            python3 -c "
+            if python3 -c "import yaml" 2>/dev/null; then
+                python3 -c "
 import yaml
 with open('${config_dir}/precinct.yaml') as f:
     data = yaml.safe_load(f)
@@ -65,6 +66,10 @@ with open('${config_dir}/precinct.yaml') as f:
     print(f\"  Name: {data.get('name', 'N/A')}\")
     print(f\"  Location: {data.get('location_name', 'N/A')}\")
 "
+            else
+                echo "  (PyYAML not available - showing raw file)"
+                head -10 "${config_dir}/precinct.yaml"
+            fi
             echo ""
         fi
         
@@ -72,7 +77,8 @@ with open('${config_dir}/precinct.yaml') as f:
         if [ -f "${config_dir}/mapping.yaml" ]; then
             echo "BALLOT MAPPING:"
             echo "---------------"
-            python3 -c "
+            if python3 -c "import yaml" 2>/dev/null; then
+                python3 -c "
 import yaml
 with open('${config_dir}/mapping.yaml') as f:
     data = yaml.safe_load(f)
@@ -82,6 +88,11 @@ with open('${config_dir}/mapping.yaml') as f:
         print(f\"  First mark: {marks[0]['key']} → {marks[0]['value']}\")
         print(f\"  Last mark: {marks[-1]['key']} → {marks[-1]['value']}\")
 "
+            else
+                echo "  (PyYAML not available - showing raw file snippet)"
+                head -5 "${config_dir}/mapping.yaml"
+                echo "  ..."
+            fi
             echo ""
         fi
         

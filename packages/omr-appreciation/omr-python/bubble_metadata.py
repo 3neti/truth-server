@@ -7,9 +7,14 @@ or falling back to parsing for backward compatibility.
 """
 
 import json
-import yaml
 from pathlib import Path
 from typing import Dict, Optional
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
 
 
 class BubbleMetadata:
@@ -35,6 +40,10 @@ class BubbleMetadata:
     
     def _load_from_configs(self, config_path: str):
         """Load metadata from election configs."""
+        if not YAML_AVAILABLE:
+            print("Warning: PyYAML not available, bubble metadata disabled")
+            return
+        
         try:
             config_dir = Path(config_path)
             
