@@ -82,7 +82,7 @@ test('election:setup-precinct calls InitializeSystem with correct paths and hand
             ]
         ]);
 
-    // Step 2: Bind the mock instance into Laravel’s container
+    // Step 2: Bind the mock instance into Laravel's container
     app()->instance(InitializeSystem::class, $mock);
 
     // Step 3: Run the command
@@ -94,4 +94,34 @@ test('election:setup-precinct calls InitializeSystem with correct paths and hand
     expect($output)->toContain('CURRIMAO-001');
     expect($output)->toContain('10');
     expect($output)->toContain('60');
+});
+
+test('election:setup-precinct accepts --config-path option', function () {
+    // Create a test config directory
+    $testConfigPath = base_path('tests/fixtures/test-config');
+    File::ensureDirectoryExists($testConfigPath);
+
+    // Copy fixtures to test directory
+    $electionSource = realpath(__DIR__ . '/../../../../config/election.json');
+    $precinctSource = realpath(__DIR__ . '/../../../../config/precinct.yaml');
+    $mappingSource = realpath(__DIR__ . '/../../../../config/mapping.yaml');
+
+    File::copy($electionSource, $testConfigPath . '/election.json');
+    File::copy($precinctSource, $testConfigPath . '/precinct.yaml');
+    File::copy($mappingSource, $testConfigPath . '/mapping.yaml');
+
+    expect(Precinct::count())->toBe(0);
+
+    // Run with --config-path option
+    $this->artisan('election:setup-precinct', ['--config-path' => 'tests/fixtures/test-config'])
+        ->expectsOutputToContain('📂 Loading configs from: tests/fixtures/test-config')
+        ->expectsOutput('✅ Election setup complete.')
+        ->assertSuccessful();
+
+    expect(Precinct::count())->toBe(1);
+    expect(Position::count())->toBeGreaterThan(0);
+    expect(Candidate::count())->toBeGreaterThan(0);
+
+    // Cleanup
+    File::deleteDirectory($testConfigPath);
 });
