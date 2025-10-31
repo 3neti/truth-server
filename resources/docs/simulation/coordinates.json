@@ -1,0 +1,332 @@
+{
+    "document_id": "0102800000",
+    "template_id": "simulation-barangay-v1",
+    "version": "1.0.0",
+    "description": "Simulation template with simple bubble IDs (A1-A6, B1-B50)",
+    "ballot_size": {
+        "width_mm": 210,
+        "height_mm": 297
+    },
+    "bubble": {
+        "A1": {
+            "center_x": 30,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "A2": {
+            "center_x": 55,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "A3": {
+            "center_x": 80,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "A4": {
+            "center_x": 105,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "A5": {
+            "center_x": 130,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "A6": {
+            "center_x": 155,
+            "center_y": 80,
+            "diameter": 5
+        },
+        "B1": {
+            "center_x": 30,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B2": {
+            "center_x": 55,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B3": {
+            "center_x": 80,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B4": {
+            "center_x": 105,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B5": {
+            "center_x": 130,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B6": {
+            "center_x": 155,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B7": {
+            "center_x": 180,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B8": {
+            "center_x": 205,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B9": {
+            "center_x": 230,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B10": {
+            "center_x": 255,
+            "center_y": 130,
+            "diameter": 5
+        },
+        "B11": {
+            "center_x": 30,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B12": {
+            "center_x": 55,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B13": {
+            "center_x": 80,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B14": {
+            "center_x": 105,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B15": {
+            "center_x": 130,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B16": {
+            "center_x": 155,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B17": {
+            "center_x": 180,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B18": {
+            "center_x": 205,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B19": {
+            "center_x": 230,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B20": {
+            "center_x": 255,
+            "center_y": 145,
+            "diameter": 5
+        },
+        "B21": {
+            "center_x": 30,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B22": {
+            "center_x": 55,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B23": {
+            "center_x": 80,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B24": {
+            "center_x": 105,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B25": {
+            "center_x": 130,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B26": {
+            "center_x": 155,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B27": {
+            "center_x": 180,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B28": {
+            "center_x": 205,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B29": {
+            "center_x": 230,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B30": {
+            "center_x": 255,
+            "center_y": 160,
+            "diameter": 5
+        },
+        "B31": {
+            "center_x": 30,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B32": {
+            "center_x": 55,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B33": {
+            "center_x": 80,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B34": {
+            "center_x": 105,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B35": {
+            "center_x": 130,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B36": {
+            "center_x": 155,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B37": {
+            "center_x": 180,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B38": {
+            "center_x": 205,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B39": {
+            "center_x": 230,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B40": {
+            "center_x": 255,
+            "center_y": 175,
+            "diameter": 5
+        },
+        "B41": {
+            "center_x": 30,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B42": {
+            "center_x": 55,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B43": {
+            "center_x": 80,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B44": {
+            "center_x": 105,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B45": {
+            "center_x": 130,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B46": {
+            "center_x": 155,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B47": {
+            "center_x": 180,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B48": {
+            "center_x": 205,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B49": {
+            "center_x": 230,
+            "center_y": 190,
+            "diameter": 5
+        },
+        "B50": {
+            "center_x": 255,
+            "center_y": 190,
+            "diameter": 5
+        }
+    },
+    "fiducial": {
+        "tl": {
+            "x": 8.5,
+            "y": 8.5,
+            "marker_id": 101,
+            "type": "aruco",
+            "dict": "DICT_4X4_100"
+        },
+        "tr": {
+            "x": 201.5,
+            "y": 8.5,
+            "marker_id": 102,
+            "type": "aruco",
+            "dict": "DICT_4X4_100"
+        },
+        "br": {
+            "x": 201.5,
+            "y": 288.5,
+            "marker_id": 103,
+            "type": "aruco",
+            "dict": "DICT_4X4_100"
+        },
+        "bl": {
+            "x": 8.5,
+            "y": 288.5,
+            "marker_id": 104,
+            "type": "aruco",
+            "dict": "DICT_4X4_100"
+        }
+    },
+    "barcode": {
+        "document_barcode": {
+            "x": 70,
+            "y": 270,
+            "width": 70,
+            "height": 15,
+            "type": "qr",
+            "data": "SIMULATION-001"
+        }
+    }
+}
