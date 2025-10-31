@@ -1,0 +1,17 @@
+code: 27020001
+location_name: 'Hungduan Central School'
+latitude: 16.8281715
+longitude: 121.0030019
+electoral_inspectors:
+  -
+    id: uuid-juan
+    name: 'Juan dela Cruz'
+    role: 'chairperson'
+  -
+    id: uuid-maria
+    name: 'Maria Santos'
+    role: 'member'
+  -
+    id: uuid-pedro
+    name: 'Pedro Reyes'
+    role: 'member'

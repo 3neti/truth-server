@@ -1,0 +1,120 @@
+code: 0102800000
+location_name: 'Currimao, Ilocos Norte'
+district: 2
+marks:
+  # BARANGAY POSITIONS
+  # PUNONG_BARANGAY-1402702011 (Row A)
+  - key: A1
+    value: 'LD_001'
+  - key: A2
+    value: 'SJ_002'
+  - key: A3
+    value: 'DW_003'
+  - key: A4
+    value: 'MS_004'
+  - key: A5
+    value: 'BP_005'
+  - key: A6
+    value: 'AJ_006'
+
+  # MEMBER_SANGGUNIANG_BARANGAY-1402702011 (Row B) — All 50 candidates
+  - key: B1
+    value: 'JD_001'
+  - key: B2
+    value: 'ES_002'
+  - key: B3
+    value: 'MF_003'
+  - key: B4
+    value: 'JL_004'
+  - key: B5
+    value: 'CB_005'
+  - key: B6
+    value: 'SB_006'
+  - key: B7
+    value: 'WS_007'
+  - key: B8
+    value: 'JR_008'
+  - key: B9
+    value: 'MD_009'
+  - key: B10
+    value: 'CT_010'
+  - key: B11
+    value: 'KR_011'
+  - key: B12
+    value: 'NK_012'
+  - key: B13
+    value: 'HJ_013'
+  - key: B14
+    value: 'ZS_014'
+  - key: B15
+    value: 'BC_015'
+  - key: B16
+    value: 'GG_016'
+  - key: B17
+    value: 'JG_017'
+  - key: B18
+    value: 'AA_018'
+  - key: B19
+    value: 'DC_019'
+  - key: B20
+    value: 'KW_020'
+  - key: B21
+    value: 'MR_021'
+  - key: B22
+    value: 'EB_022'
+  - key: B23
+    value: 'CE_023'
+  - key: B24
+    value: 'RM_024'
+  - key: B25
+    value: 'CB_025'
+  - key: B26
+    value: 'TS_026'
+  - key: B27
+    value: 'JM_027'
+  - key: B28
+    value: 'OS_028'
+  - key: B29
+    value: 'RG_029'
+  - key: B30
+    value: 'SH_030'
+  - key: B31
+    value: 'JR_031'
+  - key: B32
+    value: 'Z_032'
+  - key: B33
+    value: 'JB_033'
+  - key: B34
+    value: 'MY_034'
+  - key: B35
+    value: 'MA_035'
+  - key: B36
+    value: 'EG_036'
+  - key: B37
+    value: 'TC_037'
+  - key: B38
+    value: 'FP_038'
+  - key: B39
+    value: 'PP_039'
+  - key: B40
+    value: 'RM_040'
+  - key: B41
+    value: 'ATJ_041'
+  - key: B42
+    value: 'IE_042'
+  - key: B43
+    value: 'PD_043'
+  - key: B44
+    value: 'A_044'
+  - key: B45
+    value: 'JC_045'
+  - key: B46
+    value: 'AG_046'
+  - key: B47
+    value: 'TH_047'
+  - key: B48
+    value: 'LN_048'
+  - key: B49
+    value: 'BC_049'
+  - key: B50
+    value: 'HM_050'
