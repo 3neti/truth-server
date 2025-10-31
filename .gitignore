@@ -51,3 +51,6 @@ yarn-error.log
 /storage/omr-test/
 /storage/omr-calibration/
 packages/omr-appreciation/omr-python/__pycache__/
+
+# Simulation framework outputs
+/storage/app/private/simulation/

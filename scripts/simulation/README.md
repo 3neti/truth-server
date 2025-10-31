@@ -184,7 +184,7 @@ Each scenario type has specific test parameters:
 The simulation generates a structured output directory:
 
 ```
-storage/simulation/
+storage/app/private/simulation/
 ├── template/
 │   ├── coordinates.json          # Ballot template coordinates
 │   └── generate.log              # Template generation log
@@ -203,6 +203,8 @@ storage/simulation/
 │   └── scenario-3-faint/
 └── summary.txt                   # Summary report
 ```
+
+**Note:** This directory is in `.gitignore` and won't be committed to the repository.
 
 ### Output Files
 

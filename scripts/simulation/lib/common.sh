@@ -35,10 +35,57 @@ log_scenario() {
     echo -e "${BLUE}$1${NC}"
 }
 
+log_section() {
+    echo ""
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  $1${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+}
+
+log_debug() {
+    if [ "${LOG_LEVEL:-INFO}" = "DEBUG" ]; then
+        echo -e "${YELLOW}[DEBUG]${NC} $1"
+    fi
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
 # Path utilities
 get_project_root() {
     # Assume scripts are in scripts/simulation/lib, so project root is ../../../
     echo "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+}
+
+validate_path() {
+    local path="$1"
+    local msg="${2:-Path not found}"
+    
+    if [ ! -e "$path" ]; then
+        log_error "$msg: $path"
+        return 1
+    fi
+    return 0
+}
+
+get_file_size() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "0"
+    else
+        echo "0"
+    fi
+}
+
+command_exists() {
+    command -v "$1" &>/dev/null
+}
+
+check_python_module() {
+    local module="$1"
+    python3 -c "import $module" 2>/dev/null
 }
 
 # Validation functions
@@ -64,18 +111,42 @@ check_command_exists() {
 }
 
 # Test result tracking
-SCENARIO_PASSED=0
-SCENARIO_FAILED=0
-SCENARIO_TOTAL=0
+TEST_RESULTS=()
+TEST_PASSED=0
+TEST_FAILED=0
 
-increment_passed() {
-    SCENARIO_PASSED=$((SCENARIO_PASSED + 1))
-    SCENARIO_TOTAL=$((SCENARIO_TOTAL + 1))
+record_success() {
+    local test_name="$1"
+    TEST_RESULTS+=("PASS: $test_name")
+    TEST_PASSED=$((TEST_PASSED + 1))
 }
 
-increment_failed() {
-    SCENARIO_FAILED=$((SCENARIO_FAILED + 1))
-    SCENARIO_TOTAL=$((SCENARIO_TOTAL + 1))
+record_failure() {
+    local test_name="$1"
+    TEST_RESULTS+=("FAIL: $test_name")
+    TEST_FAILED=$((TEST_FAILED + 1))
+}
+
+get_total_tests() {
+    echo $((TEST_PASSED + TEST_FAILED))
+}
+
+get_passed_tests() {
+    echo $TEST_PASSED
+}
+
+get_failed_tests() {
+    echo $TEST_FAILED
+}
+
+show_test_results() {
+    for result in "${TEST_RESULTS[@]}"; do
+        if [[ "$result" == PASS:* ]]; then
+            log_success "${result#PASS: }"
+        else
+            log_error "${result#FAIL: }"
+        fi
+    done
 }
 
 print_summary() {
@@ -117,7 +188,7 @@ check_python_modules() {
 }
 
 # Export functions for use in other scripts
-export -f log_info log_success log_error log_warn log_header log_scenario
-export -f get_project_root check_file_exists check_command_exists
-export -f increment_passed increment_failed print_summary
-export -f check_python_modules
+export -f log_info log_success log_error log_warn log_warning log_header log_scenario log_section log_debug
+export -f get_project_root validate_path get_file_size command_exists check_python_module
+export -f check_file_exists check_command_exists check_python_modules
+export -f record_success record_failure get_total_tests get_passed_tests get_failed_tests show_test_results

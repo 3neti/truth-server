@@ -220,43 +220,55 @@ from pathlib import Path
 with open('$template_file') as f:
     template = json.load(f)
 
-# Get all bubble keys grouped by position
+# Group bubbles: Row A is separate, rows B-J are one multi-seat position
 bubbles_by_position = {}
-for key, bubble in template['bubble'].items():
-    position = bubble['position_id']
-    if position not in bubbles_by_position:
-        bubbles_by_position[position] = []
-    bubbles_by_position[position].append(key)
+for key in template['bubble'].keys():
+    row = key[0]  # Get first character (A, B, C, etc.)
+    if row == 'A':
+        # Punong Barangay - separate position
+        if 'PUNONG_BARANGAY' not in bubbles_by_position:
+            bubbles_by_position['PUNONG_BARANGAY'] = []
+        bubbles_by_position['PUNONG_BARANGAY'].append(key)
+    else:
+        # All other rows (B-J) are Sangguniang Barangay members - one position
+        if 'SANGGUNIANG_BARANGAY' not in bubbles_by_position:
+            bubbles_by_position['SANGGUNIANG_BARANGAY'] = []
+        bubbles_by_position['SANGGUNIANG_BARANGAY'].append(key)
 
-# Get max votes per position from template
-max_votes = {}
-for key, bubble in template['bubble'].items():
-    position = bubble['position_id']
-    max_votes[position] = bubble.get('max_votes', 1)
+# Set max votes per position
+max_votes = {
+    'PUNONG_BARANGAY': 1,      # Vote for 1 punong barangay
+    'SANGGUNIANG_BARANGAY': 7  # Vote for up to 7 members
+}
 
 # Generate votes based on scenario type
 votes = {}
 scenario_type = '$scenario_type'
 
 if scenario_type == 'normal':
-    # Select valid number of candidates per position
+    # Vote maximum allowed for each position
     for position, keys in bubbles_by_position.items():
-        num_votes = random.randint(1, min(max_votes[position], len(keys)))
-        selected = random.sample(keys, num_votes)
-        for key in selected:
-            votes[key] = {'filled': True, 'fill_ratio': 0.7}
+        max_possible = min(max_votes[position], len(keys))
+        if max_possible > 0:
+            num_votes = max_possible  # Always vote max for normal scenario
+            selected = random.sample(keys, num_votes)
+            for key in selected:
+                votes[key] = {'filled': True, 'fill_ratio': 0.7}
 
 elif scenario_type == 'overvote':
-    # Deliberately exceed max_votes for at least one position
+    # Deliberately exceed max_votes for Sangguniang position only
     for position, keys in bubbles_by_position.items():
-        if random.random() < 0.5:  # 50% chance to overvote
-            num_votes = max_votes[position] + random.randint(1, 2)
-            num_votes = min(num_votes, len(keys))
+        if position == 'PUNONG_BARANGAY':
+            # Always vote correctly for Punong Barangay (1 vote)
+            num_votes = 1
         else:
-            num_votes = random.randint(1, max_votes[position])
-        selected = random.sample(keys, num_votes)
-        for key in selected:
-            votes[key] = {'filled': True, 'fill_ratio': 0.7}
+            # Overvote for Sangguniang (8-9 votes instead of max 7)
+            num_votes = min(max_votes[position] + random.randint(1, 2), len(keys))
+        
+        if num_votes > 0:
+            selected = random.sample(keys, num_votes)
+            for key in selected:
+                votes[key] = {'filled': True, 'fill_ratio': 0.7}
 
 elif scenario_type == 'undervote':
     # Select fewer than max votes for most positions
@@ -271,20 +283,24 @@ elif scenario_type == 'undervote':
                 votes[key] = {'filled': True, 'fill_ratio': 0.7}
 
 elif scenario_type == 'faint':
-    # Use low fill ratios
+    # Use low fill ratios (but vote max allowed)
     for position, keys in bubbles_by_position.items():
-        num_votes = random.randint(1, max_votes[position])
-        selected = random.sample(keys, num_votes)
-        for key in selected:
-            votes[key] = {'filled': True, 'fill_ratio': random.uniform(0.2, 0.4)}
+        max_possible = min(max_votes[position], len(keys))
+        if max_possible > 0:
+            num_votes = max_possible  # Vote max, but with faint marks
+            selected = random.sample(keys, num_votes)
+            for key in selected:
+                votes[key] = {'filled': True, 'fill_ratio': random.uniform(0.2, 0.4)}
 
 elif scenario_type == 'stray':
     # Add normal votes plus some stray marks
     for position, keys in bubbles_by_position.items():
-        num_votes = random.randint(1, max_votes[position])
-        selected = random.sample(keys, num_votes)
-        for key in selected:
-            votes[key] = {'filled': True, 'fill_ratio': 0.7}
+        max_possible = min(max_votes[position], len(keys))
+        if max_possible > 0:
+            num_votes = random.randint(1, max_possible)
+            selected = random.sample(keys, num_votes)
+            for key in selected:
+                votes[key] = {'filled': True, 'fill_ratio': 0.7}
     
     # Add stray marks (unmarked but with some fill)
     all_keys = list(template['bubble'].keys())
@@ -296,10 +312,12 @@ elif scenario_type == 'stray':
 else:
     # Default: normal voting pattern
     for position, keys in bubbles_by_position.items():
-        num_votes = random.randint(1, max_votes[position])
-        selected = random.sample(keys, num_votes)
-        for key in selected:
-            votes[key] = {'filled': True, 'fill_ratio': 0.7}
+        max_possible = min(max_votes[position], len(keys))
+        if max_possible > 0:
+            num_votes = random.randint(1, max_possible)
+            selected = random.sample(keys, num_votes)
+            for key in selected:
+                votes[key] = {'filled': True, 'fill_ratio': 0.7}
 
 # Save votes
 with open('$output_file', 'w') as f:

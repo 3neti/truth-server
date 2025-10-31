@@ -17,7 +17,7 @@ source "${LIB_DIR}/aruco-generator.sh"
 source "${LIB_DIR}/overlay-generator.sh"
 
 # Default configuration
-DEFAULT_OUTPUT_DIR="storage/simulation"
+DEFAULT_OUTPUT_DIR="storage/app/private/simulation"
 DEFAULT_CONFIG_DIR="config"
 DEFAULT_SCENARIOS=("normal" "overvote" "faint")
 
@@ -29,8 +29,8 @@ Usage: $0 [OPTIONS]
 Run end-to-end ballot appreciation simulation testing.
 
 OPTIONS:
-    -o, --output DIR        Output directory (default: $DEFAULT_OUTPUT_DIR)
-    -c, --config DIR        Config directory (default: $DEFAULT_CONFIG_DIR)
+    -o, --output DIR        Output directory (default: storage/app/private/simulation)
+    -c, --config DIR        Config directory (default: config)
     -s, --scenarios LIST    Comma-separated scenario types (default: normal,overvote,faint)
     -l, --list-scenarios    List available scenario types and exit
     -f, --fresh             Start fresh by removing existing output directory
