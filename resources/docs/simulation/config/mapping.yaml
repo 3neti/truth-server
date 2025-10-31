@@ -17,7 +17,8 @@ marks:
   - key: A6
     value: 'AJ_006'
 
-  # MEMBER_SANGGUNIANG_BARANGAY-1402702011 (Row B) — All 50 candidates
+  # MEMBER_SANGGUNIANG_BARANGAY-1402702011 (Rows B-J, 6 bubbles per row)
+  # Row B (candidates 1-6)
   - key: B1
     value: 'JD_001'
   - key: B2
@@ -30,91 +31,99 @@ marks:
     value: 'CB_005'
   - key: B6
     value: 'SB_006'
-  - key: B7
+  # Row C (candidates 7-12)
+  - key: C1
     value: 'WS_007'
-  - key: B8
+  - key: C2
     value: 'JR_008'
-  - key: B9
+  - key: C3
     value: 'MD_009'
-  - key: B10
+  - key: C4
     value: 'CT_010'
-  - key: B11
+  - key: C5
     value: 'KR_011'
-  - key: B12
+  - key: C6
     value: 'NK_012'
-  - key: B13
+  # Row D (candidates 13-18)
+  - key: D1
     value: 'HJ_013'
-  - key: B14
+  - key: D2
     value: 'ZS_014'
-  - key: B15
+  - key: D3
     value: 'BC_015'
-  - key: B16
+  - key: D4
     value: 'GG_016'
-  - key: B17
+  - key: D5
     value: 'JG_017'
-  - key: B18
+  - key: D6
     value: 'AA_018'
-  - key: B19
+  # Row E (candidates 19-24)
+  - key: E1
     value: 'DC_019'
-  - key: B20
+  - key: E2
     value: 'KW_020'
-  - key: B21
+  - key: E3
     value: 'MR_021'
-  - key: B22
+  - key: E4
     value: 'EB_022'
-  - key: B23
+  - key: E5
     value: 'CE_023'
-  - key: B24
+  - key: E6
     value: 'RM_024'
-  - key: B25
+  # Row F (candidates 25-30)
+  - key: F1
     value: 'CB_025'
-  - key: B26
+  - key: F2
     value: 'TS_026'
-  - key: B27
+  - key: F3
     value: 'JM_027'
-  - key: B28
+  - key: F4
     value: 'OS_028'
-  - key: B29
+  - key: F5
     value: 'RG_029'
-  - key: B30
+  - key: F6
     value: 'SH_030'
-  - key: B31
+  # Row G (candidates 31-36)
+  - key: G1
     value: 'JR_031'
-  - key: B32
+  - key: G2
     value: 'Z_032'
-  - key: B33
+  - key: G3
     value: 'JB_033'
-  - key: B34
+  - key: G4
     value: 'MY_034'
-  - key: B35
+  - key: G5
     value: 'MA_035'
-  - key: B36
+  - key: G6
     value: 'EG_036'
-  - key: B37
+  # Row H (candidates 37-42)
+  - key: H1
     value: 'TC_037'
-  - key: B38
+  - key: H2
     value: 'FP_038'
-  - key: B39
+  - key: H3
     value: 'PP_039'
-  - key: B40
+  - key: H4
     value: 'RM_040'
-  - key: B41
+  - key: H5
     value: 'ATJ_041'
-  - key: B42
+  - key: H6
     value: 'IE_042'
-  - key: B43
+  # Row I (candidates 43-48)
+  - key: I1
     value: 'PD_043'
-  - key: B44
+  - key: I2
     value: 'A_044'
-  - key: B45
+  - key: I3
     value: 'JC_045'
-  - key: B46
+  - key: I4
     value: 'AG_046'
-  - key: B47
+  - key: I5
     value: 'TH_047'
-  - key: B48
+  - key: I6
     value: 'LN_048'
-  - key: B49
+  # Row J (candidates 49-50)
+  - key: J1
     value: 'BC_049'
-  - key: B50
+  - key: J2
     value: 'HM_050'

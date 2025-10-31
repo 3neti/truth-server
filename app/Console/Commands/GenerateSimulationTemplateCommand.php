@@ -112,7 +112,7 @@ class GenerateSimulationTemplateCommand extends Command
     }
     
     /**
-     * Generate bubble coordinates with simple IDs
+     * Generate bubble coordinates with simple IDs using row-based layout
      */
     protected function generateBubbleCoordinates(BubbleIdGenerator $generator): array
     {
@@ -120,34 +120,32 @@ class GenerateSimulationTemplateCommand extends Command
         $metadata = $generator->generateBubbleMetadata();
         
         // Layout parameters (in mm)
-        $startX = 30.0;
-        $startY_RowA = 80.0;   // Punong Barangay row
-        $startY_RowB = 130.0;  // Sangguniang Barangay row
+        $startX = 30.0;        // Left margin
+        $startY = 80.0;        // Top margin for Row A
         $spacingX = 25.0;      // Horizontal spacing between bubbles
+        $spacingY = 15.0;      // Vertical spacing between rows
         $diameter = 5.0;       // Bubble diameter
-        
-        $colIndex = 0;
+        $bubblesPerRow = 6;    // Standard bubbles per row
         
         foreach ($metadata as $bubbleId => $meta) {
-            // Determine row based on bubble ID prefix
-            if (str_starts_with($bubbleId, 'A')) {
-                // Row A: Punong Barangay (A1-A6)
-                $y = $startY_RowA;
-                $colIndex = (int) substr($bubbleId, 1) - 1;
-            } elseif (str_starts_with($bubbleId, 'B')) {
-                // Row B: Sangguniang Barangay (B1-B50)
-                $y = $startY_RowB;
-                $bubbleNum = (int) substr($bubbleId, 1) - 1;
-                
-                // Arrange in rows of 10 bubbles each
-                $row = floor($bubbleNum / 10);
-                $col = $bubbleNum % 10;
-                
-                $colIndex = $col;
-                $y = $startY_RowB + ($row * 15.0); // 15mm spacing between rows
+            // Parse bubble ID (e.g., A1, B2, J1)
+            preg_match('/^([A-Z])(\d+)$/', $bubbleId, $matches);
+            if (count($matches) !== 3) {
+                continue; // Skip invalid IDs
             }
             
+            $rowLetter = $matches[1];
+            $colNumber = (int) $matches[2];
+            
+            // Calculate row index (A=0, B=1, C=2, etc.)
+            $rowIndex = ord($rowLetter) - ord('A');
+            
+            // Calculate column index (1-based to 0-based)
+            $colIndex = $colNumber - 1;
+            
+            // Calculate position
             $x = $startX + ($colIndex * $spacingX);
+            $y = $startY + ($rowIndex * $spacingY);
             
             $bubbles[$bubbleId] = [
                 'center_x' => round($x, 2),
