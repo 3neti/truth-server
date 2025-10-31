@@ -32,6 +32,7 @@ from image_aligner import detect_fiducials, align_image
 from mark_detector import detect_marks
 from barcode_decoder import decode_barcode
 from utils import load_template
+from bubble_metadata import load_bubble_metadata, BubbleMetadata
 
 
 class VoteAccumulator:
@@ -146,9 +147,11 @@ class BallotSession:
         self.status = 'active'
         self._save_metadata()
     
-    def finalize(self) -> str:
+    def finalize(self, bubble_metadata: Optional[BubbleMetadata] = None) -> str:
         """
         Finalize session and generate ballot string for Laravel.
+        
+        Supports both simple and verbose bubble ID formats.
         
         Returns:
             Compact ballot string: "BAL-001|POSITION1:CODE1,CODE2;POSITION2:CODE3"
@@ -161,7 +164,16 @@ class BallotSession:
         
         for bubble_id, filled in self.votes.items():
             if filled:
-                # Parse bubble_id: PRESIDENT_LD_001 -> position=PRESIDENT, code=LD_001
+                # Try metadata lookup first
+                if bubble_metadata and bubble_metadata.available:
+                    meta = bubble_metadata.get(bubble_id)
+                    if meta:
+                        position = meta['position_code']
+                        code = meta['candidate_code']
+                        position_votes[position].append(code)
+                        continue
+                
+                # Fall back to parsing for verbose IDs
                 parts = bubble_id.split('_', 1)
                 if len(parts) == 2:
                     position = parts[0]
@@ -302,8 +314,9 @@ class ContestValidator:
     Validate vote selections against contest rules (max_selections).
     """
     
-    def __init__(self, questionnaire_data: Optional[Dict]):
+    def __init__(self, questionnaire_data: Optional[Dict], bubble_metadata: Optional[BubbleMetadata] = None):
         self.rules: Dict[str, int] = {}  # position_code -> max_selections
+        self.bubble_metadata = bubble_metadata
         
         if questionnaire_data and 'positions' in questionnaire_data:
             for position in questionnaire_data['positions']:
@@ -315,6 +328,8 @@ class ContestValidator:
     def validate(self, votes: Dict[str, bool]) -> Dict[str, Dict]:
         """
         Validate current votes against contest rules.
+        
+        Supports both simple and verbose bubble ID formats.
         
         Returns:
             Dict mapping position_code -> validation result
@@ -330,7 +345,15 @@ class ContestValidator:
         
         for bubble_id, filled in votes.items():
             if filled:
-                # Parse bubble_id: PRESIDENT_LD_001 -> position=PRESIDENT
+                # Try metadata lookup first
+                if self.bubble_metadata and self.bubble_metadata.available:
+                    meta = self.bubble_metadata.get(bubble_id)
+                    if meta:
+                        position = meta['position_code']
+                        position_counts[position] += 1
+                        continue
+                
+                # Fall back to parsing for verbose IDs
                 parts = bubble_id.split('_', 1)
                 if len(parts) >= 1:
                     position = parts[0]
@@ -400,6 +423,8 @@ Examples:
                    help='Directory for session storage (default: storage/app/live-sessions)')
     ap.add_argument('--validate-contests', action='store_true',
                    help='Enable multi-contest validation (overvote detection)')
+    ap.add_argument('--config-path', type=str, default=None,
+                   help='Path to election config directory (for bubble metadata lookup)')
     
     return ap.parse_args()
 
@@ -488,14 +513,27 @@ if ($template && isset($template->json_data['positions'])) {{
         return None
 
 
-def get_candidate_name(bubble_id: str, questionnaire_data: Optional[Dict]) -> Optional[str]:
+def get_candidate_name(
+    bubble_id: str, 
+    questionnaire_data: Optional[Dict],
+    bubble_metadata: Optional[BubbleMetadata] = None
+) -> Optional[str]:
     """
     Convert bubble ID to candidate name.
     
+    Supports both simple IDs (via metadata) and verbose IDs (via parsing).
+    
     Example:
-      bubble_id = "PRESIDENT_LD_001"
+      bubble_id = "PRESIDENT_LD_001" or "A1"
       returns = "Leonardo DiCaprio"
     """
+    # Try metadata lookup first (if available)
+    if bubble_metadata and bubble_metadata.available:
+        meta = bubble_metadata.get(bubble_id)
+        if meta:
+            return meta['candidate_name']
+    
+    # Fall back to legacy parsing for verbose IDs
     if not questionnaire_data or 'positions' not in questionnaire_data:
         return None
     
@@ -517,8 +555,16 @@ def get_candidate_name(bubble_id: str, questionnaire_data: Optional[Dict]) -> Op
     return None
 
 
-def convert_bubbles_to_zones(bubbles: Dict, mm_to_px: float = 11.811):
-    """Convert bubble dict to zones format for mark_detector."""
+def convert_bubbles_to_zones(
+    bubbles: Dict, 
+    mm_to_px: float = 11.811,
+    bubble_metadata: Optional[BubbleMetadata] = None
+):
+    """
+    Convert bubble dict to zones format for mark_detector.
+    
+    Supports both simple IDs (via metadata) and verbose IDs (via parsing).
+    """
     zones = []
     for bubble_id, bubble in bubbles.items():
         center_x_px = bubble['center_x'] * mm_to_px
@@ -526,10 +572,26 @@ def convert_bubbles_to_zones(bubbles: Dict, mm_to_px: float = 11.811):
         diameter_px = bubble['diameter'] * mm_to_px
         radius_px = diameter_px / 2
         
+        # Determine contest and code
+        if bubble_metadata and bubble_metadata.available:
+            meta = bubble_metadata.get(bubble_id)
+            if meta:
+                # Use metadata (simple ID format)
+                contest = meta['position_code']
+                code = meta['candidate_code']
+            else:
+                # Metadata available but bubble not found - parse as fallback
+                contest = bubble_id.rsplit('_', 1)[0] if '_' in bubble_id else ''
+                code = bubble_id.rsplit('_', 1)[1] if '_' in bubble_id else bubble_id
+        else:
+            # No metadata - use legacy parsing (verbose ID format)
+            contest = bubble_id.rsplit('_', 1)[0] if '_' in bubble_id else ''
+            code = bubble_id.rsplit('_', 1)[1] if '_' in bubble_id else bubble_id
+        
         zones.append({
             'id': bubble_id,
-            'contest': bubble_id.rsplit('_', 1)[0],  # e.g., PRESIDENT_001 -> PRESIDENT
-            'code': bubble_id.rsplit('_', 1)[1] if '_' in bubble_id else bubble_id,
+            'contest': contest,
+            'code': code,
             'x': int(center_x_px - radius_px),
             'y': int(center_y_px - radius_px),
             'width': int(diameter_px),
@@ -540,7 +602,7 @@ def convert_bubbles_to_zones(bubbles: Dict, mm_to_px: float = 11.811):
 
 def draw_overlay(frame, fiducials, results, barcode_result=None, quality=None, 
                 angle_deg=None, fps=None, questionnaire_data=None, 
-                validation_results=None, session=None, is_frozen=False):
+                validation_results=None, session=None, is_frozen=False, bubble_metadata=None):
     """Draw AR overlay with fiducials, bubbles, barcode info, quality, and validation warnings."""
     mm_to_px = 11.811
     
@@ -576,7 +638,7 @@ def draw_overlay(frame, fiducials, results, barcode_result=None, quality=None,
         
         # Draw candidate name if available and bubble is filled
         if questionnaire_data and result.get('filled', False):
-            candidate_name = get_candidate_name(bubble_id, questionnaire_data)
+            candidate_name = get_candidate_name(bubble_id, questionnaire_data, bubble_metadata)
             
             if candidate_name:
                 # Draw semi-transparent background for readability
@@ -740,8 +802,15 @@ def main():
         print('Error: Provide --template or --demo-grid', file=sys.stderr)
         sys.exit(1)
     
+    # Load bubble metadata if config path provided
+    bubble_metadata = load_bubble_metadata(args.config_path)
+    if bubble_metadata.available:
+        print(f'✓ Loaded bubble metadata ({len(bubble_metadata.metadata)} bubbles)')
+    else:
+        print('ℹ️  No bubble metadata loaded (using legacy parsing)')
+    
     # Convert bubbles to zones for mark detector
-    zones = convert_bubbles_to_zones(template['bubble'])
+    zones = convert_bubbles_to_zones(template['bubble'], bubble_metadata=bubble_metadata)
     print(f'✓ Loaded {len(zones)} bubbles')
     
     # Load questionnaire data for candidate names and validation
@@ -778,7 +847,7 @@ def main():
     if audio.enabled:
         print('✓ Audio feedback enabled')
     
-    validator = ContestValidator(questionnaire_data) if args.validate_contests else None
+    validator = ContestValidator(questionnaire_data, bubble_metadata) if args.validate_contests else None
     if validator:
         print(f'✓ Contest validator initialized ({len(validator.rules)} positions)')
     
@@ -918,7 +987,8 @@ def main():
             questionnaire_data=questionnaire_data,
             validation_results=validation_results,
             session=session,
-            is_frozen=is_frozen
+            is_frozen=is_frozen,
+            bubble_metadata=bubble_metadata
         )
         
         # Update FPS
@@ -962,7 +1032,7 @@ def main():
                 print(f'  💾 Saved: {filepath}')
         elif key == ord('f') or key == ord('F'):  # Finalize ballot
             if session and session.status == 'active':
-                ballot_string = session.finalize()
+                ballot_string = session.finalize(bubble_metadata)
                 print(f'\n✓ Ballot finalized: {ballot_string}')
                 
                 # Call Laravel artisan command

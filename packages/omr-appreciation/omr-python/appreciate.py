@@ -12,6 +12,7 @@ from utils import load_template, output_json
 from image_aligner import detect_fiducials, align_image
 from mark_detector import detect_marks
 from barcode_decoder import decode_barcode
+from bubble_metadata import load_bubble_metadata
 
 
 def main():
@@ -25,6 +26,8 @@ def main():
                        help='Fill threshold (0.0 to 1.0, default: 0.3)')
     parser.add_argument('--no-align', action='store_true',
                        help='Skip fiducial alignment (for perfect test images)')
+    parser.add_argument('--config-path', type=str, default=None,
+                       help='Path to election config directory (for bubble metadata lookup)')
     
     args = parser.parse_args()
     
@@ -38,6 +41,9 @@ def main():
     except Exception as e:
         print(f"Error loading template: {e}", file=sys.stderr)
         sys.exit(1)
+    
+    # Load bubble metadata if config path provided
+    bubble_metadata = load_bubble_metadata(args.config_path)
     
     # Load image
     try:
@@ -96,10 +102,23 @@ def main():
             bubble_dict = template.get('bubble', {})
             zones = []
             for bubble_id, bubble_data in bubble_dict.items():
-                # Parse bubble_id like "PRESIDENT_LD_001" into contest and code
-                parts = bubble_id.rsplit('_', 1)
-                contest = parts[0] if len(parts) > 1 else ''
-                code = parts[1] if len(parts) > 1 else bubble_id
+                # Determine contest and code (supports both simple and verbose IDs)
+                if bubble_metadata and bubble_metadata.available:
+                    meta = bubble_metadata.get(bubble_id)
+                    if meta:
+                        # Use metadata (simple ID format)
+                        contest = meta['position_code']
+                        code = meta['candidate_code']
+                    else:
+                        # Metadata available but bubble not found - parse as fallback
+                        parts = bubble_id.rsplit('_', 1)
+                        contest = parts[0] if len(parts) > 1 else ''
+                        code = parts[1] if len(parts) > 1 else bubble_id
+                else:
+                    # No metadata - use legacy parsing (verbose ID format)
+                    parts = bubble_id.rsplit('_', 1)
+                    contest = parts[0] if len(parts) > 1 else ''
+                    code = parts[1] if len(parts) > 1 else bubble_id
                 
                 # Convert from mm to pixels
                 # Prefer center coordinates if available, otherwise use top-left
