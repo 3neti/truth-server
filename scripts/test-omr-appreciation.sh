@@ -307,6 +307,7 @@ cat > "${RUN_DIR}/test-results.json" <<EOF
 EOF
 
 # Run scenario-5-quality-gates if fixtures exist
+FIXTURE_DIR="storage/app/tests/omr-appreciation/fixtures/skew-rotation"
 if [ -d "${FIXTURE_DIR}" ] && [ -n "$(ls -A "${FIXTURE_DIR}" 2>/dev/null | grep '.png$')" ]; then
     SCENARIO_5="${RUN_DIR}/scenario-5-quality-gates"
     mkdir -p "${SCENARIO_5}"
@@ -415,7 +416,11 @@ SCENARIO6META
             fi
             
             if python3 "${APPRECIATE_SCRIPT}" "${APPRECIATE_ARGS[@]}" \
-                > "${APPRECIATION_OUTPUT}" 2>&1; then
+                > "${SCENARIO_6}/${basename}_appreciation_raw.json" 2>"${SCENARIO_6}/${basename}_stderr.log"; then
+                
+                # Strip Python warnings from output (keep only valid JSON)
+                grep -v "^Warning:" "${SCENARIO_6}/${basename}_appreciation_raw.json" | grep -v "^ERROR:" > "${APPRECIATION_OUTPUT}"
+                rm -f "${SCENARIO_6}/${basename}_appreciation_raw.json"
                 
                 # Validate results against ground truth
                 if python3 scripts/compare_appreciation_results.py \
@@ -518,7 +523,11 @@ SCENARIO7META
             fi
             
             if python3 "${APPRECIATE_SCRIPT}" "${APPRECIATE_ARGS[@]}" \
-                > "${APPRECIATION_OUTPUT}" 2>&1; then
+                > "${SCENARIO_7}/${basename}_appreciation_raw.json" 2>"${SCENARIO_7}/${basename}_stderr.log"; then
+                
+                # Strip Python warnings from output (keep only valid JSON)
+                grep -v "^Warning:" "${SCENARIO_7}/${basename}_appreciation_raw.json" | grep -v "^ERROR:" > "${APPRECIATION_OUTPUT}"
+                rm -f "${SCENARIO_7}/${basename}_appreciation_raw.json"
                 
                 # Validate results against ground truth
                 if python3 scripts/compare_appreciation_results.py \
@@ -652,9 +661,13 @@ PYROT
     
     if ! OMR_FIDUCIAL_MODE=aruco python3 packages/omr-appreciation/omr-python/appreciate.py \
         "${APPRECIATE_ARGS[@]}" \
-        > "${output_dir}/results.json" 2>"${output_dir}/stderr.log"; then
+        > "${output_dir}/results_raw.json" 2>"${output_dir}/stderr.log"; then
         return 1
     fi
+    
+    # Strip Python warnings from output (keep only valid JSON)
+    grep -v "^Warning:" "${output_dir}/results_raw.json" | grep -v "^ERROR:" > "${output_dir}/results.json"
+    rm -f "${output_dir}/results_raw.json"
     
     # Create overlay on UNROTATED ballot first (to get correct coordinate mapping)
     # Then rotate the overlay to match the rotated ballot
