@@ -100,7 +100,7 @@ class OMRSimulator
     /**
      * Find candidate name from bubble ID using questionnaire data
      * 
-     * @param string $bubbleId Bubble ID like 'PRESIDENT_LD_001'
+     * @param string $bubbleId Bubble ID like 'PRESIDENT_LD_001' or 'ROW_A_A2'
      * @param array|null $questionnaireData Questionnaire JSON with positions and candidates
      * @return string|null Candidate name or null if not found
      */
@@ -110,8 +110,25 @@ class OMRSimulator
             return null;
         }
         
+        // Handle grid-based bubble IDs (ROW_A_A2) by looking in grid data
+        if (str_starts_with($bubbleId, 'ROW_') && isset($questionnaireData['grid'])) {
+            // Extract simple ID (e.g., "A2" from "ROW_A_A2")
+            $parts = explode('_', $bubbleId);
+            $simpleId = end($parts); // Get "A2"
+            
+            // Find in grid data
+            foreach ($questionnaireData['grid']['rows'] as $row) {
+                foreach ($row['columns'] as $column) {
+                    if ($column['id'] === $simpleId) {
+                        return $column['candidate']['name'] ?? null;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // Original logic for position-based bubble IDs
         // Bubble IDs are constructed as: {position_code}_{candidate_code}
-        // where candidate_code is the last part (3-digit number like "001")
         // e.g., PRESIDENT_001, MEMBER_SANGGUNIANG_BARANGAY_001
         
         // Extract candidate code (last segment after splitting by _)
@@ -121,7 +138,7 @@ class OMRSimulator
         }
         
         $candidateCode = array_pop($parts); // Get last part (e.g., "001")
-        $positionCode = implode('_', $parts); // Rejoin remaining parts (e.g., "MEMBER_SANGGUNIANG_BARANGAY")
+        $positionCode = implode('_', $parts); // Rejoin remaining parts
         
         // Find position in questionnaire data
         foreach ($questionnaireData['positions'] as $position) {
@@ -244,8 +261,9 @@ class OMRSimulator
             
             $textParts = [];
             
-            // Confidence percentage (size 12)
-            if (isset($mark['confidence']) || isset($mark['fill_ratio'])) {
+            // Confidence percentage (size 12) - only if enabled in config
+            $showConfidence = $config['confidence']['enabled'] ?? false;
+            if ($showConfidence && (isset($mark['confidence']) || isset($mark['fill_ratio']))) {
                 $value = $mark['fill_ratio'] ?? $mark['confidence'];
                 $textParts[] = sprintf('%.0f%%', $value * 100);
             }
@@ -276,10 +294,12 @@ class OMRSimulator
                 $draw->setFontSize($fontSize);
                 $draw->setFillColor(new ImagickPixel($style['color']));
                 
-                // Position from config
-                $offsetX = $config['layout']['text_offset_x'] ?? 12;
-                $offsetY = $config['layout']['text_offset_y'] ?? 5;
-                $draw->annotation($x + $r + $offsetX, $y + $offsetY, $text);
+                // Position text below the circle (centered)
+                $offsetY = $config['layout']['text_offset_below'] ?? ($r + 30); // Below circle
+                // Center the text horizontally by measuring text width
+                $metrics = $imagick->queryFontMetrics($draw, $text);
+                $textWidth = $metrics['textWidth'] ?? 0;
+                $draw->annotation($x - ($textWidth / 2), $y + $offsetY, $text);
             }
         }
         

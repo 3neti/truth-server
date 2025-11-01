@@ -379,8 +379,9 @@ return [
         */
         'layout' => [
             'separator' => env('OMR_OVERLAY_SEPARATOR', ' | '),  // Between percentage, status, name
-            'text_offset_x' => 12,       // Horizontal distance from bubble edge (pixels)
-            'text_offset_y' => 5,        // Vertical adjustment for centering (pixels)
+            'text_offset_x' => 12,       // Horizontal distance from bubble edge (pixels) - DEPRECATED
+            'text_offset_y' => 5,        // Vertical adjustment for centering (pixels) - DEPRECATED
+            'text_offset_below' => null, // Distance below bubble center (pixels). If null, uses radius + 30
         ],
 
         /*
@@ -398,6 +399,15 @@ return [
             'background' => 'rgba(255, 255, 255, 0.9)',  // Semi-transparent white
             'border_color' => 'black',
             'border_width' => 2,
+        ],
+
+        /*
+        | Confidence Percentage Display
+        |
+        | Configuration for showing confidence percentages on marks.
+        */
+        'confidence' => [
+            'enabled' => env('OMR_OVERLAY_SHOW_CONFIDENCE', false),
         ],
 
         /*
