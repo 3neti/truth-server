@@ -31,12 +31,31 @@ OPTIONS:
     -v, --verbose           Enable verbose logging
     -h, --help              Show this help message
 
+AVAILABLE SCENARIOS:
+    Basic:
+      normal          - Clean ballot with clear marks
+      overvote        - Ballot with overvoted positions
+      faint           - Ballot with faint/light marks
+    
+    Advanced:
+      fiducials       - Fiducial marker detection tests
+      quality-gates   - Geometric distortion quality metrics
+      distortion      - Distortion without alignment correction
+      alignment       - Distortion with fiducial alignment
+      rotations       - Full 360° rotation tests (0-315°)
+
 EXAMPLES:
-    # Run default test suite
+    # Run default test suite (basic scenarios only)
     $0
 
     # Run with custom config (Barangay election)
     $0 --config resources/docs/simulation/config
+
+    # Run all scenarios (basic + advanced)
+    $0 --scenarios normal,overvote,faint,fiducials,quality-gates,distortion,alignment,rotations
+    
+    # Run only rotation tests
+    $0 --scenarios normal,rotations
 
     # Fresh run with specific scenarios
     $0 --fresh --scenarios normal,overvote,faint
@@ -266,7 +285,14 @@ EOF
 log_success "environment.json created"
 echo ""
 
-# Step 3: Run simulation with modular script
+# Step 3: Create ground truth file if not exists
+GROUND_TRUTH="storage/app/tests/omr-appreciation/fixtures/filled-ballot-ground-truth.json"
+if [[ ! -f "$GROUND_TRUTH" ]] && [[ " ${SCENARIOS[@]} " =~ " normal " ]]; then
+    log_info "Creating ground truth file from scenario-1..."
+    mkdir -p "$(dirname "$GROUND_TRUTH")"
+fi
+
+# Step 4: Run simulation with modular script
 log_section "Running Simulation Tests"
 
 # Export config for child processes
@@ -370,6 +396,59 @@ rm -rf "${RUN_DIR}/simulation-temp"
 
 log_success "Artifacts organized"
 echo ""
+
+# Step 4.5: Generate ground truth from scenario-1 if needed
+if [[ ! -f "$GROUND_TRUTH" ]] && [[ -f "${RUN_DIR}/scenario-1-normal/votes.json" ]]; then
+    log_info "Generating ground truth from scenario-1-normal..."
+    cp "${RUN_DIR}/scenario-1-normal/votes.json" "$GROUND_TRUTH"
+    log_success "Ground truth created: $GROUND_TRUTH"
+fi
+
+# Step 4.6: Run advanced scenarios if requested
+if [[ " ${SCENARIOS[@]} " =~ " fiducials " ]] || 
+   [[ " ${SCENARIOS[@]} " =~ " quality-gates " ]] || 
+   [[ " ${SCENARIOS[@]} " =~ " distortion " ]] ||
+   [[ " ${SCENARIOS[@]} " =~ " alignment " ]] ||
+   [[ " ${SCENARIOS[@]} " =~ " rotations " ]]; then
+    
+    log_section "Advanced Scenarios"
+    
+    # Source advanced scenarios library
+    source "${SCRIPT_DIR}/lib/advanced-scenarios.sh"
+    
+    # Get source files from scenario-1
+    SOURCE_FILLED="${RUN_DIR}/scenario-1-normal/blank_filled.png"
+    SOURCE_BLANK="${RUN_DIR}/scenario-1-normal/blank.png"
+    COORDS_FILE="${RUN_DIR}/template/coordinates.json"
+    
+    # Generate each advanced scenario
+    if [[ " ${SCENARIOS[@]} " =~ " fiducials " ]]; then
+        generate_scenario_fiducials "$RUN_DIR" "$COORDS_FILE"
+    fi
+    
+    if [[ " ${SCENARIOS[@]} " =~ " quality-gates " ]]; then
+        generate_scenario_quality_gates "$RUN_DIR"
+    fi
+    
+    if [[ " ${SCENARIOS[@]} " =~ " distortion " ]]; then
+        generate_scenario_distortion "$RUN_DIR" "$COORDS_FILE" "$GROUND_TRUTH"
+    fi
+    
+    if [[ " ${SCENARIOS[@]} " =~ " alignment " ]]; then
+        generate_scenario_fiducial_alignment "$RUN_DIR" "$COORDS_FILE" "$GROUND_TRUTH"
+    fi
+    
+    if [[ " ${SCENARIOS[@]} " =~ " rotations " ]]; then
+        if [[ -f "$SOURCE_FILLED" ]] && [[ -f "$SOURCE_BLANK" ]]; then
+            generate_scenario_cardinal_rotations "$RUN_DIR" "$SOURCE_FILLED" "$SOURCE_BLANK" "$COORDS_FILE" "$GROUND_TRUTH"
+        else
+            log_warning "Rotation tests skipped: source files missing"
+        fi
+    fi
+    
+    log_success "Advanced scenarios complete"
+    echo ""
+fi
 
 # Step 5: Generate test-results.json
 log_info "Generating test results summary..."
