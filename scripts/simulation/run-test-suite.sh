@@ -514,18 +514,18 @@ SCENARIOS_TEXT=""
 for scenario_dir in "${RUN_DIR}"/scenario-*; do
     if [[ -d "$scenario_dir" ]]; then
         scenario_name=$(basename "$scenario_dir")
-        SCENARIOS_TEXT+="### ${scenario_name}\n"
-        SCENARIOS_TEXT+="**Directory:** \`${scenario_name}/\`\n\n"
-        SCENARIOS_TEXT+="**Artifacts:**\n"
-        SCENARIOS_TEXT+="- \`blank_filled.png\` - Filled ballot image\n"
-        SCENARIOS_TEXT+="- \`results.json\` - Appreciation results\n"
-        SCENARIOS_TEXT+="- \`overlay.png\` - Visual overlay\n"
-        SCENARIOS_TEXT+="- \`metadata.json\` - Scenario metadata\n\n"
+        SCENARIOS_TEXT+="### ${scenario_name}\\n"
+        SCENARIOS_TEXT+="**Directory:** \\\`${scenario_name}/\\\`\\n\\n"
+        SCENARIOS_TEXT+="**Artifacts:**\\n"
+        SCENARIOS_TEXT+="- \\\`blank_filled.png\\\` - Filled ballot image\\n"
+        SCENARIOS_TEXT+="- \\\`results.json\\\` - Appreciation results\\n"
+        SCENARIOS_TEXT+="- \\\`overlay.png\\\` - Visual overlay\\n"
+        SCENARIOS_TEXT+="- \\\`metadata.json\\\` - Scenario metadata\\n\\n"
     fi
 done
 
-# Insert scenarios into README (using perl for multiline replacement)
-perl -i -pe "s/SCENARIOS_PLACEHOLDER/${SCENARIOS_TEXT}/g" "${RUN_DIR}/README.md"
+# Insert scenarios into README (using sed instead of perl to avoid backtick issues)
+sed -i.bak "s/SCENARIOS_PLACEHOLDER/${SCENARIOS_TEXT}/g" "${RUN_DIR}/README.md"
 
 # Clean up backup file
 rm -f "${RUN_DIR}/README.md.bak"
