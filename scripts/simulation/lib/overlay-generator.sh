@@ -129,5 +129,45 @@ PYOVERLAY
     fi
 }
 
+# Generate overlay from ballot and appreciation results
+# Args: ballot_image, appreciation_json, output_file, [log_file]
+generate_overlay() {
+    local ballot_image="$1"
+    local appreciation_json="$2"
+    local output_file="$3"
+    local log_file="${4:-/dev/null}"
+    
+    log_debug "Generating overlay: $ballot_image" >> "$log_file" 2>&1
+    
+    # Use config dir if available from environment
+    local config_args=""
+    if [ -n "${CONFIG_DIR:-}" ]; then
+        config_args="--config-dir=${CONFIG_DIR}"
+    fi
+    
+    # Get coordinates file from environment or use default
+    local coords_file="${COORDINATES_FILE:-}"
+    if [ -z "$coords_file" ]; then
+        log_error "COORDINATES_FILE environment variable not set" >> "$log_file" 2>&1
+        return 1
+    fi
+    
+    # Call Laravel artisan command
+    if php artisan simulation:create-overlay \
+        "$ballot_image" \
+        "$appreciation_json" \
+        "$coords_file" \
+        "$output_file" \
+        $config_args \
+        --show-legend \
+        >> "$log_file" 2>&1; then
+        log_success "Overlay generated: $output_file" >> "$log_file" 2>&1
+        return 0
+    else
+        log_error "Failed to generate overlay" >> "$log_file" 2>&1
+        return 1
+    fi
+}
+
 # Export functions
-export -f create_overlay
+export -f create_overlay generate_overlay
