@@ -13,7 +13,7 @@ source "${LIB_DIR}/template-generator.sh"
 source "${LIB_DIR}/scenario-generator.sh"
 source "${LIB_DIR}/ballot-renderer.sh"
 source "${LIB_DIR}/aruco-generator.sh"
-# source "${LIB_DIR}/ballot-appreciator.sh"  # TODO: Implement this library
+source "${LIB_DIR}/ballot-appreciator.sh"
 source "${LIB_DIR}/overlay-generator.sh"
 
 # Default configuration
@@ -103,6 +103,10 @@ done
 main() {
     log_section "Ballot Appreciation Simulation"
     
+    # Export configuration for Laravel integration
+    export CONFIG_DIR="$CONFIG_DIR"
+    export ELECTION_CONFIG_PATH="$CONFIG_DIR"
+    
     # Clean up if fresh run requested
     if [[ "$FRESH_RUN" == true ]] && [[ -d "$OUTPUT_DIR" ]]; then
         log_info "Removing existing output directory: $OUTPUT_DIR"
@@ -119,6 +123,10 @@ main() {
     log_section "Step 1: Generate Ballot Template"
     
     local coordinates_file="${template_dir}/coordinates.json"
+    # Export for child processes (Laravel commands)
+    export COORDINATES_FILE="$coordinates_file"
+    export TEMPLATE_DIR="$template_dir"
+    
     if ! generate_template "$CONFIG_DIR" "$coordinates_file" "${template_dir}/generate.log"; then
         log_error "Template generation failed"
         return 1
@@ -174,14 +182,68 @@ main() {
     done
     
     # Step 4: Run ballot appreciation on each scenario
-    # TODO: Implement ballot appreciation library
-    log_section "Step 4: Run Ballot Appreciation (TODO)"
-    log_info "Ballot appreciation step not yet implemented"
+    log_section "Step 4: Run Ballot Appreciation"
+    
+    for scenario_dir in "$scenarios_dir"/scenario-*; do
+        if [[ ! -d "$scenario_dir" ]]; then
+            continue
+        fi
+        
+        local scenario_name=$(basename "$scenario_dir")
+        local ballot_image="${scenario_dir}/ballot.png"
+        
+        if [[ ! -f "$ballot_image" ]]; then
+            log_warning "Ballot image not found for $scenario_name, skipping"
+            continue
+        fi
+        
+        log_info "Appreciating ballot: $scenario_name"
+        
+        local coords_file="${scenario_dir}/coordinates.json"
+        local results_file="${scenario_dir}/appreciation_results.json"
+        
+        if appreciate_ballot "$ballot_image" "$coords_file" "$results_file" "${scenario_dir}/appreciate.log"; then
+            record_success "Appreciation: $scenario_name"
+            
+            # Compare with ground truth
+            local votes_file="${scenario_dir}/votes.json"
+            local comparison_file="${scenario_dir}/comparison.json"
+            if compare_results "$results_file" "$votes_file" "$comparison_file"; then
+                record_success "Comparison: $scenario_name"
+            else
+                record_failure "Comparison: $scenario_name"
+            fi
+        else
+            record_failure "Appreciation: $scenario_name"
+        fi
+    done
     
     # Step 5: Generate overlays for visual inspection
-    # TODO: This requires appreciation_results.json from step 4
-    log_section "Step 5: Generate Visual Overlays (TODO)"
-    log_info "Overlay generation requires ballot appreciation results"
+    log_section "Step 5: Generate Visual Overlays"
+    
+    for scenario_dir in "$scenarios_dir"/scenario-*; do
+        if [[ ! -d "$scenario_dir" ]]; then
+            continue
+        fi
+        
+        local scenario_name=$(basename "$scenario_dir")
+        local ballot_image="${scenario_dir}/ballot.png"
+        local results_file="${scenario_dir}/appreciation_results.json"
+        local overlay_image="${scenario_dir}/overlay.png"
+        
+        if [[ ! -f "$ballot_image" ]] || [[ ! -f "$results_file" ]]; then
+            log_warning "Required files not found for $scenario_name, skipping overlay"
+            continue
+        fi
+        
+        log_info "Generating overlay: $scenario_name"
+        
+        if generate_overlay "$ballot_image" "$results_file" "$overlay_image" "${scenario_dir}/overlay.log"; then
+            record_success "Overlay: $scenario_name"
+        else
+            record_failure "Overlay: $scenario_name"
+        fi
+    done
     
     # Step 6: Generate summary report
     log_section "Step 6: Generate Summary Report"

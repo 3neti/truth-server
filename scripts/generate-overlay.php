@@ -2,13 +2,13 @@
 <?php
 /**
  * Generate overlay with candidate names
- * Usage: php scripts/generate-overlay.php <image> <results> <coords> <output>
+ * Usage: php scripts/generate-overlay.php <image> <results> <coords> <output> [config-dir]
  */
 
 require __DIR__ . '/../vendor/autoload.php';
 
 use Tests\Helpers\OMRSimulator;
-use App\Models\TemplateData;
+use App\Services\QuestionnaireLoader;
 use Illuminate\Foundation\Application;
 
 // Bootstrap Laravel
@@ -18,7 +18,7 @@ $kernel->bootstrap();
 
 // Parse arguments
 if ($argc < 5) {
-    fwrite(STDERR, "Usage: php generate-overlay.php <image> <results.json> <coordinates.json> <output.png>\n");
+    fwrite(STDERR, "Usage: php generate-overlay.php <image> <results.json> <coordinates.json> <output.png> [config-dir]\n");
     exit(1);
 }
 
@@ -26,6 +26,7 @@ $imagePath = $argv[1];
 $resultsPath = $argv[2];
 $coordsPath = $argv[3];
 $outputPath = $argv[4];
+$configPath = $argv[5] ?? null; // Optional 5th argument for config directory
 
 // Validate files exist
 if (!file_exists($imagePath)) {
@@ -57,16 +58,27 @@ if (!$coordinates) {
     exit(1);
 }
 
-// Load questionnaire data for candidate names
+// Load questionnaire data for candidate names (dual-source: file or database)
 $questionnaireData = null;
 try {
-    $data = TemplateData::where('document_id', 'PH-2025-QUESTIONNAIRE-CURRIMAO-001')->first();
-    if ($data) {
-        $questionnaireData = $data->json_data;
+    $questionnaireLoader = app(QuestionnaireLoader::class);
+    
+    // Try loading from file first (if config path provided)
+    if ($configPath) {
+        $questionnaireData = $questionnaireLoader->load($configPath, null);
+    }
+    
+    // Fall back to database if file loading failed or no config path provided
+    if ($questionnaireData === null) {
+        $questionnaireData = $questionnaireLoader->load(null, 'PH-2025-QUESTIONNAIRE-CURRIMAO-001');
+    }
+    
+    if ($questionnaireData === null) {
+        fwrite(STDERR, "Warning: Could not load questionnaire data from file or database\n");
     }
 } catch (Exception $e) {
-    // If database not available, continue without candidate names
-    fwrite(STDERR, "Warning: Could not load questionnaire data: {$e->getMessage()}\n");
+    // If loading fails, continue without candidate names
+    fwrite(STDERR, "Warning: Error loading questionnaire: {$e->getMessage()}\n");
 }
 
 // Generate overlay
