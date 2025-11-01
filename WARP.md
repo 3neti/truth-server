@@ -171,6 +171,77 @@ echo '{"watchers_count":6,"registered_voters_count":801,"actual_voters_count":70
 php artisan election:wrapup-voting
 ```
 
+### OMR Appreciation Testing
+
+Comprehensive ballot appreciation testing with config-independent ballot generation:
+
+```bash
+# Run all test scenarios with default config
+scripts/test-omr-appreciation.sh
+
+# Run with custom config directory (Barangay election)
+scripts/test-omr-appreciation.sh --config-dir resources/docs/simulation/config
+
+# Run specific scenarios only
+scripts/test-omr-appreciation.sh --scenarios normal,overvote,faint
+
+# Fresh run (removes previous test runs)
+scripts/test-omr-appreciation.sh --fresh
+
+# Verbose output for debugging
+scripts/test-omr-appreciation.sh -v
+
+# Custom output directory
+scripts/test-omr-appreciation.sh --output-dir /tmp/omr-tests
+
+# List available test scenarios
+scripts/test-omr-appreciation.sh --list-scenarios
+
+# With specific fiducial mode
+scripts/test-omr-appreciation.sh --fiducial-mode aruco
+```
+
+**Available Scenarios:**
+- `normal` - Clean ballot with clear marks (baseline test)
+- `overvote` - Overvoted positions exceeding max votes
+- `faint` - Faint/light marks testing threshold sensitivity
+- `fiducials` - Fiducial marker detection tests
+- `quality-gates` - Geometric distortion quality metrics
+- `distortion` - Appreciation without alignment correction
+- `fiducial-alignment` - Appreciation with fiducial correction
+- `cardinal-rotations` - All 8 rotations (0°/45°/90°/135°/180°/225°/270°/315°)
+
+**Output Structure:**
+```
+storage/app/tests/omr-appreciation/
+├── runs/
+│   └── YYYY-MM-DD_HHMMSS/
+│       ├── config/              # Election config snapshots
+│       ├── template/            # Generated ballot template
+│       ├── scenario-1-normal/   # Test scenario artifacts
+│       │   ├── ballot.png      # Rendered ballot
+│       │   ├── results.json    # Appreciation results
+│       │   ├── overlay.png     # Visual overlay
+│       │   ├── votes.json      # Ground truth
+│       │   └── validation.json # Accuracy metrics
+│       ├── test-results.json   # Summary
+│       └── README.md           # Documentation
+└── latest -> runs/YYYY-MM-DD_HHMMSS  # Symlink to latest run
+```
+
+**View Results:**
+```bash
+# View latest test results
+cd storage/app/tests/omr-appreciation/latest
+cat test-results.json | jq
+
+# View ballot overlays
+open scenario-*/overlay.png
+
+# Check validation metrics
+cat scenario-1-normal/validation.json | jq
+```
+
 ## Configuration Files
 
 The system requires three key configuration files:

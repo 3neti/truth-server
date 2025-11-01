@@ -195,18 +195,18 @@ render_ballot() {
     local log_file="${4:-/dev/null}"
     
     if [ ! -f "$votes_file" ]; then
-        log_error "Votes file not found: $votes_file" | tee -a "$log_file"
+        log_error "Votes file not found: $votes_file" >> "$log_file" 2>&1
         return 1
     fi
     
     if [ ! -f "$coords_file" ]; then
-        log_error "Coordinates file not found: $coords_file" | tee -a "$log_file"
+        log_error "Coordinates file not found: $coords_file" >> "$log_file" 2>&1
         return 1
     fi
     
-    log_debug "Rendering ballot from votes: $votes_file" | tee -a "$log_file"
+    log_debug "Rendering ballot from votes: $votes_file" >> "$log_file" 2>&1
     
-    python3 <<PYRENDER 2>&1 | tee -a "$log_file"
+    python3 <<PYRENDER >> "$log_file" 2>&1
 import cv2
 import numpy as np
 import json
@@ -242,7 +242,8 @@ try:
             # Generate real ArUco marker
             try:
                 marker_id = fid.get('marker_id', 101)
-                aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
+                # Use DICT_4X4_250 to support marker IDs up to 249
+                aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
                 marker_img = cv2.aruco.generateImageMarker(aruco_dict, marker_id, 200)
                 
                 # Resize and convert to BGR
@@ -321,10 +322,10 @@ except Exception as e:
 PYRENDER
 
     if [ $? -eq 0 ]; then
-        log_success "Ballot rendered: $output_file" | tee -a "$log_file"
+        log_success "Ballot rendered: $output_file" >> "$log_file" 2>&1
         return 0
     else
-        log_error "Failed to render ballot" | tee -a "$log_file"
+        log_error "Failed to render ballot" >> "$log_file" 2>&1
         return 1
     fi
 }

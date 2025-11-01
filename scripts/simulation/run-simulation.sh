@@ -172,9 +172,18 @@ main() {
         
         local votes_file="${scenario_dir}/votes.json"
         local coords_file="${scenario_dir}/coordinates.json"
-        local ballot_image="${scenario_dir}/ballot.png"
+        local blank_ballot="${scenario_dir}/blank.png"
+        local filled_ballot="${scenario_dir}/ballot.png"
         
-        if render_ballot "$votes_file" "$coords_file" "$ballot_image" "${scenario_dir}/render.log"; then
+        # Render blank ballot (template only)
+        if render_blank_ballot "$coords_file" "$blank_ballot"; then
+            log_debug "Blank ballot rendered: $blank_ballot"
+        else
+            log_warning "Failed to render blank ballot for $scenario_name"
+        fi
+        
+        # Render filled ballot (with votes)
+        if render_ballot "$votes_file" "$coords_file" "$filled_ballot" "${scenario_dir}/render.log"; then
             record_success "Render: $scenario_name"
         else
             record_failure "Render: $scenario_name"

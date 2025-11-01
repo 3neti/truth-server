@@ -131,6 +131,93 @@ if [[ -f "${CONFIG_DIR}/mapping.yaml" ]]; then
     cp "${CONFIG_DIR}/mapping.yaml" "${CONFIG_ARTIFACT_DIR}/mapping.yaml"
     log_success "mapping.yaml"
 fi
+
+# Generate config summary
+log_info "Generating config summary..."
+python3 << PYSUMMARY
+import json
+import os
+from datetime import datetime
+
+summary_lines = []
+summary_lines.append("ELECTION CONFIGURATION SUMMARY")
+summary_lines.append("="*30)
+summary_lines.append("")
+summary_lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+summary_lines.append("")
+
+# Parse election.json if available
+if os.path.exists('${CONFIG_ARTIFACT_DIR}/election.json'):
+    with open('${CONFIG_ARTIFACT_DIR}/election.json') as f:
+        election = json.load(f)
+    
+    # Positions
+    if 'positions' in election:
+        summary_lines.append("POSITIONS:")
+        summary_lines.append("-" * 10)
+        for pos in election['positions']:
+            summary_lines.append(f"  • {pos['name']} ({pos['code']})")
+            summary_lines.append(f"    Max selections: {pos.get('count', 1)}")
+        summary_lines.append("")
+    
+    # Candidates
+    if 'candidates' in election:
+        summary_lines.append("CANDIDATES:")
+        summary_lines.append("-" * 11)
+        for pos_code, candidates in election['candidates'].items():
+            summary_lines.append(f"  {pos_code}: {len(candidates)} candidates")
+        summary_lines.append("")
+
+# Note about YAML files
+try:
+    import yaml
+    yaml_available = True
+except ImportError:
+    yaml_available = False
+
+if not yaml_available:
+    summary_lines.append("PRECINCT:")
+    summary_lines.append("-" * 9)
+    summary_lines.append("  (PyYAML not available - showing raw file)")
+    if os.path.exists('${CONFIG_ARTIFACT_DIR}/precinct.yaml'):
+        with open('${CONFIG_ARTIFACT_DIR}/precinct.yaml') as f:
+            for i, line in enumerate(f):
+                if i < 10:  # First 10 lines only
+                    summary_lines.append(line.rstrip())
+    summary_lines.append("")
+    
+    summary_lines.append("BALLOT MAPPING:")
+    summary_lines.append("-" * 15)
+    summary_lines.append("  (PyYAML not available - showing raw file snippet)")
+    if os.path.exists('${CONFIG_ARTIFACT_DIR}/mapping.yaml'):
+        with open('${CONFIG_ARTIFACT_DIR}/mapping.yaml') as f:
+            for i, line in enumerate(f):
+                if i < 5:  # First 5 lines only
+                    summary_lines.append(line.rstrip())
+    summary_lines.append("  ...")
+    summary_lines.append("")
+
+# List files
+summary_lines.append("FILES:")
+summary_lines.append("-" * 6)
+import subprocess
+try:
+    result = subprocess.run(['ls', '-lh', '${CONFIG_ARTIFACT_DIR}'], 
+                          capture_output=True, text=True, check=True)
+    for line in result.stdout.strip().split('\n')[1:]:  # Skip 'total' line
+        summary_lines.append(line)
+except:
+    summary_lines.append("  (Could not list files)")
+
+# Write summary
+with open('${CONFIG_ARTIFACT_DIR}/summary.txt', 'w') as f:
+    f.write('\n'.join(summary_lines))
+    f.write('\n')
+
+print(f"Config summary generated")
+PYSUMMARY
+
+log_success "summary.txt"
 echo ""
 
 # Step 2: Capture environment information
@@ -218,6 +305,7 @@ if [[ -d "${RUN_DIR}/simulation-temp/scenarios" ]]; then
             mv "$scenario_dir" "${RUN_DIR}/${scenario_name}"
             
             # Rename files to match deprecated script naming
+            # blank.png stays as-is (unfilled template)
             if [[ -f "${RUN_DIR}/${scenario_name}/ballot.png" ]]; then
                 mv "${RUN_DIR}/${scenario_name}/ballot.png" "${RUN_DIR}/${scenario_name}/blank_filled.png"
             fi
