@@ -509,16 +509,20 @@ sed -i.bak "s/APRILTAG_STATUS_PLACEHOLDER/$([ "$APRILTAG_AVAILABLE" = "true" ] &
 sed -i.bak "s/FIDUCIAL_MODE_PLACEHOLDER/${OMR_FIDUCIAL_MODE:-black_square}/g" "${RUN_DIR}/README.md"
 sed -i.bak "s/GENERATION_DATE_PLACEHOLDER/$(date)/g" "${RUN_DIR}/README.md"
 
-# Generate scenario descriptions dynamically into temp file
-SCENARIOS_TEMP="${RUN_DIR}/scenarios_temp.txt"
-> "$SCENARIOS_TEMP"  # Create empty file
+# Generate scenario descriptions dynamically and insert into README using Python
+python3 << PYREADME
+import os
+import glob
 
-for scenario_dir in "${RUN_DIR}"/scenario-*; do
-    if [[ -d "$scenario_dir" ]]; then
-        scenario_name=$(basename "$scenario_dir")
-        cat >> "$SCENARIOS_TEMP" << SCENDESC
-### ${scenario_name}
-**Directory:** \`${scenario_name}/\`
+run_dir = '${RUN_DIR}'
+scenarios_text = []
+
+# Generate scenario descriptions
+for scenario_dir in sorted(glob.glob(f"{run_dir}/scenario-*")):
+    if os.path.isdir(scenario_dir):
+        scenario_name = os.path.basename(scenario_dir)
+        scenarios_text.append(f"""### {scenario_name}
+**Directory:** \`{scenario_name}/\`
 
 **Artifacts:**
 - \`blank.png\` - Unfilled ballot template
@@ -526,17 +530,23 @@ for scenario_dir in "${RUN_DIR}"/scenario-*; do
 - \`results.json\` - Appreciation results
 - \`overlay.png\` - Visual overlay
 - \`metadata.json\` - Scenario metadata
+""")
 
-SCENDESC
-    fi
-done
+# Read README and replace placeholder
+readme_path = f"{run_dir}/README.md"
+with open(readme_path, 'r') as f:
+    content = f.read()
 
-# Insert scenarios into README using awk to replace placeholder
-awk -v scenarios="$(cat "$SCENARIOS_TEMP")" '{gsub(/SCENARIOS_PLACEHOLDER/, scenarios)}1' "${RUN_DIR}/README.md" > "${RUN_DIR}/README.md.tmp"
-mv "${RUN_DIR}/README.md.tmp" "${RUN_DIR}/README.md"
+# Replace placeholder with scenarios text
+scenarios_str = '\n'.join(scenarios_text)
+content = content.replace('SCENARIOS_PLACEHOLDER', scenarios_str)
 
-# Clean up temp file
-rm -f "$SCENARIOS_TEMP"
+# Write updated README
+with open(readme_path, 'w') as f:
+    f.write(content)
+
+print("README scenarios inserted")
+PYREADME
 
 log_success "README.md created"
 echo ""
