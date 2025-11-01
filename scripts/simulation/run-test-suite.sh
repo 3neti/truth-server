@@ -13,8 +13,8 @@ LIB_DIR="${SCRIPT_DIR}/lib"
 source "${LIB_DIR}/common.sh"
 
 # Default configuration
-DEFAULT_CONFIG_DIR="config"
-DEFAULT_TEST_ROOT="storage/app/tests/omr-appreciation"
+DEFAULT_CONFIG_DIR="resources/docs/simulation/config"
+DEFAULT_TEST_ROOT="storage/app/private/simulation"
 DEFAULT_SCENARIOS=(normal overvote faint)
 
 # Usage information

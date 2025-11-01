@@ -68,12 +68,21 @@ switch ($command) {
 function generateTemplate(string $configDir, string $outputDir): void
 {
     try {
-        // Load questionnaire from config
-        $loader = app(QuestionnaireLoader::class);
-        $questionnaire = $loader->load($configDir, null);
+        // Resolve absolute path
+        $configPath = realpath($configDir);
+        if (!$configPath || !is_dir($configPath)) {
+            throw new Exception("Config directory not found: $configDir");
+        }
         
+        // Load election config directly
+        $electionFile = "$configPath/election.json";
+        if (!file_exists($electionFile)) {
+            throw new Exception("election.json not found in: $configDir");
+        }
+        
+        $questionnaire = json_decode(file_get_contents($electionFile), true);
         if (!$questionnaire) {
-            throw new Exception("Could not load questionnaire from: $configDir");
+            throw new Exception("Could not parse election.json from: $configDir");
         }
         
         // Generate template
