@@ -509,26 +509,34 @@ sed -i.bak "s/APRILTAG_STATUS_PLACEHOLDER/$([ "$APRILTAG_AVAILABLE" = "true" ] &
 sed -i.bak "s/FIDUCIAL_MODE_PLACEHOLDER/${OMR_FIDUCIAL_MODE:-black_square}/g" "${RUN_DIR}/README.md"
 sed -i.bak "s/GENERATION_DATE_PLACEHOLDER/$(date)/g" "${RUN_DIR}/README.md"
 
-# Generate scenario descriptions dynamically
-SCENARIOS_TEXT=""
+# Generate scenario descriptions dynamically into temp file
+SCENARIOS_TEMP="${RUN_DIR}/scenarios_temp.txt"
+> "$SCENARIOS_TEMP"  # Create empty file
+
 for scenario_dir in "${RUN_DIR}"/scenario-*; do
     if [[ -d "$scenario_dir" ]]; then
         scenario_name=$(basename "$scenario_dir")
-        SCENARIOS_TEXT+="### ${scenario_name}\\n"
-        SCENARIOS_TEXT+="**Directory:** \\\`${scenario_name}/\\\`\\n\\n"
-        SCENARIOS_TEXT+="**Artifacts:**\\n"
-        SCENARIOS_TEXT+="- \\\`blank_filled.png\\\` - Filled ballot image\\n"
-        SCENARIOS_TEXT+="- \\\`results.json\\\` - Appreciation results\\n"
-        SCENARIOS_TEXT+="- \\\`overlay.png\\\` - Visual overlay\\n"
-        SCENARIOS_TEXT+="- \\\`metadata.json\\\` - Scenario metadata\\n\\n"
+        cat >> "$SCENARIOS_TEMP" << SCENDESC
+### ${scenario_name}
+**Directory:** \`${scenario_name}/\`
+
+**Artifacts:**
+- \`blank.png\` - Unfilled ballot template
+- \`blank_filled.png\` - Filled ballot image
+- \`results.json\` - Appreciation results
+- \`overlay.png\` - Visual overlay
+- \`metadata.json\` - Scenario metadata
+
+SCENDESC
     fi
 done
 
-# Insert scenarios into README (using sed instead of perl to avoid backtick issues)
-sed -i.bak "s/SCENARIOS_PLACEHOLDER/${SCENARIOS_TEXT}/g" "${RUN_DIR}/README.md"
+# Insert scenarios into README using awk to replace placeholder
+awk -v scenarios="$(cat "$SCENARIOS_TEMP")" '{gsub(/SCENARIOS_PLACEHOLDER/, scenarios)}1' "${RUN_DIR}/README.md" > "${RUN_DIR}/README.md.tmp"
+mv "${RUN_DIR}/README.md.tmp" "${RUN_DIR}/README.md"
 
-# Clean up backup file
-rm -f "${RUN_DIR}/README.md.bak"
+# Clean up temp file
+rm -f "$SCENARIOS_TEMP"
 
 log_success "README.md created"
 echo ""

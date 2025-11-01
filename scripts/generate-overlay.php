@@ -48,9 +48,20 @@ if (!file_exists($coordsPath)) {
 $results = json_decode(file_get_contents($resultsPath), true);
 $coordinates = json_decode(file_get_contents($coordsPath), true);
 
-if (!$results || !isset($results['results'])) {
+// Handle both 'results' and 'bubbles' formats (Laravel command uses 'bubbles')
+if (!$results) {
     fwrite(STDERR, "Error: Invalid results JSON\n");
     exit(1);
+}
+
+if (!isset($results['results']) && !isset($results['bubbles'])) {
+    fwrite(STDERR, "Results file missing 'results' array\n");
+    exit(1);
+}
+
+// Normalize to 'results' key for consistent handling
+if (isset($results['bubbles']) && !isset($results['results'])) {
+    $results['results'] = $results['bubbles'];
 }
 
 if (!$coordinates) {
