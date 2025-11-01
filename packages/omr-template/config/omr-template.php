@@ -42,6 +42,7 @@ return [
         '1-col' => ['cols' => 1, 'gutter' => 6, 'row_gap' => 3, 'cell_pad' => 2],
         '2-col' => ['cols' => 2, 'gutter' => 10, 'row_gap' => 3, 'cell_pad' => 2],
         '3-col' => ['cols' => 3, 'gutter' => 10, 'row_gap' => 2, 'cell_pad' => 2],
+        '6-col' => ['cols' => 6, 'gutter' => 5, 'row_gap' => 2, 'cell_pad' => 1],
     ],
 
     /*

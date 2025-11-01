@@ -347,7 +347,7 @@ if [[ -d "${RUN_DIR}/simulation-temp/scenarios" ]]; then
                 python3 << PYMETA
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 try:
     # Load files
@@ -361,10 +361,10 @@ try:
     # Get bubbles filled from votes
     bubbles_filled = [bid for bid, vote in votes.items() if vote.get('filled', False)]
     
-    # Get bubbles detected from results
-    results = results_data.get('results', {})
+    # Get bubbles detected from results (handle both 'results' and 'bubbles' formats)
+    results = results_data.get('results') or results_data.get('bubbles', [])
     if isinstance(results, list):
-        bubbles_detected = [r['id'] for r in results if r.get('filled', False)]
+        bubbles_detected = [r.get('id') or r.get('bubble_id') for r in results if r.get('filled', False)]
     else:
         bubbles_detected = [bid for bid, r in results.items() if r.get('filled', False)]
     
@@ -374,7 +374,7 @@ try:
         "description": scenario.get('description', ''),
         "bubbles_filled": sorted(bubbles_filled),
         "bubbles_detected": sorted(bubbles_detected),
-        "timestamp": datetime.utcnow().isoformat() + '+00:00'
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
     # Write metadata.json

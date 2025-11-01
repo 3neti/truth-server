@@ -51,7 +51,8 @@ try:
             # Generate real ArUco marker
             try:
                 marker_id = fid.get('marker_id', 101)
-                aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
+                # Use DICT_4X4_1000 to support marker IDs 0-999
+                aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_1000)
                 marker_img = cv2.aruco.generateImageMarker(aruco_dict, marker_id, 200)
                 
                 # Resize and convert to BGR
@@ -87,7 +88,7 @@ try:
         cv2.putText(ballot, bubble_id, (label_x, label_y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.3, (100, 100, 100), 1)
     
-    # Add QR code placeholder (if barcode area exists)
+    # Add QR code (if barcode area exists)
     if 'barcode' in coords and 'document_barcode' in coords['barcode']:
         bc = coords['barcode']['document_barcode']
         x = int(bc['x'] * mm_to_px)
@@ -95,10 +96,26 @@ try:
         w = int(bc['width'] * mm_to_px)
         h = int(bc['height'] * mm_to_px)
         
-        # Draw QR placeholder box
-        cv2.rectangle(ballot, (x, y), (x + w, y + h), (0, 0, 0), 2)
-        cv2.putText(ballot, 'QR', (x + 5, y + h // 2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 100, 100), 2)
+        # Try to generate real QR code
+        try:
+            import qrcode
+            qr_data = bc.get('data', '$qr_data')
+            qr = qrcode.QRCode(version=1, box_size=10, border=1)
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert PIL image to numpy array
+            qr_array = np.array(qr_img.convert('RGB'))
+            qr_resized = cv2.resize(qr_array, (w, h))
+            
+            # Place QR code on ballot
+            ballot[y:y+h, x:x+w] = qr_resized
+        except ImportError:
+            # Fallback to placeholder if qrcode library not available
+            cv2.rectangle(ballot, (x, y), (x + w, y + h), (0, 0, 0), 2)
+            cv2.putText(ballot, 'QR', (x + 5, y + h // 2),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 100, 100), 2)
     
     # Save ballot
     cv2.imwrite('$output_file', ballot)

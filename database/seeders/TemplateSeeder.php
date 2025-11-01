@@ -75,7 +75,7 @@ class TemplateSeeder extends Seeder
             ]
         );
 
-        // Answer sheet template
+        // Answer sheet template (position-based layout)
         Template::updateOrCreate(
             [
                 'family_id' => $family->id,
@@ -87,6 +87,26 @@ class TemplateSeeder extends Seeder
                 'category' => 'election',
                 'storage_type' => 'local',
                 'handlebars_template' => $this->getAnswerSheetTemplate(),
+                'sample_data' => $this->getPhilippineBallotSampleData(),
+                'json_schema' => $this->getPhilippineBallotSchema(),
+                'is_public' => true,
+                'user_id' => $user->id,
+                'version' => '1.0.0',
+            ]
+        );
+
+        // Answer sheet template (grid-based layout from mapping.yaml)
+        Template::updateOrCreate(
+            [
+                'family_id' => $family->id,
+                'layout_variant' => 'answer-sheet-grid',
+            ],
+            [
+                'name' => 'Election Ballot - Answer Sheet (Grid)',
+                'description' => 'Grid-based ballot layout matching mapping.yaml structure',
+                'category' => 'election',
+                'storage_type' => 'local',
+                'handlebars_template' => $this->getAnswerSheetGridTemplate(),
                 'sample_data' => $this->getPhilippineBallotSampleData(),
                 'json_schema' => $this->getPhilippineBallotSchema(),
                 'is_public' => true,
@@ -667,6 +687,49 @@ JSON;
         {{#each candidates}}
         {
           "code": "{{code}}",
+          "label": "",
+          "number": {{number}}
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  ]
+}
+JSON;
+    }
+
+    private function getAnswerSheetGridTemplate(): string
+    {
+        return <<<'JSON'
+{
+  "document": {
+    "title": "{{election_name}} - Official Ballot",
+    "unique_id": "{{precinct_code}}-ballot-{{date}}",
+    "date": "{{date}}",
+    "precinct": "{{precinct_code}}",
+    "location": "{{precinct_location}}",
+    "layout": "ballot-grid"
+  },
+  "sections": [
+    {{#each grid.rows}}
+    {
+      "type": "multiple_choice",
+      "code": "ROW_{{row}}",
+      "title": "{{#if is_new_position}}{{position_title}}{{/if}}",
+      "question": "",
+      "maxSelections": 6,
+      "layout": "6-col",
+      "metadata": {
+        "show_bubbles": true,
+        "row_gap": 0.2,
+        "row_label": "{{row}}",
+        "is_new_position": {{#if is_new_position}}true{{else}}false{{/if}}
+      },
+      "choices": [
+        {{#each columns}}
+        {
+          "code": "{{id}}",
           "label": "",
           "number": {{number}}
         }{{#unless @last}},{{/unless}}

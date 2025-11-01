@@ -138,6 +138,20 @@ main() {
         return 1
     fi
     
+    # Generate ballot PDF from coordinates
+    local ballot_pdf="${template_dir}/ballot.pdf"
+    local ballot_png="${template_dir}/ballot.png"
+    
+    log_info "Generating ballot PDF..."
+    if generate_ballot_pdf "$coordinates_file" "$ballot_pdf"; then
+        log_success "Ballot PDF generated: ballot.pdf"
+    else
+        # Keep PNG as fallback if PDF generation failed
+        if [[ -f "$ballot_png" ]]; then
+            log_info "Ballot template available as PNG: ballot.png"
+        fi
+    fi
+    
     record_success "Template generation"
     
     # Step 2: Generate test scenarios

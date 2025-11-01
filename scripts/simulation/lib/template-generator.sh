@@ -123,5 +123,46 @@ PYVALIDATE
     fi
 }
 
+# Generate ballot PDF from coordinates
+# Args: coords_file, output_pdf
+generate_ballot_pdf() {
+    local coords_file=$1
+    local output_pdf=$2
+    
+    if [ ! -f "$coords_file" ]; then
+        log_error "Coordinates file not found: $coords_file"
+        return 1
+    fi
+    
+    # Use ballot renderer to create PNG first, then convert to PDF
+    local temp_png="${output_pdf%.pdf}.png"
+    
+    # Source ballot renderer for render_blank_ballot function
+    source "${SCRIPT_DIR}/ballot-renderer.sh"
+    
+    # Render blank ballot as PNG
+    if ! render_blank_ballot "$coords_file" "$temp_png"; then
+        log_error "Failed to render ballot PNG"
+        return 1
+    fi
+    
+    # Convert PNG to PDF using ImageMagick
+    if command -v convert >/dev/null 2>&1; then
+        if convert "$temp_png" -quality 100 "$output_pdf" 2>/dev/null; then
+            log_success "Ballot PDF generated: $output_pdf"
+            rm -f "$temp_png"  # Clean up temp PNG
+            return 0
+        else
+            log_warning "ImageMagick convert failed, keeping PNG only"
+            # Keep PNG as fallback
+            return 1
+        fi
+    else
+        log_warning "ImageMagick not available, skipping PDF generation"
+        log_info "Blank ballot PNG available: $temp_png"
+        return 1
+    fi
+}
+
 # Export functions
-export -f generate_template validate_coordinates
+export -f generate_template validate_coordinates generate_ballot_pdf

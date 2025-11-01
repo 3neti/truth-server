@@ -75,9 +75,18 @@ class CreateOverlayCommand extends Command
             return 1;
         }
         
-        // Validate results structure
-        if (!isset($results['results'])) {
-            $this->error("Results file missing 'results' array");
+        // Validate results structure - handle both 'results' and 'bubbles' keys
+        $bubbleResults = null;
+        if (isset($results['results'])) {
+            $bubbleResults = $results['results'];
+        } elseif (isset($results['bubbles'])) {
+            // Convert bubbles array to results dict format
+            $bubbleResults = [];
+            foreach ($results['bubbles'] as $bubble) {
+                $bubbleResults[$bubble['bubble_id']] = $bubble;
+            }
+        } else {
+            $this->error("Results file missing 'results' or 'bubbles' array");
             return 1;
         }
         
@@ -107,7 +116,7 @@ class CreateOverlayCommand extends Command
         try {
             $overlayPath = OMRSimulator::createOverlay(
                 $ballotImage,
-                $results['results'],
+                $bubbleResults,
                 $coordinates,
                 [
                     'scenario' => 'simulation',
