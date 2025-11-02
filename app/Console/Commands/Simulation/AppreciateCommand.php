@@ -57,8 +57,17 @@ class AppreciateCommand extends Command
         $this->info("Running appreciation...");
         $outputText = shell_exec($command);
 
-        // Parse JSON result
-        $result = json_decode($outputText, true);
+        // Extract JSON from output (Python script may output debug lines before JSON)
+        $jsonStart = strpos($outputText, '{');
+        if ($jsonStart === false) {
+            $this->error("No JSON found in appreciation output");
+            $this->line("Raw output:");
+            $this->line($outputText);
+            return 1;
+        }
+        
+        $jsonText = substr($outputText, $jsonStart);
+        $result = json_decode($jsonText, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->error("Appreciation script returned invalid JSON");

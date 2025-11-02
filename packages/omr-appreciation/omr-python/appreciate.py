@@ -56,6 +56,9 @@ def main():
     
     # Align image based on fiducials (unless disabled)
     inv_matrix = None  # No transformation needed if alignment is skipped
+    quality_metrics = None
+    fiducial_coords = None
+    
     if args.no_align:
         # Skip alignment for perfect test images
         aligned_image = image
@@ -65,6 +68,14 @@ def main():
         if fiducials is None:
             print("Error: Could not detect 4 fiducial markers", file=sys.stderr)
             sys.exit(1)
+        
+        # Store fiducial coordinates for output
+        fiducial_coords = {
+            'tl': {'x': int(fiducials[0][0]), 'y': int(fiducials[0][1])},
+            'tr': {'x': int(fiducials[1][0]), 'y': int(fiducials[1][1])},
+            'bl': {'x': int(fiducials[2][0]), 'y': int(fiducials[2][1])},
+            'br': {'x': int(fiducials[3][0]), 'y': int(fiducials[3][1])},
+        }
         
         # Align image (returns original image + inverse matrix for coordinate transform)
         try:
@@ -165,6 +176,43 @@ def main():
             'confidence': barcode_result['confidence'],
             'source': barcode_result['source']
         }
+    
+    # Include fiducial alignment data if available
+    if fiducial_coords:
+        output['fiducials'] = {
+            'detected': fiducial_coords,
+            'count': 4
+        }
+    
+    # Include quality metrics if available
+    if quality_metrics:
+        # Import quality check function
+        try:
+            from quality_metrics import check_quality_thresholds
+            verdicts = check_quality_thresholds(quality_metrics)
+            
+            output['quality'] = {
+                'metrics': {
+                    'rotation_deg': round(quality_metrics['theta_deg'], 2),
+                    'shear_deg': round(quality_metrics['shear_deg'], 2),
+                    'aspect_ratio_tb': round(quality_metrics['ratio_tb'], 3),
+                    'aspect_ratio_lr': round(quality_metrics['ratio_lr'], 3),
+                    'reprojection_error_px': round(quality_metrics['reproj_error_px'], 2)
+                },
+                'verdicts': verdicts,
+                'overall': verdicts['overall']
+            }
+        except ImportError:
+            # Quality metrics module not available, include raw metrics
+            output['quality'] = {
+                'metrics': {
+                    'rotation_deg': round(quality_metrics['theta_deg'], 2),
+                    'shear_deg': round(quality_metrics['shear_deg'], 2),
+                    'aspect_ratio_tb': round(quality_metrics['ratio_tb'], 3),
+                    'aspect_ratio_lr': round(quality_metrics['ratio_lr'], 3),
+                    'reprojection_error_px': round(quality_metrics['reproj_error_px'], 2)
+                }
+            }
     
     # Output JSON
     output_json(output)

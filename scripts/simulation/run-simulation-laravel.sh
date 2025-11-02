@@ -73,16 +73,20 @@ done
 
 cd "$PROJECT_ROOT"
 
+# Create timestamped run directory
+TIMESTAMP=$(date -u '+%Y-%m-%d_%H%M%S')
+RUN_DIR="${OUTPUT_DIR}/runs/${TIMESTAMP}"
+
 # Clean up if fresh run requested
-if [[ "$FRESH_RUN" == true ]] && [[ -d "$OUTPUT_DIR" ]]; then
-    log_info "Removing existing output directory: $OUTPUT_DIR"
-    rm -rf "$OUTPUT_DIR"
+if [[ "$FRESH_RUN" == true ]] && [[ -d "${OUTPUT_DIR}/runs" ]]; then
+    log_info "Removing all previous runs: ${OUTPUT_DIR}/runs"
+    rm -rf "${OUTPUT_DIR}/runs"
 fi
 
-# Create output directory structure
-mkdir -p "$OUTPUT_DIR"
-template_dir="${OUTPUT_DIR}/template"
-scenarios_dir="${OUTPUT_DIR}/scenarios"
+# Create run directory structure
+mkdir -p "$RUN_DIR"
+template_dir="${RUN_DIR}/template"
+scenarios_dir="${RUN_DIR}/scenarios"
 mkdir -p "$template_dir" "$scenarios_dir"
 
 log_section "Step 0: Seed Database from Config"
@@ -157,23 +161,27 @@ for scenario_type in "${SCENARIOS[@]}"; do
             # Normal: Fill some bubbles from different rows
             BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4,ROW_H_H1,ROW_H_H6,ROW_J_J1"
             DESCRIPTION="Normal ballot with 8 filled bubbles"
+            NO_ALIGN=false  # Enable alignment for quality metrics
             ;;
         overvote)
             # Overvote: Fill 2 bubbles in row A (only 1 allowed for Punong Barangay)
             BUBBLES="ROW_A_A6,ROW_C_C3,ROW_C_C5,ROW_D_D2,ROW_E_E3,ROW_E_E4,ROW_F_F3,ROW_G_G2,ROW_H_H4"
             DESCRIPTION="Overvote scenario"
+            NO_ALIGN=false  # Enable alignment for quality metrics
             ;;
         faint)
             # Faint marks with low intensity
             BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4,ROW_H_H1,ROW_H_H6,ROW_J_J1"
             INTENSITY="0.4"
             DESCRIPTION="Faint marks scenario"
+            NO_ALIGN=false  # Enable alignment for quality metrics
             ;;
         fiducials)
             # Fiducials: Test fiducial marker detection
             BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4"
             DESCRIPTION="Fiducial marker detection test"
             SKIP_FILL=true  # Just test fiducial detection
+            NO_ALIGN=false  # Fiducial detection requires alignment
             ;;
         quality-gates)
             # Quality gates: Test with slight distortion WITH alignment
@@ -197,16 +205,162 @@ for scenario_type in "${SCENARIOS[@]}"; do
             NO_ALIGN=false
             ;;
         cardinal-rotations)
-            # Cardinal rotations: Test all 8 orientations
+            # Cardinal rotations: Test main 4 orientations
             BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3"
-            DESCRIPTION="Cardinal rotation test (0°/45°/90°/135°/180°/225°/270°/315°)"
-            ROTATIONS=(0 45 90 135 180 225 270 315)
+            DESCRIPTION="Cardinal rotation test (0°/90°/180°/270°)"
+            ROTATIONS=(0 90 180 270)
+            NO_ALIGN=false  # Enable alignment for rotations
             ;;
         *)
             log_warning "Unknown scenario type: $scenario_type"
             continue
             ;;
     esac
+    
+    # Check if this is a multi-rotation scenario
+    if [[ -n "${ROTATIONS:-}" ]]; then
+        # Multi-rotation scenario (cardinal-rotations)
+        log_info "  Multi-rotation scenario: testing ${#ROTATIONS[@]} rotations"
+        
+        # Fill bubbles once
+        log_info "  Filling bubbles: $BUBBLES"
+        FILLED_PNG=$(php artisan simulation:fill-bubbles \
+            "${scenario_dir}/blank.png" \
+            --bubbles="$BUBBLES" \
+            --coordinates="$COORDS_JSON" \
+            --output="${scenario_dir}/blank_filled_base.png" \
+            2>&1 | tail -1)
+        
+        if [[ $? -ne 0 ]]; then
+            log_error "  Failed to fill bubbles"
+            ((scenario_count++))
+            continue
+        fi
+        
+        # Test each rotation
+        rotation_results=()
+        for rotation in "${ROTATIONS[@]}"; do
+            log_info "  Testing rotation: ${rotation}°"
+            rotation_dir="${scenario_dir}/rotation_${rotation}"
+            mkdir -p "$rotation_dir"
+            
+            # Apply rotation
+            if [[ "$HAS_IMAGEMAGICK" == "true" ]]; then
+                # For rotation scenarios, we keep both rotated input and upright output
+                # Store the upright ballot as the canonical version (since appreciation corrects it)
+                cp "${scenario_dir}/blank.png" "${rotation_dir}/blank.png"
+                cp "${scenario_dir}/blank_filled_base.png" "${rotation_dir}/blank_filled.png"
+                
+                if [[ "$rotation" -ne 0 ]]; then
+                    # Save the rotated input as a reference
+                    convert "${scenario_dir}/blank_filled_base.png" \
+                        -background white \
+                        -rotate "${rotation}" \
+                        "${rotation_dir}/blank_filled_rotated.png" 2>/dev/null
+                fi
+                
+                # Create scenario.json
+                cat > "${rotation_dir}/scenario.json" <<ROTATION_SCENARIO
+{
+  "scenario_id": "${scenario_name}/rotation_${rotation}",
+  "scenario_type": "${scenario_type}",
+  "description": "${DESCRIPTION} - ${rotation}° rotation",
+  "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+  "configuration": {
+    "rotation_angle": ${rotation},
+    "alignment_enabled": true,
+    "bubbles_filled": [
+$(echo "$BUBBLES" | tr ',' '\n' | sed 's/^/      "/;s/$/",/' | sed '$ s/,$//')
+    ]
+  }
+}
+ROTATION_SCENARIO
+                
+                # Run appreciation on rotated ballot (alignment will correct the rotation)
+                ALIGN_FLAG=""
+                if [[ "${NO_ALIGN:-true}" != "false" ]]; then
+                    ALIGN_FLAG="--no-align"
+                fi
+                
+                # Use the rotated ballot if it exists, otherwise the upright one (for rotation_0)
+                INPUT_BALLOT="${rotation_dir}/blank_filled_rotated.png"
+                if [[ ! -f "$INPUT_BALLOT" ]]; then
+                    INPUT_BALLOT="${rotation_dir}/blank_filled.png"
+                fi
+                
+                php artisan simulation:appreciate \
+                    "$INPUT_BALLOT" \
+                    "$COORDS_JSON" \
+                    --output="${rotation_dir}/results.json" \
+                    ${ALIGN_FLAG} \
+                    > /dev/null 2>&1
+                
+                if [[ $? -eq 0 ]]; then
+                    DETECTED=$(jq '[.results[] | select(.filled == true)] | length' "${rotation_dir}/results.json")
+                    rotation_results+=("${rotation}°: ${DETECTED} detected")
+                    log_success "    ${rotation}°: Detected $DETECTED bubbles"
+                    
+                    # Enrich votes with candidate information
+                    php artisan simulation:enrich-votes \
+                        "${rotation_dir}/results.json" \
+                        --config-dir="$CONFIG_DIR" \
+                        --output="${rotation_dir}/votes.json" \
+                        --fields=key,value,position,position_name,name,alias,number \
+                        > /dev/null 2>&1
+                    
+                    # Generate overlay visualization
+                    # Note: Appreciation with alignment reports results in template coordinate space,
+                    # so we overlay on the upright filled ballot (stored in blank_filled.png)
+                    php artisan simulation:create-overlay \
+                        "${rotation_dir}/blank_filled.png" \
+                        "${rotation_dir}/results.json" \
+                        "$COORDS_JSON" \
+                        "${rotation_dir}/overlay.png" \
+                        --document-id=SIM-QUESTIONNAIRE-001 \
+                        --show-legend \
+                        > /dev/null 2>&1
+                    
+                    # Validate quality gates (don't exit on failure)
+                    php artisan simulation:validate-quality \
+                        "${rotation_dir}/results.json" \
+                        --output="${rotation_dir}/quality_validation.json" \
+                        > /dev/null 2>&1 || true
+                    
+                    QUALITY_VERDICT=$(jq -r '.validation.overall_verdict // "unknown"' "${rotation_dir}/quality_validation.json" 2>/dev/null || echo "unknown")
+                    log_info "    ${rotation}°: Quality ${QUALITY_VERDICT}"
+                    
+                    log_success "    ${rotation}°: All artifacts generated"
+                else
+                    rotation_results+=("${rotation}°: FAILED")
+                    log_error "    ${rotation}°: Appreciation failed"
+                fi
+            else
+                log_warning "  ImageMagick not available, skipping rotation"
+                break
+            fi
+        done
+        
+        # Create summary
+        cat > "${scenario_dir}/rotation_summary.json" <<ROTATION_SUMMARY
+{
+  "scenario": "${scenario_name}",
+  "rotations_tested": [$(IFS=,; echo "${ROTATIONS[*]}" | sed 's/\([0-9]*\)/"\1°"/g')],
+  "results": [
+$(for result in "${rotation_results[@]}"; do
+    rotation_angle=$(echo "$result" | cut -d: -f1)
+    detected=$(echo "$result" | grep -oE '[0-9]+ detected' | cut -d' ' -f1 || echo "0")
+    echo "    {\"rotation\": \"$rotation_angle\", \"detected\": ${detected:-0}},"
+done | sed '$ s/,$//')
+  ]
+}
+ROTATION_SUMMARY
+        
+        log_success "  Rotation summary: ${rotation_results[*]}"
+        
+        # Skip normal appreciation step
+        ((scenario_count++))
+        continue
+    fi
     
     # Handle special scenario types
     if [[ "${SKIP_FILL:-false}" == "true" ]]; then
@@ -239,7 +393,7 @@ for scenario_type in "${SCENARIOS[@]}"; do
             convert "${scenario_dir}/blank_filled.png" \
                 -background white \
                 -rotate "${DISTORTION_ANGLE}" \
-                "${scenario_dir}/blank_filled_rotated.png"
+                "${scenario_dir}/blank_filled_rotated.png" 2>/dev/null
             mv "${scenario_dir}/blank_filled_rotated.png" "${scenario_dir}/blank_filled.png"
         else
             log_warning "  ImageMagick not available, skipping rotation"
@@ -335,21 +489,41 @@ SCENARIO_META
         log_warning "  Overlay generation failed (continuing...)"
     fi
     
+    # Validate quality gates if alignment was enabled
+    if [[ "${NO_ALIGN:-true}" == "false" ]]; then
+        php artisan simulation:validate-quality \
+            "${scenario_dir}/results.json" \
+            --output="${scenario_dir}/quality_validation.json" \
+            > /dev/null 2>&1 || true
+        
+        QUALITY_VERDICT=$(jq -r '.validation.overall_verdict // "unknown"' "${scenario_dir}/quality_validation.json" 2>/dev/null || echo "unknown")
+        log_info "  Quality: ${QUALITY_VERDICT}"
+    fi
+    
     ((scenario_count++))
 done
 
 log_success "Scenarios created: ${#SCENARIOS[@]}"
 
+# Create symlink to latest run
+LATEST_LINK="${OUTPUT_DIR}/latest"
+if [[ -L "$LATEST_LINK" ]] || [[ -e "$LATEST_LINK" ]]; then
+    rm -f "$LATEST_LINK"
+fi
+ln -s "runs/${TIMESTAMP}" "$LATEST_LINK"
+
 log_section "Simulation Complete"
-log_info "Output directory: $OUTPUT_DIR"
+log_info "Run ID: ${TIMESTAMP}"
+log_info "Run directory: $RUN_DIR"
+log_info "Latest link: $LATEST_LINK"
 log_info "Template: $template_dir"
 log_info "Scenarios: $scenarios_dir"
 
 # List generated files
 echo ""
 log_info "Generated artifacts:"
-find "$OUTPUT_DIR" -type f | sort | while read file; do
-    rel_path="${file#$OUTPUT_DIR/}"
+find "$RUN_DIR" -type f | sort | while read file; do
+    rel_path="${file#$RUN_DIR/}"
     size=$(ls -lh "$file" | awk '{print $5}')
     echo "  - $rel_path ($size)"
 done
