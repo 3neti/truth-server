@@ -11,7 +11,7 @@ class AppreciateCommand extends Command
                             {ballot-image : Path to filled ballot PNG}
                             {coordinates-file : Path to coordinates JSON}
                             {--output= : Output JSON path (optional)}
-                            {--threshold=0.3 : Fill threshold}
+                            {--threshold= : Fill threshold (default: from config)}
                             {--no-align : Skip fiducial alignment}';
 
     protected $description = 'Run OMR appreciation on ballot image using Python script';
@@ -21,7 +21,8 @@ class AppreciateCommand extends Command
         $ballotImage = $this->argument('ballot-image');
         $coordsFile = $this->argument('coordinates-file');
         $output = $this->option('output');
-        $threshold = $this->option('threshold');
+        $threshold = $this->option('threshold') 
+            ?? config('omr-thresholds.detection_threshold', 0.3);
         $noAlign = $this->option('no-align');
 
         // Validate inputs

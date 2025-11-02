@@ -2,7 +2,8 @@
 
 import cv2
 import numpy as np
-from typing import Dict, List, Optional
+from typing import List, Dict, Optional
+from threshold_config import get_confidence_thresholds, get_quality_thresholds, get_classification_thresholds
 from utils import get_roi_coordinates
 
 
@@ -89,10 +90,16 @@ def calculate_mark_metrics(image: np.ndarray, x: int, y: int, width: int, height
     # High confidence = clear distinction between marked and unmarked
     # Low confidence = ambiguous (e.g., partial marks, smudges)
     
+    # Load thresholds from config
+    confidence_thresholds = get_confidence_thresholds()
+    reference_threshold = confidence_thresholds.get('reference', 0.3)
+    perfect_fill = confidence_thresholds.get('perfect_fill', 0.5)
+    noise_threshold = confidence_thresholds.get('noise_threshold', 0.15)
+    
     # Confidence factors:
     # 1. Distance from decision boundary (threshold)
-    distance_from_threshold = abs(fill_ratio - 0.3)  # 0.3 is typical threshold
-    clarity_score = min(distance_from_threshold / 0.3, 1.0)  # 0 to 1
+    distance_from_threshold = abs(fill_ratio - reference_threshold)
+    clarity_score = min(distance_from_threshold / reference_threshold, 1.0)  # 0 to 1
     
     # 2. Bimodal distribution indicates clear mark
     # For perspective-transformed images, high std_dev is NORMAL for filled marks
@@ -101,18 +108,21 @@ def calculate_mark_metrics(image: np.ndarray, x: int, y: int, width: int, height
     
     # 3. For filled marks, check if we have substantial dark pixels
     # For unfilled marks, check if we have mostly light pixels
-    if fill_ratio > 0.3:  # Likely filled
+    if fill_ratio > reference_threshold:  # Likely filled
         # High confidence if we have good dark pixel concentration
-        dark_concentration = min(fill_ratio / 0.5, 1.0)  # Normalize to 0.5 as "perfect"
+        dark_concentration = min(fill_ratio / perfect_fill, 1.0)  # Normalize to perfect_fill
         quality_score = dark_concentration
     else:  # Likely unfilled
         # High confidence if fill ratio is very low
-        quality_score = 1.0 - min(fill_ratio / 0.15, 1.0)
+        quality_score = 1.0 - min(fill_ratio / noise_threshold, 1.0)
     
     # 4. Uniformity adjusted for expected bimodality after transform
     # High std_dev is expected for filled marks after perspective transform
     # Only penalize if std_dev is unusually low (possible scanning artifact)
-    if fill_ratio > 0.3 and std_dev > 60:
+    quality_thresholds = get_quality_thresholds()
+    high_std_dev = quality_thresholds.get('high_std_dev', 60)
+    
+    if fill_ratio > reference_threshold and std_dev > high_std_dev:
         # This is expected for filled marks after transform
         uniformity = 0.9
     else:
@@ -168,15 +178,25 @@ def detect_marks(image: np.ndarray, zones: List[Dict], threshold: float = 0.3,
         # Determine fill status
         filled = fill_ratio >= threshold
         
-        # Add warning flags for quality issues
+        # Add warning flags for quality issues (using configurable thresholds)
+        classification = get_classification_thresholds()
+        confidence_config = get_confidence_thresholds()
+        quality = get_quality_thresholds()
+        
+        ambiguous_min = classification.get('ambiguous_min', 0.15)
+        ambiguous_max = classification.get('ambiguous_max', 0.45)
+        overfilled_threshold = classification.get('overfilled', 0.7)
+        low_conf_threshold = confidence_config.get('low_confidence', 0.5)
+        min_uniformity = quality.get('min_uniformity', 0.4)
+        
         warnings = []
-        if 0.15 < fill_ratio < 0.45:  # Ambiguous range
+        if ambiguous_min < fill_ratio < ambiguous_max:  # Ambiguous range
             warnings.append('ambiguous')
-        if confidence < 0.5:
+        if confidence < low_conf_threshold:
             warnings.append('low_confidence')
-        if metrics['uniformity'] < 0.4:
+        if metrics['uniformity'] < min_uniformity:
             warnings.append('non_uniform')
-        if fill_ratio > 0.7:
+        if fill_ratio > overfilled_threshold:
             warnings.append('overfilled')
         
         result = {

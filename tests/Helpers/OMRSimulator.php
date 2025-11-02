@@ -330,8 +330,14 @@ class OMRSimulator
     protected static function getMarkStyle(array $mark): array
     {
         $config = config('omr-template.overlay', []);
+        $thresholds = config('omr-thresholds', []);
         $colors = $config['colors'] ?? [];
         $circles = $config['circles'] ?? [];
+        
+        // Get threshold values from config
+        $validMarkThreshold = $thresholds['classification']['valid_mark'] ?? 0.95;
+        $faintMarkThreshold = $thresholds['classification']['faint_mark'] ?? 0.16;
+        $ambiguousMax = $thresholds['classification']['ambiguous_max'] ?? 0.45;
         
         // Red for overvotes
         if ($mark['is_overvote'] ?? false) {
@@ -353,8 +359,8 @@ class OMRSimulator
             ];
         }
         
-        // Green for valid filled marks
-        if (($mark['filled'] ?? false) && ($mark['fill_ratio'] ?? 0) >= 0.95) {
+        // Green for valid filled marks (using configurable threshold)
+        if (($mark['filled'] ?? false) && ($mark['fill_ratio'] ?? 0) >= $validMarkThreshold) {
             return [
                 'color' => $colors['valid'] ?? 'lime',
                 'thickness' => $circles['valid_thickness'] ?? 4,
@@ -373,11 +379,9 @@ class OMRSimulator
             ];
         }
         
-        // Orange for marks that are faint but still visible
-        // Marks with fill_ratio 0.16-0.45 (above noise floor ~0.14 but below threshold)
-        // Background noise is typically 0.13-0.15, actual faint marks are 0.16+
+        // Orange for marks that are faint but still visible (using configurable thresholds)
         $fillRatio = $mark['fill_ratio'] ?? null;
-        if ($fillRatio !== null && $fillRatio >= 0.16 && $fillRatio < 0.45) {
+        if ($fillRatio !== null && $fillRatio >= $faintMarkThreshold && $fillRatio < $ambiguousMax) {
             return [
                 'color' => $colors['faint'] ?? 'orange',
                 'thickness' => $circles['unfilled_thickness'] ?? 2,

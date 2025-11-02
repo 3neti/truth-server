@@ -19,7 +19,7 @@ class ThresholdTuningCommand extends Command
                             {--output-dir= : Output directory (default: storage/app/private/threshold-tuning)}
                             {--dpi=300 : DPI for rendering}
                             {--intensities=1.0,0.85,0.70,0.55,0.40,0.25 : Comma-separated fill intensities to test}
-                            {--threshold=0.3 : Appreciation threshold to use}
+                            {--threshold= : Appreciation threshold to use (default: from config)}
                             {--bubbles= : Comma-separated bubble IDs to fill (default: use test profile)}';
 
     /**
@@ -37,7 +37,9 @@ class ThresholdTuningCommand extends Command
         $configDir = $this->option('config-dir');
         $outputDir = $this->option('output-dir') ?: storage_path('app/private/threshold-tuning');
         $dpi = (int) $this->option('dpi');
-        $threshold = (float) $this->option('threshold');
+        $threshold = $this->option('threshold')
+            ? (float) $this->option('threshold')
+            : (float) config('omr-thresholds.detection_threshold', 0.3);
         
         // Parse intensities
         $intensities = array_map('floatval', explode(',', $this->option('intensities')));
