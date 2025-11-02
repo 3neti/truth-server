@@ -228,25 +228,20 @@ SCENARIO_META
         FILLED_COUNT=$(jq '[.results[] | select(.filled == true)] | length' "${scenario_dir}/results.json")
         log_success "  Detected $FILLED_COUNT filled bubbles"
         
-        # Extract detected votes (filled bubbles) to votes.json
-        jq '{
-          "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ")),
-          "detected_votes": [
-            .results[] | select(.filled == true) | {
-              "bubble_id": .id,
-              "fill_ratio": .fill_ratio,
-              "confidence": .confidence,
-              "warnings": .warnings
-            }
-          ],
-          "summary": {
-            "total_bubbles": (.results | length),
-            "filled_bubbles": ([.results[] | select(.filled == true)] | length),
-            "unfilled_bubbles": ([.results[] | select(.filled == false)] | length)
-          }
-        }' "${scenario_dir}/results.json" > "${scenario_dir}/votes.json"
+        # Enrich votes with candidate information
+        log_info "  Enriching votes with candidate info..."
+        php artisan simulation:enrich-votes \
+            "${scenario_dir}/results.json" \
+            --config-dir="$CONFIG_DIR" \
+            --output="${scenario_dir}/votes.json" \
+            --fields=key,value,position,position_name,name,alias,number \
+            > /dev/null 2>&1
         
-        log_success "  Votes extracted: votes.json"
+        if [[ $? -eq 0 ]]; then
+            log_success "  Votes enriched: votes.json"
+        else
+            log_warning "  Vote enrichment failed (continuing...)"
+        fi
     else
         log_error "  Appreciation failed"
         ((scenario_count++))
