@@ -16,6 +16,13 @@ DEFAULT_OUTPUT_DIR="storage/app/private/simulation"
 DEFAULT_CONFIG_DIR="resources/docs/simulation/config"
 DEFAULT_SCENARIOS=("normal" "overvote" "faint")
 
+# Check for ImageMagick (required for advanced scenarios)
+if command -v convert >/dev/null 2>&1; then
+    HAS_IMAGEMAGICK=true
+else
+    HAS_IMAGEMAGICK=false
+fi
+
 # Parse command line arguments
 OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
 CONFIG_DIR="$DEFAULT_CONFIG_DIR"
@@ -162,26 +169,81 @@ for scenario_type in "${SCENARIOS[@]}"; do
             INTENSITY="0.4"
             DESCRIPTION="Faint marks scenario"
             ;;
+        fiducials)
+            # Fiducials: Test fiducial marker detection
+            BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4"
+            DESCRIPTION="Fiducial marker detection test"
+            SKIP_FILL=true  # Just test fiducial detection
+            ;;
+        quality-gates)
+            # Quality gates: Test with slight distortion WITH alignment
+            BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4"
+            DESCRIPTION="Quality metrics with geometric distortion (5° rotation, with fiducial alignment)"
+            DISTORTION_ANGLE=5  # 5 degree rotation
+            NO_ALIGN=false  # Enable alignment to test quality metrics
+            ;;
+        distortion)
+            # Distortion: Test without alignment correction
+            BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4"
+            DESCRIPTION="Appreciation without fiducial alignment (10° rotation)"
+            DISTORTION_ANGLE=10
+            NO_ALIGN=true
+            ;;
+        fiducial-alignment)
+            # Fiducial alignment: Test WITH correction
+            BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3,ROW_E_E4,ROW_G_G4"
+            DESCRIPTION="Appreciation with fiducial alignment correction (10° rotation)"
+            DISTORTION_ANGLE=10
+            NO_ALIGN=false
+            ;;
+        cardinal-rotations)
+            # Cardinal rotations: Test all 8 orientations
+            BUBBLES="ROW_A_A2,ROW_D_D2,ROW_D_D3"
+            DESCRIPTION="Cardinal rotation test (0°/45°/90°/135°/180°/225°/270°/315°)"
+            ROTATIONS=(0 45 90 135 180 225 270 315)
+            ;;
         *)
             log_warning "Unknown scenario type: $scenario_type"
             continue
             ;;
     esac
     
-    # Fill bubbles
-    log_info "  Filling bubbles: $BUBBLES"
-    FILLED_PNG=$(php artisan simulation:fill-bubbles \
-        "${scenario_dir}/blank.png" \
-        --bubbles="$BUBBLES" \
-        --coordinates="$COORDS_JSON" \
-        --output="${scenario_dir}/blank_filled.png" \
-        ${INTENSITY:+--intensity=$INTENSITY} \
-        2>&1 | tail -1)
+    # Handle special scenario types
+    if [[ "${SKIP_FILL:-false}" == "true" ]]; then
+        # Fiducials scenario: Just copy blank ballot (test fiducial detection only)
+        log_info "  Skipping bubble fill (fiducial detection only)"
+        cp "${scenario_dir}/blank.png" "${scenario_dir}/blank_filled.png"
+        FILLED_PNG="${scenario_dir}/blank_filled.png"
+    else
+        # Fill bubbles
+        log_info "  Filling bubbles: $BUBBLES"
+        FILLED_PNG=$(php artisan simulation:fill-bubbles \
+            "${scenario_dir}/blank.png" \
+            --bubbles="$BUBBLES" \
+            --coordinates="$COORDS_JSON" \
+            --output="${scenario_dir}/blank_filled.png" \
+            ${INTENSITY:+--intensity=$INTENSITY} \
+            2>&1 | tail -1)
+        
+        if [[ $? -ne 0 ]]; then
+            log_error "  Failed to fill bubbles"
+            ((scenario_count++))
+            continue
+        fi
+    fi
     
-    if [[ $? -ne 0 ]]; then
-        log_error "  Failed to fill bubbles"
-        ((scenario_count++))
-        continue
+    # Apply geometric distortion if specified
+    if [[ -n "${DISTORTION_ANGLE:-}" ]]; then
+        if [[ "$HAS_IMAGEMAGICK" == "true" ]]; then
+            log_info "  Applying rotation: ${DISTORTION_ANGLE}°"
+            convert "${scenario_dir}/blank_filled.png" \
+                -background white \
+                -rotate "${DISTORTION_ANGLE}" \
+                "${scenario_dir}/blank_filled_rotated.png"
+            mv "${scenario_dir}/blank_filled_rotated.png" "${scenario_dir}/blank_filled.png"
+        else
+            log_warning "  ImageMagick not available, skipping rotation"
+        fi
     fi
     
     # Get threshold configuration from Laravel
@@ -207,6 +269,8 @@ for scenario_type in "${SCENARIOS[@]}"; do
       "faint_mark": ${FAINT_MARK}
     },
     "fill_intensity": ${INTENSITY:-1.0},
+    "distortion_angle": ${DISTORTION_ANGLE:-0},
+    "alignment_enabled": $([ "${NO_ALIGN:-false}" == "true" ] && echo "false" || echo "true"),
     "bubbles_filled": [
 $(echo "$BUBBLES" | tr ',' '\n' | sed 's/^/      "/;s/$/",/' | sed '$ s/,$//')
     ]
@@ -215,12 +279,19 @@ $(echo "$BUBBLES" | tr ',' '\n' | sed 's/^/      "/;s/$/",/' | sed '$ s/,$//')
 SCENARIO_META
     
     # Run appreciation
-    log_info "  Running appreciation (threshold: ${DETECTION_THRESHOLD})..."
+    ALIGN_FLAG="--no-align"  # Default: no alignment
+    if [[ "${NO_ALIGN:-true}" == "false" ]]; then
+        ALIGN_FLAG=""  # Enable alignment
+        log_info "  Running appreciation with fiducial alignment (threshold: ${DETECTION_THRESHOLD})..."
+    else
+        log_info "  Running appreciation without alignment (threshold: ${DETECTION_THRESHOLD})..."
+    fi
+    
     php artisan simulation:appreciate \
         "${scenario_dir}/blank_filled.png" \
         "$COORDS_JSON" \
         --output="${scenario_dir}/results.json" \
-        --no-align \
+        ${ALIGN_FLAG} \
         > /dev/null 2>&1
     
     if [[ $? -eq 0 ]]; then
