@@ -174,7 +174,11 @@ def main():
             'decoded': barcode_result['decoded'],
             'decoder': barcode_result['decoder'],
             'confidence': barcode_result['confidence'],
-            'source': barcode_result['source']
+            'source': barcode_result['source'],
+            'barcode_type': barcode_result.get('barcode_type'),
+            'attempts': barcode_result.get('attempts', []),
+            'roi_size': barcode_result.get('roi_size'),
+            'decode_time_ms': round(barcode_result.get('decode_time_ms', 0.0), 2)
         }
     
     # Include fiducial alignment data if available

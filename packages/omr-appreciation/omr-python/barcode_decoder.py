@@ -289,8 +289,9 @@ def decode_barcode(
     
     Strategy:
     1. Try pyzbar on preprocessed ROI
-    2. If fails, try ZXing CLI
-    3. If fails, fall back to metadata from coordinates.json
+    2. If fails, try pyzxing (PDF417 support)
+    3. If fails, try ZXing CLI
+    4. If fails, fall back to metadata from coordinates.json
     
     Args:
         image: Input ballot image (BGR format)
@@ -302,28 +303,42 @@ def decode_barcode(
         Dictionary with:
         {
             'document_id': str or None,
-            'decoder': 'pyzbar', 'zxing', 'metadata', or 'none',
+            'decoder': 'pyzbar', 'pyzxing', 'zxing_cli', 'metadata', or 'none',
             'confidence': float (0.0 to 1.0),
             'rect': dict or None,
             'decoded': bool,
-            'source': 'visual' or 'metadata'
+            'source': 'visual' or 'metadata',
+            'barcode_type': str or None,
+            'attempts': list of decoder names attempted,
+            'roi_size': tuple of (width, height),
+            'decode_time_ms': float
         }
     """
+    import time
+    start_time = time.time()
+    
     result = {
         'document_id': None,
         'decoder': 'none',
         'confidence': 0.0,
         'rect': None,
         'decoded': False,
-        'source': 'none'
+        'source': 'none',
+        'barcode_type': None,
+        'attempts': [],
+        'roi_size': None,
+        'decode_time_ms': 0.0
     }
     
     # Extract ROI
     try:
         roi, roi_rect = extract_barcode_roi(image, barcode_coords, mm_to_px_ratio)
         result['rect'] = roi_rect
+        result['roi_size'] = (roi_rect['width'], roi_rect['height'])
     except Exception as e:
-        print(f"Failed to extract barcode ROI: {e}")
+        import sys
+        print(f"Failed to extract barcode ROI: {e}", file=sys.stderr)
+        result['attempts'].append('roi_extraction_failed')
         # Fall back to metadata immediately if ROI extraction fails
         if metadata_fallback:
             result['document_id'] = metadata_fallback
@@ -331,12 +346,14 @@ def decode_barcode(
             result['confidence'] = 1.0
             result['decoded'] = True
             result['source'] = 'metadata'
+        result['decode_time_ms'] = (time.time() - start_time) * 1000
         return result
     
     # Preprocess ROI
     roi_processed = preprocess_roi(roi)
     
     # Try pyzbar first (supports Code128, QR, Code39, etc.)
+    result['attempts'].append('pyzbar')
     decode_result = decode_pdf417_pyzbar(roi_processed)
     if decode_result:
         result['document_id'] = decode_result['data']
@@ -344,9 +361,12 @@ def decode_barcode(
         result['confidence'] = decode_result['confidence']
         result['decoded'] = True
         result['source'] = 'visual'
+        result['barcode_type'] = decode_result['type']
+        result['decode_time_ms'] = (time.time() - start_time) * 1000
         return result
     
     # Try pyzxing fallback (supports PDF417, requires Java)
+    result['attempts'].append('pyzxing')
     decode_result = decode_pdf417_pyzxing(roi_processed)
     if decode_result:
         result['document_id'] = decode_result['data']
@@ -354,9 +374,12 @@ def decode_barcode(
         result['confidence'] = decode_result['confidence']
         result['decoded'] = True
         result['source'] = 'visual'
+        result['barcode_type'] = decode_result['type']
+        result['decode_time_ms'] = (time.time() - start_time) * 1000
         return result
     
     # Try ZXing CLI fallback (if installed)
+    result['attempts'].append('zxing_cli')
     decode_result = decode_pdf417_zxing(roi_processed)
     if decode_result:
         result['document_id'] = decode_result['data']
@@ -364,9 +387,12 @@ def decode_barcode(
         result['confidence'] = decode_result['confidence']
         result['decoded'] = True
         result['source'] = 'visual'
+        result['barcode_type'] = decode_result['type']
+        result['decode_time_ms'] = (time.time() - start_time) * 1000
         return result
     
     # Fall back to metadata if visual decode failed
+    result['attempts'].append('metadata_fallback')
     if metadata_fallback:
         result['document_id'] = metadata_fallback
         result['decoder'] = 'metadata'
@@ -374,6 +400,7 @@ def decode_barcode(
         result['decoded'] = True
         result['source'] = 'metadata'
     
+    result['decode_time_ms'] = (time.time() - start_time) * 1000
     return result
 
 
