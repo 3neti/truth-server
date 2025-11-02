@@ -178,10 +178,95 @@ for scenario_type in "${SCENARIOS[@]}"; do
         ${INTENSITY:+--intensity=$INTENSITY} \
         2>&1 | tail -1)
     
+    if [[ $? -ne 0 ]]; then
+        log_error "  Failed to fill bubbles"
+        ((scenario_count++))
+        continue
+    fi
+    
+    # Get threshold configuration from Laravel
+    DETECTION_THRESHOLD=$(php artisan tinker --execute="echo config('omr-thresholds.detection_threshold');" 2>/dev/null | tail -1 || echo "0.3")
+    VALID_MARK=$(php artisan tinker --execute="echo config('omr-thresholds.classification.valid_mark');" 2>/dev/null | tail -1 || echo "0.95")
+    AMBIGUOUS_MIN=$(php artisan tinker --execute="echo config('omr-thresholds.classification.ambiguous_min');" 2>/dev/null | tail -1 || echo "0.15")
+    AMBIGUOUS_MAX=$(php artisan tinker --execute="echo config('omr-thresholds.classification.ambiguous_max');" 2>/dev/null | tail -1 || echo "0.45")
+    FAINT_MARK=$(php artisan tinker --execute="echo config('omr-thresholds.classification.faint_mark');" 2>/dev/null | tail -1 || echo "0.16")
+    
+    # Create scenario.json with metadata
+    cat > "${scenario_dir}/scenario.json" <<SCENARIO_META
+{
+  "scenario_id": "${scenario_name}",
+  "scenario_type": "${scenario_type}",
+  "description": "${DESCRIPTION}",
+  "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+  "configuration": {
+    "thresholds": {
+      "detection_threshold": ${DETECTION_THRESHOLD},
+      "valid_mark": ${VALID_MARK},
+      "ambiguous_min": ${AMBIGUOUS_MIN},
+      "ambiguous_max": ${AMBIGUOUS_MAX},
+      "faint_mark": ${FAINT_MARK}
+    },
+    "fill_intensity": ${INTENSITY:-1.0},
+    "bubbles_filled": [
+$(echo "$BUBBLES" | tr ',' '\n' | sed 's/^/      "/;s/$/",/' | sed '$ s/,$//')
+    ]
+  }
+}
+SCENARIO_META
+    
+    # Run appreciation
+    log_info "  Running appreciation (threshold: ${DETECTION_THRESHOLD})..."
+    php artisan simulation:appreciate \
+        "${scenario_dir}/blank_filled.png" \
+        "$COORDS_JSON" \
+        --output="${scenario_dir}/results.json" \
+        --no-align \
+        > /dev/null 2>&1
+    
     if [[ $? -eq 0 ]]; then
-        log_success "  Scenario $scenario_name created"
+        # Count filled bubbles from results JSON
+        FILLED_COUNT=$(jq '[.results[] | select(.filled == true)] | length' "${scenario_dir}/results.json")
+        log_success "  Detected $FILLED_COUNT filled bubbles"
+        
+        # Extract detected votes (filled bubbles) to votes.json
+        jq '{
+          "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ")),
+          "detected_votes": [
+            .results[] | select(.filled == true) | {
+              "bubble_id": .id,
+              "fill_ratio": .fill_ratio,
+              "confidence": .confidence,
+              "warnings": .warnings
+            }
+          ],
+          "summary": {
+            "total_bubbles": (.results | length),
+            "filled_bubbles": ([.results[] | select(.filled == true)] | length),
+            "unfilled_bubbles": ([.results[] | select(.filled == false)] | length)
+          }
+        }' "${scenario_dir}/results.json" > "${scenario_dir}/votes.json"
+        
+        log_success "  Votes extracted: votes.json"
     else
-        log_error "  Failed to create scenario $scenario_name"
+        log_error "  Appreciation failed"
+        ((scenario_count++))
+        continue
+    fi
+    
+    # Create overlay
+    log_info "  Creating overlay..."
+    php artisan simulation:create-overlay \
+        "${scenario_dir}/blank_filled.png" \
+        "${scenario_dir}/results.json" \
+        "$COORDS_JSON" \
+        "${scenario_dir}/overlay.png" \
+        --document-id=SIM-QUESTIONNAIRE-001 \
+        --show-legend > /dev/null 2>&1
+    
+    if [[ $? -eq 0 ]]; then
+        log_success "  Overlay created: overlay.png"
+    else
+        log_warning "  Overlay generation failed (continuing...)"
     fi
     
     ((scenario_count++))
