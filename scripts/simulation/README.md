@@ -128,6 +128,7 @@ OPTIONS:
     -l, --list-scenarios    List available scenario types
     -f, --fresh             Start fresh (remove existing output)
     -v, --verbose           Enable verbose logging
+    --cast-ballots          Cast ballots to Laravel (election:cast)
     -h, --help              Show help message
 ```
 
@@ -148,6 +149,11 @@ OPTIONS:
 
 # Verbose mode for debugging
 ./scripts/simulation/run-simulation.sh --verbose
+
+# Cast ballots to Laravel election system
+./scripts/simulation/run-simulation.sh \
+  --scenarios normal \
+  --cast-ballots
 ```
 
 ## Scenario Types
@@ -195,6 +201,10 @@ storage/app/private/simulation/
 │   │   ├── coordinates.json      # Ballot coordinates
 │   │   ├── ballot.png            # Rendered ballot image
 │   │   ├── appreciation_results.json  # Detection results
+│   │   ├── votes.json            # Enriched votes with ballot_cast_format
+│   │   ├── ballot-cast-format.txt     # Compact ballot string
+│   │   ├── ballot-cast.sh        # Executable cast command
+│   │   ├── ballot-cast-output.log     # Laravel cast output (if --cast-ballots)
 │   │   ├── overlay.png           # Visual overlay
 │   │   ├── render.log            # Rendering log
 │   │   ├── appreciate.log        # Appreciation log
@@ -331,6 +341,75 @@ pip3 install pillow opencv-python numpy
 The framework integrates with Laravel commands:
 - `php artisan election:generate-template`: Generate coordinates from config
 
+## Ballot Cast Format Integration
+
+The simulation framework now generates compact ballot strings compatible with Laravel's `election:cast-ballot` command, enabling seamless integration between CV ballot processing and the Laravel election system.
+
+### Format Specification
+
+```
+BALLOT-ID|POSITION:CODE1,CODE2;POSITION2:CODE3
+```
+
+**Example:**
+```
+SIM-QUESTIONNAIRE-001|PUNONG-BARANGAY:KANDIDATO-1_001;KAGAWAD:KANDIDATO-5_005,KANDIDATO-6_006
+```
+
+### Usage
+
+**Generate format without casting:**
+```bash
+./scripts/simulation/run-simulation-laravel.sh --scenarios normal
+```
+
+The `votes.json` file will include a `ballot_cast_format` field.
+
+**Generate and cast to Laravel:**
+```bash
+./scripts/simulation/run-simulation-laravel.sh --scenarios normal --cast-ballots
+```
+
+This automatically:
+1. Runs ballot appreciation
+2. Enriches votes with candidate information
+3. Generates compact ballot string
+4. Executes `echo "..." | php artisan election:cast`
+5. Logs output to `ballot-cast-output.log`
+
+### Output Files
+
+When using `--cast-ballots`, each scenario generates:
+
+- **ballot-cast-format.txt**: Raw ballot string
+- **ballot-cast.sh**: Executable shell command
+- **ballot-cast-output.log**: Laravel command output
+- **votes.json**: Includes `ballot_cast_format` field
+
+### Manual Casting
+
+You can also manually cast ballots from generated files:
+
+```bash
+# Execute the generated script
+bash storage/app/private/simulation/latest/scenarios/scenario-1-normal/ballot-cast.sh
+
+# Or extract and pipe directly
+cat storage/.../votes.json | jq -r '.ballot_cast_format' | \
+  xargs -I {} echo "{}" | php artisan election:cast
+```
+
+### Testing
+
+Test the integration with:
+```bash
+./scripts/test-ballot-cast-integration.sh
+```
+
+See also:
+- [Ballot Cast Format Guide](../../packages/omr-appreciation/BALLOT_CAST_FORMAT.md)
+- [Quick Reference](../../packages/omr-appreciation/QUICK_REFERENCE.md)
+
 ## Integration with Truth System
 
 This simulation framework integrates with the Truth election system:
@@ -339,6 +418,7 @@ This simulation framework integrates with the Truth election system:
 2. **Laravel Commands**: Calls Laravel artisan commands for template generation
 3. **Data Structures**: Outputs match TruthElection package formats
 4. **Validation**: Tests match real ballot appreciation workflows
+5. **Ballot Casting**: Generates compact format for Laravel election commands
 
 ## Troubleshooting
 

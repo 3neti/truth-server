@@ -29,6 +29,7 @@ CONFIG_DIR="$DEFAULT_CONFIG_DIR"
 SCENARIOS=("${DEFAULT_SCENARIOS[@]}")
 FRESH_RUN=false
 VERBOSE=false
+CASTBALLOTS=false  # New flag to cast ballots to Laravel
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -53,6 +54,10 @@ while [[ $# -gt 0 ]]; do
             export LOG_LEVEL=DEBUG
             shift
             ;;
+        --cast-ballots)
+            CAST_BALLOTS=true
+            shift
+            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -62,6 +67,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -s, --scenarios LIST    Comma-separated scenarios"
             echo "  -f, --fresh             Start fresh"
             echo "  -v, --verbose           Verbose output"
+            echo "  --cast-ballots          Cast ballots to Laravel election:cast"
             exit 0
             ;;
         *)
@@ -464,6 +470,35 @@ SCENARIO_META
         
         if [[ $? -eq 0 ]]; then
             log_success "  Votes enriched: votes.json"
+            
+            # Generate ballot cast format if flag enabled
+            if [[ "${CAST_BALLOTS:-false}" == "true" ]]; then
+                log_info "  Generating ballot cast format..."
+                
+                # Extract ballot_cast_format from votes.json
+                BALLOT_CAST_FORMAT=$(jq -r '.ballot_cast_format // empty' "${scenario_dir}/votes.json" 2>/dev/null)
+                
+                if [[ -n "$BALLOT_CAST_FORMAT" ]]; then
+                    log_success "  Format: $BALLOT_CAST_FORMAT"
+                    
+                    # Save to file for reference
+                    echo "$BALLOT_CAST_FORMAT" > "${scenario_dir}/ballot-cast-format.txt"
+                    
+                    # Generate Laravel command
+                    CAST_COMMAND="echo \"$BALLOT_CAST_FORMAT\" | php artisan election:cast"
+                    echo "$CAST_COMMAND" > "${scenario_dir}/ballot-cast.sh"
+                    chmod +x "${scenario_dir}/ballot-cast.sh"
+                    
+                    log_info "  Casting ballot to Laravel..."
+                    if eval "$CAST_COMMAND" > "${scenario_dir}/ballot-cast-output.log" 2>&1; then
+                        log_success "  ✓ Ballot cast successfully"
+                    else
+                        log_error "  ✗ Ballot cast failed (see ballot-cast-output.log)"
+                    fi
+                else
+                    log_warning "  No ballot_cast_format found in votes.json"
+                fi
+            fi
         else
             log_warning "  Vote enrichment failed (continuing...)"
         fi

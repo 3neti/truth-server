@@ -15,6 +15,42 @@ from barcode_decoder import decode_barcode
 from bubble_metadata import load_bubble_metadata
 
 
+def generate_ballot_cast_format(document_id: str, results: list) -> str:
+    """Generate compact ballot format for Laravel election:cast-ballot command.
+    
+    Args:
+        document_id: Ballot ID (e.g., 'BAL-001')
+        results: List of mark detection results
+        
+    Returns:
+        Compact ballot string in format:
+        "BAL-001|POSITION1:CODE1,CODE2;POSITION2:CODE3"
+    """
+    # Group filled marks by contest/position
+    positions = {}
+    for result in results:
+        if result.get('filled', False):
+            contest = result.get('contest', '')
+            code = result.get('code', '')
+            
+            if contest and code:
+                if contest not in positions:
+                    positions[contest] = []
+                positions[contest].append(code)
+    
+    # Build compact format: POSITION:CODE1,CODE2;POSITION2:CODE3
+    position_strings = []
+    for position, codes in sorted(positions.items()):
+        codes_str = ','.join(codes)
+        position_strings.append(f"{position}:{codes_str}")
+    
+    # Join with semicolons
+    ballot_votes = ';'.join(position_strings)
+    
+    # Final format: BALLOT-ID|VOTES
+    return f"{document_id}|{ballot_votes}"
+
+
 def main():
     """Main entry point for OMR appreciation."""
     parser = argparse.ArgumentParser(
@@ -162,9 +198,15 @@ def main():
         sys.exit(1)
     
     # Prepare output
+    document_id = barcode_result['document_id'] if barcode_result and barcode_result['decoded'] else template.get('document_id', '')
+    
+    # Generate compact ballot cast format
+    ballot_cast_format = generate_ballot_cast_format(document_id, results)
+    
     output = {
-        'document_id': barcode_result['document_id'] if barcode_result and barcode_result['decoded'] else template.get('document_id', ''),
+        'document_id': document_id,
         'template_id': template.get('template_id', ''),
+        'ballot_cast_format': ballot_cast_format,
         'results': results
     }
     

@@ -111,9 +111,17 @@ class EnrichVotesCommand extends Command
             $enrichedVotes[] = $enrichedVote;
         }
 
+        // Generate ballot cast format
+        $ballotCastFormat = $this->generateBallotCastFormat(
+            $results['document_id'] ?? 'UNKNOWN',
+            $enrichedVotes
+        );
+
         // Build output
         $enrichedOutput = [
             'timestamp' => date('c'),
+            'document_id' => $results['document_id'] ?? 'UNKNOWN',
+            'ballot_cast_format' => $ballotCastFormat,
             'detected_votes' => $enrichedVotes,
             'summary' => [
                 'total_bubbles' => count($bubbleResults),
@@ -205,5 +213,42 @@ class EnrichVotesCommand extends Command
         // For other formats, try to extract key
         // (Could be extended for other ID formats)
         return null;
+    }
+
+    /**
+     * Generate compact ballot cast format for Laravel election:cast-ballot
+     * Format: "BALLOT-ID|POSITION:CODE1,CODE2;POSITION2:CODE3"
+     */
+    protected function generateBallotCastFormat(string $documentId, array $enrichedVotes): string
+    {
+        // Group votes by position
+        $positions = [];
+        foreach ($enrichedVotes as $vote) {
+            $position = $vote['position'] ?? null;
+            $value = $vote['value'] ?? null;
+
+            if ($position && $value) {
+                if (!isset($positions[$position])) {
+                    $positions[$position] = [];
+                }
+                $positions[$position][] = $value;
+            }
+        }
+
+        // Sort positions alphabetically for consistency
+        ksort($positions);
+
+        // Build position strings: POSITION:CODE1,CODE2
+        $positionStrings = [];
+        foreach ($positions as $position => $codes) {
+            $codesStr = implode(',', $codes);
+            $positionStrings[] = "{$position}:{$codesStr}";
+        }
+
+        // Join with semicolons
+        $ballotVotes = implode(';', $positionStrings);
+
+        // Final format: BALLOT-ID|VOTES
+        return "{$documentId}|{$ballotVotes}";
     }
 }

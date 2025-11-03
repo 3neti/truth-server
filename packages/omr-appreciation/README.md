@@ -8,6 +8,8 @@
 - ✅ **Image Alignment**: Basic scaling/alignment based on fiducials
 - ✅ **Mark Detection**: Detect filled marks in defined zones using pixel density
 - ✅ **Confidence Scoring**: Calculate confidence levels for each detection
+- ✅ **Ballot Cast Format**: Generate compact strings for Laravel election commands
+- ✅ **Barcode Decoding**: Extract ballot IDs from QR codes and barcodes
 - ✅ **Artisan Command**: Easy CLI interface for document appreciation
 
 ## Installation
@@ -19,6 +21,25 @@ composer require lbhurtado/omr-appreciation
 ```
 
 ## Usage
+
+### Quick Start: CV Appreciation → Laravel Integration
+
+```bash
+# 1. Appreciate ballot and generate compact format
+cd packages/omr-appreciation/omr-python
+python appreciate.py ballot.png template.json --config-path config/ > votes.json
+
+# 2. Extract and cast ballot to Laravel
+python extract_ballot_cast.py votes.json --pipe-mode | bash
+
+# One-line version:
+python appreciate.py ballot.png template.json --config-path config/ | \
+  python extract_ballot_cast.py /dev/stdin --pipe-mode | bash
+```
+
+**Output Format:** `BAL-001|PRESIDENT:AJ_006;SENATOR:ES_002,LN_048`
+
+📖 **See [BALLOT_CAST_FORMAT.md](BALLOT_CAST_FORMAT.md) for complete integration guide**
 
 ### Via Artisan Command
 
